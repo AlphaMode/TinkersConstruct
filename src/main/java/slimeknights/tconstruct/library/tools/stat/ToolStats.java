@@ -31,6 +31,15 @@ public class ToolStats {
   /** Mining level for breaking blocks */
   public static final TierToolStat HARVEST_LEVEL = register(new TierToolStat(name("harvest_level"), HarvestLevels.WOOD, HarvestLevels::getHarvestLevelName));
 
+  // armor
+  /** Main armor value */
+  public static final FloatToolStat ARMOR = register(new FloatToolStat(name("armor"), 0xFF8547CC, 0, 0, 30));
+  /** Hidden toughness value */
+  public static final FloatToolStat ARMOR_TOUGHNESS = register(new FloatToolStat(name("armor_toughness"), 0xFF8547CC, 0, 0, 20));
+  /** Knockback resistance percentage */
+  public static final FloatToolStat KNOCKBACK_RESISTANCE = register(new FloatToolStat(name("knockback_resistance"), 0xFF8547CC, 0, 0, 1));
+  
+
   /**
    * Gets the tool stat for the given name
    * @param name  Name

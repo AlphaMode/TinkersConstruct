@@ -29,7 +29,7 @@ import java.util.stream.IntStream;
  * Contains information about what's needed to craft the tool, how it behaves...
  */
 public class ToolDefinition {
-  public static final ToolDefinition EMPTY = new ToolDefinition(new ToolBaseStatDefinition.Builder().build(), Collections::emptyList, Collections::emptyList);
+  public static final ToolDefinition EMPTY = new ToolDefinition(ToolBaseStatDefinition.builder().build(), Collections::emptyList, Collections::emptyList);
   /** Stat builder for tools with no parts */
   public static final BiFunction<ToolDefinition,List<IMaterial>,? extends ToolStatsBuilder> NO_PARTS_STATS_BUILDER = (definition, materials) -> ToolStatsBuilder.noParts(definition);
   /** Default stat builder for melee and harvest tools */

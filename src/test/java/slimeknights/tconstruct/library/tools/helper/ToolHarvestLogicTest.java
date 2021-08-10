@@ -79,7 +79,7 @@ class ToolHarvestLogicTest extends ToolItemTest {
     IModifiable toolWithMiningModifier = new HarvestTool(
       new Item.Properties().addToolType(ToolType.PICKAXE, 1),
       new ToolDefinition(
-        new ToolBaseStatDefinition.Builder().modifier(ToolStats.MINING_SPEED, modifier).build(),
+        ToolBaseStatDefinition.builder().modifier(ToolStats.MINING_SPEED, modifier).build(),
         () -> ImmutableList.of(MaterialItemFixture.MATERIAL_ITEM_HEAD, MaterialItemFixture.MATERIAL_ITEM_HANDLE, MaterialItemFixture.MATERIAL_ITEM_EXTRA),
         Collections::emptyList
       ));

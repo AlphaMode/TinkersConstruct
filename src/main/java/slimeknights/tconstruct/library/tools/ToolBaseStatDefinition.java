@@ -104,6 +104,11 @@ public final class ToolBaseStatDefinition {
     return getStartingSlots(SlotType.SOUL);
   }
 
+  /** Creates a new builder instance */
+  public static Builder builder() {
+    return new Builder();
+  }
+
   /** Tool stat builder */
   public static class Builder {
     private boolean setUpgrades = false;
@@ -115,6 +120,10 @@ public final class ToolBaseStatDefinition {
     // stats
     private final ImmutableMap.Builder<FloatToolStat,Float> bonuses = ImmutableMap.builder();
     private final ImmutableMap.Builder<FloatToolStat,Float> modifiers = ImmutableMap.builder();
+
+    /** @deprecated use {@link ToolBaseStatDefinition#builder()} */
+    @Deprecated
+    public Builder() {}
 
     /**
      * Sets the starting slot count for the given slot
