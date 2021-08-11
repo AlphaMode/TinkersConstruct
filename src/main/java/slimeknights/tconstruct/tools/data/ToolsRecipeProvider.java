@@ -3,6 +3,7 @@ package slimeknights.tconstruct.tools.data;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
+import net.minecraft.data.ShapedRecipeBuilder;
 import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -27,6 +28,7 @@ import slimeknights.tconstruct.shared.TinkerMaterials;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import slimeknights.tconstruct.tools.TinkerToolParts;
 import slimeknights.tconstruct.tools.TinkerTools;
+import slimeknights.tconstruct.tools.item.ArmorSlotType;
 import slimeknights.tconstruct.world.TinkerWorld;
 
 import java.util.function.Consumer;
@@ -52,6 +54,8 @@ public class ToolsRecipeProvider extends BaseRecipeProvider implements IMaterial
   private void addToolBuildingRecipes(Consumer<IFinishedRecipe> consumer) {
     String folder = "tools/building/";
     String repairFolder = "tools/repair/";
+    String armorFolder = "armor/building/";
+    String armorRepairFolder = "armor/repair/";
     // stone
     toolBuilding(consumer, TinkerTools.pickaxe, folder);
     toolBuilding(consumer, TinkerTools.sledgeHammer, folder);
@@ -79,6 +83,43 @@ public class ToolsRecipeProvider extends BaseRecipeProvider implements IMaterial
     SpecializedRepairRecipeBuilder.repair(TinkerTools.flintAndBronze, MaterialIds.tinkersBronze)
                                   .buildRepairKit(consumer, wrap(TinkerTools.flintAndBronze, repairFolder, "_repair_kit"))
                                   .build(consumer, wrap(TinkerTools.flintAndBronze, repairFolder, "_station"));
+
+    // travelers gear
+    ShapedRecipeBuilder.shapedRecipe(TinkerTools.travelersGear.get(ArmorSlotType.HELMET))
+                       .patternLine("l l")
+                       .patternLine("glg")
+                       .patternLine("c c")
+                       .key('c', TinkerMaterials.copper.getIngotTag())
+                       .key('l', Tags.Items.LEATHER)
+                       .key('g', Tags.Items.GLASS_PANES_COLORLESS)
+                       .addCriterion("has_item", hasItem(TinkerMaterials.copper.getIngotTag()))
+                       .build(consumer, modResource(armorFolder + "travelers_goggles"));
+    ShapedRecipeBuilder.shapedRecipe(TinkerTools.travelersGear.get(ArmorSlotType.CHESTPLATE))
+                       .patternLine("l l")
+                       .patternLine("lcl")
+                       .patternLine("lcl")
+                       .key('c', TinkerMaterials.copper.getIngotTag())
+                       .key('l', Tags.Items.LEATHER)
+                       .addCriterion("has_item", hasItem(TinkerMaterials.copper.getIngotTag()))
+                       .build(consumer, modResource(armorFolder + "travelers_chestplate"));
+    ShapedRecipeBuilder.shapedRecipe(TinkerTools.travelersGear.get(ArmorSlotType.LEGGINGS))
+                       .patternLine("lll")
+                       .patternLine("c c")
+                       .patternLine("l l")
+                       .key('c', TinkerMaterials.copper.getIngotTag())
+                       .key('l', Tags.Items.LEATHER)
+                       .addCriterion("has_item", hasItem(TinkerMaterials.copper.getIngotTag()))
+                       .build(consumer, modResource(armorFolder + "travelers_pants"));
+    ShapedRecipeBuilder.shapedRecipe(TinkerTools.travelersGear.get(ArmorSlotType.BOOTS))
+                       .patternLine("c c")
+                       .patternLine("l l")
+                       .key('c', TinkerMaterials.copper.getIngotTag())
+                       .key('l', Tags.Items.LEATHER)
+                       .addCriterion("has_item", hasItem(TinkerMaterials.copper.getIngotTag()))
+                       .build(consumer, modResource(armorFolder + "travelers_boots"));
+    SpecializedRepairRecipeBuilder.repair(Ingredient.fromStacks(TinkerTools.travelersGear.values().stream().map(ItemStack::new)), MaterialIds.copper)
+                                  .buildRepairKit(consumer, modResource(armorRepairFolder + "travelers_repair_kit"))
+                                  .build(consumer, modResource(armorRepairFolder + "travelers_station"));
   }
 
   private void addPartRecipes(Consumer<IFinishedRecipe> consumer) {

@@ -10,8 +10,8 @@ public class ArmorDefinitions {
   /** Balanced armor set */
   public static final ModifiableArmorMaterial TRAVELERS = ModifiableArmorMaterial
     .builder(TConstruct.getResource("travelers"))
-    .setDurabilityFactor(5)
-    .set(ToolStats.ARMOR, 1, 4, 5, 1)
+    .setDurabilityFactor(10)
+    .set(ToolStats.ARMOR, 1, 4, 5, 2)
     .startingSlots(SlotType.UPGRADE, 3)
     .startingSlots(SlotType.ARMOR, 3)
     .startingSlots(SlotType.ABILITY, 1)
