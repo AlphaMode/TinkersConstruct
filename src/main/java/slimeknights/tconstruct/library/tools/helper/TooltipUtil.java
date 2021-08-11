@@ -175,6 +175,35 @@ public class TooltipUtil {
   }
 
   /**
+   * Gets the  default information for the given tool stack
+   *
+   * @param tool      the tool stack
+   * @param tooltip   Tooltip list
+   * @param flag      Tooltip flag
+   * @return List from the parameter after filling
+   */
+  public static List<ITextComponent> getArmorStats(IModifierToolStack tool, List<ITextComponent> tooltip, TooltipFlag flag) {
+    TooltipBuilder builder = new TooltipBuilder(tool, tooltip);
+    Item item = tool.getItem();
+    if (TinkerTags.Items.DURABILITY.contains(item)) {
+      builder.addDurability();
+    }
+    if (TinkerTags.Items.ARMOR.contains(item)) {
+      builder.add(ToolStats.ARMOR);
+      builder.addOptional(ToolStats.ARMOR_TOUGHNESS);
+      builder.addOptional(ToolStats.KNOCKBACK_RESISTANCE);
+    }
+
+    builder.addAllFreeSlots();
+
+    for (ModifierEntry entry : tool.getModifierList()) {
+      entry.getModifier().addInformation(tool, entry.getLevel(), tooltip, flag);
+    }
+
+    return builder.getTooltips();
+  }
+
+  /**
    * Gets the tooltip of the components list of a tool
    * @param item      Modifiable item instance
    * @param stack     Item stack being displayed

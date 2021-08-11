@@ -24,7 +24,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.IndestructibleItemEntity;
@@ -34,9 +33,11 @@ import slimeknights.tconstruct.library.tools.capability.ToolCapabilityProvider;
 import slimeknights.tconstruct.library.tools.helper.ToolBuildHandler;
 import slimeknights.tconstruct.library.tools.helper.ToolDamageUtil;
 import slimeknights.tconstruct.library.tools.helper.TooltipUtil;
+import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 import slimeknights.tconstruct.library.tools.nbt.StatsNBT;
 import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
+import slimeknights.tconstruct.library.utils.TooltipFlag;
 import slimeknights.tconstruct.library.utils.TooltipKey;
 
 import javax.annotation.Nullable;
@@ -228,15 +229,13 @@ public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay
     ToolStack tool = ToolStack.from(stack);
     if (!tool.isBroken()) {
       // base stats
-      if (slot == EquipmentSlotType.MAINHAND) {
-        StatsNBT statsNBT = tool.getStats();
-        UUID uuid = ARMOR_MODIFIERS[slot.getIndex()];
-        builder.put(Attributes.ARMOR, new AttributeModifier(uuid, "tconstruct.armor.armor", statsNBT.getFloat(ToolStats.ARMOR), AttributeModifier.Operation.ADDITION));
-        builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(uuid, "tconstruct.armor.toughness", statsNBT.getFloat(ToolStats.ARMOR_TOUGHNESS), AttributeModifier.Operation.ADDITION));
-        double toughness = statsNBT.getFloat(ToolStats.KNOCKBACK_RESISTANCE);
-        if (toughness != 0) {
-          builder.put(ForgeMod.REACH_DISTANCE.get(), new AttributeModifier(uuid, "tconstruct.armor.knockback_resistance", toughness, AttributeModifier.Operation.ADDITION));
-        }
+      StatsNBT statsNBT = tool.getStats();
+      UUID uuid = ARMOR_MODIFIERS[slot.getIndex()];
+      builder.put(Attributes.ARMOR, new AttributeModifier(uuid, "tconstruct.armor.armor", statsNBT.getFloat(ToolStats.ARMOR), AttributeModifier.Operation.ADDITION));
+      builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(uuid, "tconstruct.armor.toughness", statsNBT.getFloat(ToolStats.ARMOR_TOUGHNESS), AttributeModifier.Operation.ADDITION));
+      double toughness = statsNBT.getFloat(ToolStats.KNOCKBACK_RESISTANCE);
+      if (toughness != 0) {
+        builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(uuid, "tconstruct.armor.knockback_resistance", toughness, AttributeModifier.Operation.ADDITION));
       }
       // grab attributes from modifiers
       BiConsumer<Attribute,AttributeModifier> attributeConsumer = builder::put;
@@ -297,6 +296,10 @@ public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay
     TooltipUtil.addInformation(this, stack, tooltip, TooltipKey.fromScreen(), flagIn == TooltipFlags.ADVANCED);
   }
 
+  @Override
+  public List<ITextComponent> getStatInformation(IModifierToolStack tool, List<ITextComponent> tooltips, TooltipFlag tooltipFlag) {
+    return TooltipUtil.getArmorStats(tool, tooltips, tooltipFlag);
+  }
 
   /* Display items */
 

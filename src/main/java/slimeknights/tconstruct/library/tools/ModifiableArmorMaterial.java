@@ -293,7 +293,7 @@ public class ModifiableArmorMaterial implements IArmorMaterial {
      */
     public StatsBuilder setDurabilityFactor(float maxDamageFactor) {
       for (EquipmentSlotType slotType : ARMOR_SLOTS) {
-        set(ToolStats.DURABILITY, MAX_DAMAGE_ARRAY[slotType.getIndex()] * maxDamageFactor);
+        set(slotType, ToolStats.DURABILITY, MAX_DAMAGE_ARRAY[slotType.getIndex()] * maxDamageFactor);
       }
       return this;
     }
