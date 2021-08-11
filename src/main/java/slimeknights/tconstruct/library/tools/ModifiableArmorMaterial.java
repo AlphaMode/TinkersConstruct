@@ -23,7 +23,7 @@ public class ModifiableArmorMaterial implements IArmorMaterial {
   // copy of the vanilla array for the builder
   private static final int[] MAX_DAMAGE_ARRAY = {13, 15, 16, 11};
   /** Array of all four armor slot types */
-  private static final EquipmentSlotType[] ARMOR_SLOTS = {EquipmentSlotType.FEET, EquipmentSlotType.LEGS, EquipmentSlotType.CHEST, EquipmentSlotType.HEAD};
+  public static final EquipmentSlotType[] ARMOR_SLOTS = {EquipmentSlotType.FEET, EquipmentSlotType.LEGS, EquipmentSlotType.CHEST, EquipmentSlotType.HEAD};
 
   /** Namespaced name of the armor */
   private final ResourceLocation name;
