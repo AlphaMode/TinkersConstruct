@@ -8,18 +8,22 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemStack.TooltipDisplayFlags;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.TriPredicate;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.context.ToolHarvestContext;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 import slimeknights.tconstruct.library.tools.nbt.ToolStack;
+import slimeknights.tconstruct.library.utils.InventoryType;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.BiConsumer;
@@ -108,6 +112,66 @@ public final class ModifierUtil {
                                         rand.nextFloat() * 0.05F,
                                         (rand.nextFloat() - rand.nextFloat()) * 0.1F));
       world.addEntity(ent);
+    }
+  }
+
+  /**
+   * Ticks the item in the inventory
+   * @param stack         Stack to tick
+   * @param world         World with the item
+   * @param entity        Entity holding the item
+   * @param itemSlot      Slot containing the item
+   * @param isSelected    Potentially wrong isSelected description of the item
+   * @param correctSlot   Predicate to check if this slot is correct for the item
+   */
+  public static void inventoryTick(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected, TriPredicate<InventoryType, Integer, Boolean> correctSlot) {
+    // don't care about non-living, they skip most tool context
+    if (entity instanceof LivingEntity) {
+      // if no modifiers, can skip a big chunk of logic
+      ToolStack tool = ToolStack.from(stack);
+      List<ModifierEntry> modifiers = tool.getModifierList();
+      if (!modifiers.isEmpty()) {
+        // determine which inventory contains the stack
+        InventoryType inventoryType;
+        LivingEntity living = (LivingEntity) entity;
+        boolean isMainHand = false;
+        if (entity instanceof PlayerEntity) {
+          PlayerInventory inventory = ((PlayerEntity) entity).inventory;
+          // if the index is large, must be main
+          if (itemSlot >= 4) {
+            inventoryType = InventoryType.MAIN;
+          } else {
+            // vanilla isSelected is stupid, only checks the index and not the inventory so armor could be "selected"
+            // only 0 can be the offhand
+            if (itemSlot == 0 && living.getHeldItemOffhand() == stack) {
+              inventoryType = InventoryType.OFFHAND;
+            } else if (inventory.armorItemInSlot(itemSlot) == stack) {
+              inventoryType = InventoryType.ARMOR;
+            } else {
+              inventoryType = InventoryType.MAIN;
+              isMainHand = isSelected;
+            }
+          }
+        } else {
+          // treating hands as first inventory, armor as second like most mobs
+          // if your mob ticks differently, let me know and we can figure out a solution
+          if ((itemSlot == 0 && living.getHeldItemMainhand() == stack)) {
+            inventoryType = InventoryType.HANDS;
+            isMainHand = true;
+          } else if (itemSlot == 1 && living.getHeldItemOffhand() == stack) {
+            inventoryType = InventoryType.HANDS;
+          } else {
+            inventoryType = InventoryType.ARMOR;
+          }
+        }
+        // determine if the slot is correct
+        boolean isCorrectSlot = correctSlot.test(inventoryType, itemSlot, isMainHand);
+
+        // we pass in the stack for most custom context, but for the sake of armor its easier to tell them that this is the correct slot for effects
+        for (ModifierEntry entry : modifiers) {
+          entry.getModifier().onInventoryTick(tool, entry.getLevel(), world, living, inventoryType, itemSlot, isMainHand, isCorrectSlot, stack);
+        }
+      }
     }
   }
 }

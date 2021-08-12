@@ -32,10 +32,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.TriPredicate;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.IndestructibleItemEntity;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
 import slimeknights.tconstruct.library.tools.capability.ToolCapabilityProvider;
+import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 import slimeknights.tconstruct.library.tools.helper.ToolAttackUtil;
 import slimeknights.tconstruct.library.tools.helper.ToolBuildHandler;
 import slimeknights.tconstruct.library.tools.helper.ToolDamageUtil;
@@ -43,6 +45,7 @@ import slimeknights.tconstruct.library.tools.helper.TooltipUtil;
 import slimeknights.tconstruct.library.tools.nbt.StatsNBT;
 import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
+import slimeknights.tconstruct.library.utils.InventoryType;
 import slimeknights.tconstruct.library.utils.TooltipKey;
 
 import javax.annotation.Nullable;
@@ -58,6 +61,8 @@ import java.util.function.Consumer;
  */
 public class ModifiableItem extends Item implements IModifiableDisplay, IModifiableWeapon {
   protected static final UUID REACH_MODIFIER = UUID.fromString("9b26fa32-5774-4b4e-afc3-b4055ecb1f6a");
+  /** Predicate to check if this item is in the correct slot */
+  private static final TriPredicate<InventoryType,Integer,Boolean> CORRECT_SLOT_PREDICATE = (inv, slot, selected) -> selected || inv == InventoryType.OFFHAND || inv == InventoryType.HANDS;
 
   /** Tool definition for the given tool */
   @Getter
@@ -253,21 +258,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
 
   @Override
   public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-    super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
-
-    // don't care about non-living, they skip most tool context
-    if (entityIn instanceof LivingEntity) {
-      ToolStack tool = ToolStack.from(stack);
-      List<ModifierEntry> modifiers = tool.getModifierList();
-      if (!modifiers.isEmpty()) {
-        LivingEntity living = (LivingEntity) entityIn;
-        // we pass in the stack for most custom context, but for the sake of armor its easier to tell them that this is the correct slot for effects
-        boolean isHeld = isSelected || living.getHeldItemOffhand() == stack;
-        for (ModifierEntry entry : modifiers) {
-          entry.getModifier().onInventoryTick(tool, entry.getLevel(), worldIn, living, itemSlot, isSelected, isHeld, stack);
-        }
-      }
-    }
+    ModifierUtil.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected, CORRECT_SLOT_PREDICATE);
   }
   
   /* Right click hooks */

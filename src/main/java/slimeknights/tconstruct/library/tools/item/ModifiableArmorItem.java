@@ -25,11 +25,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.TriPredicate;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.IndestructibleItemEntity;
 import slimeknights.tconstruct.library.tools.ModifiableArmorMaterial;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
 import slimeknights.tconstruct.library.tools.capability.ToolCapabilityProvider;
+import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 import slimeknights.tconstruct.library.tools.helper.ToolBuildHandler;
 import slimeknights.tconstruct.library.tools.helper.ToolDamageUtil;
 import slimeknights.tconstruct.library.tools.helper.TooltipUtil;
@@ -37,6 +39,7 @@ import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 import slimeknights.tconstruct.library.tools.nbt.StatsNBT;
 import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
+import slimeknights.tconstruct.library.utils.InventoryType;
 import slimeknights.tconstruct.library.utils.TooltipFlag;
 import slimeknights.tconstruct.library.utils.TooltipKey;
 
@@ -53,6 +56,8 @@ import java.util.function.Consumer;
 public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay {
   // TODO: AT this
   private static final UUID[] ARMOR_MODIFIERS = new UUID[]{UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"), UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"), UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"), UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150")};
+  /** Predicate to check if this item is in the right slot */
+  private final TriPredicate<InventoryType, Integer, Boolean> CORRECT_SLOT_PREDICATE = (inv, slot, selected) -> inv == InventoryType.ARMOR && slot == getEquipmentSlot().getIndex();
 
   @Getter
   private final ToolDefinition toolDefinition;
@@ -252,36 +257,11 @@ public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay
 
   @Override
   public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-    super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
-    // TODO: can we abstract this away somewhere?
-
-    // don't care about non-living, they skip most tool context
-    if (entityIn instanceof LivingEntity) {
-      ToolStack tool = ToolStack.from(stack);
-      List<ModifierEntry> modifiers = tool.getModifierList();
-      if (!modifiers.isEmpty()) {
-        LivingEntity living = (LivingEntity) entityIn;
-        // we pass in the stack for most custom context, but for the sake of armor its easier to tell them that this is the correct slot for effects
-        for (ModifierEntry entry : modifiers) {
-          entry.getModifier().onInventoryTick(tool, entry.getLevel(), worldIn, living, itemSlot, isSelected, false, stack);
-        }
-      }
-    }
+    ModifierUtil.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected, CORRECT_SLOT_PREDICATE);
   }
 
-  @Override
-  public void onArmorTick(ItemStack stack, World world, PlayerEntity player) {
-    // TODO: this is kinda messy looking those parameters passed for armor, makes me wonder if we want an armor tick method
-    ToolStack tool = ToolStack.from(stack);
-    List<ModifierEntry> modifiers = tool.getModifierList();
-    if (!modifiers.isEmpty()) {
-      // we pass in the stack for most custom context, but for the sake of armor its easier to tell them that this is the correct slot for effects
-      for (ModifierEntry entry : modifiers) {
-        entry.getModifier().onInventoryTick(tool, entry.getLevel(), world, player, -1, false, true, stack);
-      }
-    }
-  }
-
+  // leaves out armor tick as that method is basically useless to us, called same time as inventory tick but without slot index, meaning we have to work to get slot index
+  // guess one benefit is no math to find out its armor inventory, but we need to do that math anyways
 
   /* Tooltips */
 

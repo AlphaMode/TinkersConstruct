@@ -50,6 +50,7 @@ import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 import slimeknights.tconstruct.library.tools.stat.FloatToolStat;
 import slimeknights.tconstruct.library.tools.stat.ModifierStatsBuilder;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
+import slimeknights.tconstruct.library.utils.InventoryType;
 import slimeknights.tconstruct.library.utils.RestrictedCompoundTag;
 import slimeknights.tconstruct.library.utils.RomanNumeralHelper;
 import slimeknights.tconstruct.library.utils.TooltipFlag;
@@ -399,18 +400,27 @@ public class Modifier implements IForgeRegistryEntry<Modifier> {
     return factor;
   }
 
+  /** @deprecated use {@link #onInventoryTick(IModifierToolStack, int, World, LivingEntity, InventoryType, int, boolean, boolean, ItemStack)} */
+  @Deprecated
+  public void onInventoryTick(IModifierToolStack tool, int level, World world, LivingEntity holder, int itemSlot, boolean isSelected, boolean isCorrectSlot, ItemStack stack) {}
+
   /**
    * Called when the stack updates in the player inventory
    * @param tool           Current tool instance
    * @param level          Modifier level
    * @param world          World containing tool
    * @param holder         Entity holding tool
+   * @param inventoryType  Inventory containing the stack, as slot is vague alone
    * @param itemSlot       Slot containing this tool
-   * @param isSelected     If true, this item is currently in the player's main hand
+   * @param isMainHand     If true, this item is currently in the player's main hand
    * @param isCorrectSlot  If true, this item is in the proper slot. For tools, that is main hand or off hand. For armor, this means its in the correct armor slot
    * @param stack          Item stack instance to check other slots for the tool. Do not modify
    */
-  public void onInventoryTick(IModifierToolStack tool, int level, World world, LivingEntity holder, int itemSlot, boolean isSelected, boolean isCorrectSlot, ItemStack stack) {}
+  public void onInventoryTick(IModifierToolStack tool, int level, World world, LivingEntity holder, InventoryType inventoryType, int itemSlot, boolean isMainHand, boolean isCorrectSlot, ItemStack stack) {
+    onInventoryTick(tool, level, world, holder, itemSlot, isMainHand, isCorrectSlot, stack);
+  }
+
+
 
   /**
    * Called on entity or block loot to allow modifying loot
