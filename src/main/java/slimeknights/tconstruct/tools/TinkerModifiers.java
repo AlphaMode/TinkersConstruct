@@ -13,6 +13,7 @@ import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import slimeknights.mantle.registration.object.EnumObject;
@@ -41,6 +42,7 @@ import slimeknights.tconstruct.library.recipe.modifiers.spilling.effects.EffectS
 import slimeknights.tconstruct.library.recipe.modifiers.spilling.effects.SetFireSpillingEffect;
 import slimeknights.tconstruct.library.recipe.modifiers.spilling.effects.TeleportSpillingEffect;
 import slimeknights.tconstruct.library.tools.SlotType;
+import slimeknights.tconstruct.library.tools.capability.EntityModifierDataCapability;
 import slimeknights.tconstruct.library.tools.item.IModifiable;
 import slimeknights.tconstruct.shared.block.SlimeType;
 import slimeknights.tconstruct.tools.item.CreativeSlotItem;
@@ -339,6 +341,11 @@ public final class TinkerModifiers extends TinkerModule {
    */
   public static final RegistryObject<ModifierLootModifier.Serializer> modifierLootModifier = GLOBAL_LOOT_MODIFIERS.register("modifier_hook", ModifierLootModifier.Serializer::new);
 
+
+  /*
+   * Events
+   */
+
   @SubscribeEvent
   void registerSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event) {
     SpillingRecipeLookup.registerEffect(TConstruct.getResource("damage"), DamageSpillingEffect.LOADER);
@@ -346,5 +353,10 @@ public final class TinkerModifiers extends TinkerModule {
     SpillingRecipeLookup.registerEffect(TConstruct.getResource("set_fire"), SetFireSpillingEffect.LOADER);
     SpillingRecipeLookup.registerEffect(TConstruct.getResource("cure_effects"), CureEffectsSpillingEffect.LOADER);
     SpillingRecipeLookup.registerEffect(TConstruct.getResource("teleport"), TeleportSpillingEffect.LOADER);
+  }
+
+  @SubscribeEvent
+  void commonSetup(final FMLCommonSetupEvent event) {
+    EntityModifierDataCapability.register();
   }
 }
