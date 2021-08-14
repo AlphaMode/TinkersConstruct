@@ -669,6 +669,7 @@ public class ModifierRecipeProvider extends BaseRecipeProvider {
                          .build(consumer, prefix(TinkerModifiers.expanded, abilityFolder));
     // reach expander
     ModifierRecipeBuilder.modifier(TinkerModifiers.reach.get())
+                         .setTools(CompoundIngredient.from(Ingredient.fromTag(TinkerTags.Items.HARVEST), Ingredient.fromTag(TinkerTags.Items.CHESTPLATES)))
                          .addInputSalvage(Items.PISTON, 0.9f)
                          .addInputSalvage(TinkerMaterials.queensSlime.getIngotTag(), 1.0f)
                          .addInputSalvage(Items.PISTON, 0.9f)
