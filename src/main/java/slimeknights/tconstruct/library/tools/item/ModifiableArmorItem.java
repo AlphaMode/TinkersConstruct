@@ -247,10 +247,10 @@ public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay
       StatsNBT statsNBT = tool.getStats();
       UUID uuid = ARMOR_MODIFIERS[slot.getIndex()];
       builder.put(Attributes.ARMOR, new AttributeModifier(uuid, "tconstruct.armor.armor", statsNBT.getFloat(ToolStats.ARMOR), AttributeModifier.Operation.ADDITION));
-      builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(uuid, "tconstruct.armor.toughness", statsNBT.getFloat(ToolStats.ARMOR_TOUGHNESS), AttributeModifier.Operation.ADDITION));
-      double toughness = statsNBT.getFloat(ToolStats.KNOCKBACK_RESISTANCE);
-      if (toughness != 0) {
-        builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(uuid, "tconstruct.armor.knockback_resistance", toughness, AttributeModifier.Operation.ADDITION));
+      builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(uuid, "tconstruct.armor.toughness", statsNBT.getFloat(ToolStats.ARMOR_TOUGHNESS), AttributeModifier.Operation.ADDITION));
+      double knockbackResistance = statsNBT.getFloat(ToolStats.KNOCKBACK_RESISTANCE);
+      if (knockbackResistance != 0) {
+        builder.put(Attributes.KNOCKBACK_RESISTANCE, new AttributeModifier(uuid, "tconstruct.armor.knockback_resistance", knockbackResistance, AttributeModifier.Operation.ADDITION));
       }
       // grab attributes from modifiers
       BiConsumer<Attribute,AttributeModifier> attributeConsumer = builder::put;
