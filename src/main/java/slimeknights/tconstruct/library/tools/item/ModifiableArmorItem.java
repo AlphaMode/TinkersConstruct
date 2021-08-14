@@ -19,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
@@ -26,6 +27,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.TriPredicate;
+import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.IndestructibleItemEntity;
 import slimeknights.tconstruct.library.tools.ModifiableArmorMaterial;
@@ -59,6 +61,9 @@ public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay
   /** Predicate to check if this item is in the right slot */
   private final TriPredicate<InventoryType, Integer, Boolean> CORRECT_SLOT_PREDICATE = (inv, slot, selected) -> inv == InventoryType.ARMOR && slot == getEquipmentSlot().getIndex();
 
+  /** Volatile modifier tag to make piglins neutal when worn */
+  public static final ResourceLocation PIGLIN_NEUTRAL = TConstruct.getResource("piglin_neutral");
+
   @Getter
   private final ToolDefinition toolDefinition;
   /** Cache of the tool built for rendering */
@@ -87,6 +92,11 @@ public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay
   @Override
   public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
     return false;
+  }
+
+  @Override
+  public boolean makesPiglinsNeutral(ItemStack stack, LivingEntity wearer) {
+    return ToolStack.from(stack).getVolatileData().getBoolean(PIGLIN_NEUTRAL);
   }
 
 
