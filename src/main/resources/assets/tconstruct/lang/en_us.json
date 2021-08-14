@@ -1489,6 +1489,7 @@
   "modifier.tconstruct.feather_falling": "Feather Falling",
   "modifier.tconstruct.feather_falling.flavor": "Floof",
   "modifier.tconstruct.feather_falling.description": "Softens falls causing reduced damage",
+  "modifier.tconstruct.feather_falling.resistance": "Fall Resistance",
 
 
   "_comment": "Abilities",
