@@ -2,8 +2,8 @@
   "loader": "tconstruct:tool",
   "parent": "forge:item/default",
   "textures": {
-    "tool":   "tconstruct:item/tool/armor/travelers/googles",
-    "broken": "tconstruct:item/tool/armor/travelers/googles_broken"
+    "tool":   "tconstruct:item/tool/armor/travelers/goggles",
+    "broken": "tconstruct:item/tool/armor/travelers/goggles_broken"
   },
-  "modifier_roots": [ "tconstruct:item/tool/armor/travelers/google_modifiers/" ]
+  "modifier_roots": [ "tconstruct:item/tool/armor/travelers/goggle_modifiers/" ]
 }
