@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools;
 
-import net.minecraft.util.SoundEvents;
 import slimeknights.tconstruct.TConstruct;
+import slimeknights.tconstruct.common.Sounds;
 import slimeknights.tconstruct.library.tools.ModifiableArmorMaterial;
 import slimeknights.tconstruct.library.tools.SlotType;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
@@ -16,7 +16,7 @@ public class ArmorDefinitions {
     .startingSlots(SlotType.ARMOR, 3)
     .startingSlots(SlotType.ABILITY, 1)
     .buildStats()
-    .setSoundEvent(SoundEvents.ITEM_ARMOR_EQUIP_CHAIN)
+    .setSoundEvent(Sounds.EQUIP_TRAVELERS.getSound())
     .build();
 
   /** High defense armor set */
@@ -30,7 +30,7 @@ public class ArmorDefinitions {
     .startingSlots(SlotType.ARMOR, 5)
     .startingSlots(SlotType.ABILITY, 1)
     .buildStats()
-    .setSoundEvent(SoundEvents.ITEM_ARMOR_EQUIP_NETHERITE)
+    .setSoundEvent(Sounds.EQUIP_PLATE.getSound())
     .build();
 
   /** High modifiers armor set */
@@ -43,7 +43,7 @@ public class ArmorDefinitions {
     .startingSlots(SlotType.ARMOR, 1)
     .startingSlots(SlotType.ABILITY, 2, 1, 1, 2)
     .buildStats()
-    .setSoundEvent(SoundEvents.BLOCK_SLIME_BLOCK_PLACE) // TODO: custom sound event
+    .setSoundEvent(Sounds.EQUIP_SLIME.getSound())
     .build();
 
 }

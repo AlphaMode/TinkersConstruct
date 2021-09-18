@@ -33,6 +33,8 @@ public enum Sounds {
 
   // equip sounds
   EQUIP_SLIME("equip.slime"),
+  EQUIP_TRAVELERS("equip.travelers"),
+  EQUIP_PLATE("equip.plate"),
 
   // unused
   FRYING_PAN_BOING("frypan_hit"),
