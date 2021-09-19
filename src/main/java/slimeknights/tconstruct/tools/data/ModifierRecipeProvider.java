@@ -558,6 +558,30 @@ public class ModifierRecipeProvider extends BaseRecipeProvider {
                          .buildSalvage(consumer, prefix(TinkerModifiers.ricochet, armorSalvage))
                          .build(consumer, prefix(TinkerModifiers.ricochet, armorFolder));
 
+    // armor ability
+    ModifierRecipeBuilder.modifier(TinkerModifiers.leaping.get())
+                         .setTools(TinkerTags.Items.LEGGINGS)
+                         .addInputSalvage(Items.PISTON, 0.6f)
+                         .addInputSalvage(Items.RABBIT_FOOT, 0.2f)
+                         .addInputSalvage(Items.PISTON, 0.6f)
+                         .addInput(TinkerWorld.slime.get(SlimeType.SKY))
+                         .addInput(TinkerWorld.slime.get(SlimeType.SKY))
+                         .addSalvage(TinkerCommons.slimeball.get(SlimeType.SKY), 4, 18)
+                         .setSlots(SlotType.ABILITY, 1)
+                         .buildSalvage(consumer, prefix(TinkerModifiers.leaping, armorSalvage))
+                         .build(consumer, prefix(TinkerModifiers.leaping, armorFolder));
+    ModifierRecipeBuilder.modifier(TinkerModifiers.doubleJump.get())
+                         .setTools(TinkerTags.Items.BOOTS)
+                         .addInput(TinkerWorld.slime.get(SlimeType.ICHOR))
+                         .addInput(ItemTags.BEDS)
+                         .addInput(TinkerWorld.slime.get(SlimeType.ICHOR))
+                         .addInputSalvage(Items.PHANTOM_MEMBRANE, 0.3f)
+                         .addInputSalvage(Items.PHANTOM_MEMBRANE, 0.3f)
+                         .addSalvage(TinkerCommons.slimeball.get(SlimeType.ICHOR), 4, 18)
+                         .setSlots(SlotType.ABILITY, 1)
+                         .buildSalvage(consumer, prefix(TinkerModifiers.doubleJump, armorSalvage))
+                         .build(consumer, prefix(TinkerModifiers.doubleJump, armorFolder));
+
     /*
      * ability
      */
