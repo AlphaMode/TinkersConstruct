@@ -29,7 +29,7 @@ public class EntityModifierDataCapability implements Capability.IStorage<ModData
   private static final ResourceLocation ID = TConstruct.getResource("modifier_data");
   /** Instance of the capability storage because forge requires it */
   private static final EntityModifierDataCapability INSTANCE = new EntityModifierDataCapability();
-  /** Capabilit type */
+  /** Capability type */
   @CapabilityInject(ModDataNBT.class)
   public static Capability<ModDataNBT> CAPABILITY = null;
 
@@ -43,7 +43,7 @@ public class EntityModifierDataCapability implements Capability.IStorage<ModData
   private static void attachCapability(AttachCapabilitiesEvent<Entity> event) {
     if (event.getObject() instanceof LivingEntity) {
       Provider provider = new Provider();
-      event.addCapability(ID, new Provider());
+      event.addCapability(ID, provider);
       event.addListener(provider);
     }
   }
@@ -70,10 +70,7 @@ public class EntityModifierDataCapability implements Capability.IStorage<ModData
 
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-      if (cap == CAPABILITY) {
-        return data.cast();
-      }
-      return LazyOptional.empty();
+      return CAPABILITY.orEmpty(cap, data);
     }
 
     @Override
