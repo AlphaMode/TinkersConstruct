@@ -1,7 +1,5 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.armor;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -12,7 +10,6 @@ import slimeknights.tconstruct.library.tools.helper.ToolDamageUtil;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 
 public class ThornsModifier extends Modifier {
-  private static final Enchantment ench = Enchantments.THORNS;
   public ThornsModifier() {
     super(0x91C2AC);
   }
