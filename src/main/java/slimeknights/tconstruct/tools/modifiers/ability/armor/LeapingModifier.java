@@ -43,7 +43,7 @@ public class LeapingModifier extends Modifier {
     LivingEntity entity = event.getEntityLiving();
     int boost = ModifierUtil.getTotalModifierLevel(entity, LEAPING);
     if (boost > 0) {
-      entity.setMotion(entity.getMotion().add(0, boost * 0.15, 0));
+      entity.setMotion(entity.getMotion().add(0, boost * 0.1, 0));
     }
   }
 }

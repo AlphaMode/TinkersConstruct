@@ -4,7 +4,7 @@
     "tag": "tconstruct:modifiable/armor/leggings"
   },
   "slots": {
-    "abilities": 1
+    "upgrades": 1
   },
   "modifier": "tconstruct:leaping",
   "min_level": 1,
@@ -18,13 +18,9 @@
       "chance": 0.2
     },
     {
-      "item": "minecraft:piston",
-      "chance": 0.6
-    },
-    {
       "item": "tconstruct:sky_slime_ball",
       "min": 4,
-      "max": 18
+      "max": 9
     }
   ]
 }

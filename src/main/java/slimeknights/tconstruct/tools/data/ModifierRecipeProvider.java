@@ -528,6 +528,16 @@ public class ModifierRecipeProvider extends BaseRecipeProvider {
                                     .setMaxLevel(5)
                                     .buildSalvage(consumer, prefix(TinkerModifiers.revitalizing, armorSalvage))
                                     .build(consumer, prefix(TinkerModifiers.revitalizing, armorFolder));
+    ModifierRecipeBuilder.modifier(TinkerModifiers.leaping.get())
+                         .setTools(TinkerTags.Items.LEGGINGS)
+                         .addInputSalvage(Items.PISTON, 0.6f)
+                         .addInputSalvage(Items.RABBIT_FOOT, 0.2f)
+                         .addInput(TinkerWorld.slime.get(SlimeType.SKY))
+                         .addSalvage(TinkerCommons.slimeball.get(SlimeType.SKY), 4, 9)
+                         .setSlots(SlotType.UPGRADE, 1)
+                         .setMaxLevel(2)
+                         .buildSalvage(consumer, prefix(TinkerModifiers.leaping, armorSalvage))
+                         .build(consumer, prefix(TinkerModifiers.leaping, armorFolder));
     // upgrade - boots
     IncrementalModifierRecipeBuilder.modifier(TinkerModifiers.featherFalling.get())
                                     .setTools(TinkerTags.Items.BOOTS)
@@ -548,6 +558,7 @@ public class ModifierRecipeProvider extends BaseRecipeProvider {
                                     .setSlots(SlotType.UPGRADE, 1)
                                     .setMaxLevel(4)
                                     .build(consumer, wrap(TinkerModifiers.featherFalling, armorFolder, "_from_blocks"));
+    // upgrade - all
     ModifierRecipeBuilder.modifier(TinkerModifiers.ricochet.get())
                          .setTools(TinkerTags.Items.ARMOR)
                          .addInputSalvage(TinkerCommons.obsidianPane, 0.4f)
@@ -559,17 +570,6 @@ public class ModifierRecipeProvider extends BaseRecipeProvider {
                          .build(consumer, prefix(TinkerModifiers.ricochet, armorFolder));
 
     // armor ability
-    ModifierRecipeBuilder.modifier(TinkerModifiers.leaping.get())
-                         .setTools(TinkerTags.Items.LEGGINGS)
-                         .addInputSalvage(Items.PISTON, 0.6f)
-                         .addInputSalvage(Items.RABBIT_FOOT, 0.2f)
-                         .addInputSalvage(Items.PISTON, 0.6f)
-                         .addInput(TinkerWorld.slime.get(SlimeType.SKY))
-                         .addInput(TinkerWorld.slime.get(SlimeType.SKY))
-                         .addSalvage(TinkerCommons.slimeball.get(SlimeType.SKY), 4, 18)
-                         .setSlots(SlotType.ABILITY, 1)
-                         .buildSalvage(consumer, prefix(TinkerModifiers.leaping, armorSalvage))
-                         .build(consumer, prefix(TinkerModifiers.leaping, armorFolder));
     ModifierRecipeBuilder.modifier(TinkerModifiers.doubleJump.get())
                          .setTools(TinkerTags.Items.BOOTS)
                          .addInput(TinkerWorld.slime.get(SlimeType.ICHOR))
