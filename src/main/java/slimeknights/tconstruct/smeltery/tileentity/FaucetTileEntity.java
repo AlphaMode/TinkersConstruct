@@ -1,15 +1,15 @@
 package slimeknights.tconstruct.smeltery.tileentity;
 
 import lombok.Getter;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -28,7 +28,7 @@ import slimeknights.tconstruct.smeltery.network.FaucetActivationPacket;
 
 import static slimeknights.tconstruct.smeltery.block.FaucetBlock.FACING;
 
-public class FaucetTileEntity extends MantleTileEntity implements ITickableTileEntity {
+public class FaucetTileEntity extends MantleTileEntity implements TickableBlockEntity {
   /** Transfer rate of the faucet */
   public static final int MB_PER_TICK = 12;
   /** amount of MB to extract from the input at a time */
@@ -66,7 +66,7 @@ public class FaucetTileEntity extends MantleTileEntity implements ITickableTileE
   }
 
   @SuppressWarnings("WeakerAccess")
-  protected FaucetTileEntity(TileEntityType<?> tileEntityTypeIn) {
+  protected FaucetTileEntity(BlockEntityType<?> tileEntityTypeIn) {
     super(tileEntityTypeIn);
   }
 
@@ -79,8 +79,8 @@ public class FaucetTileEntity extends MantleTileEntity implements ITickableTileE
    * @return  Fluid handler
    */
   private LazyOptional<IFluidHandler> findFluidHandler(Direction side) {
-    assert world != null;
-    TileEntity te = world.getTileEntity(pos.offset(side));
+    assert level != null;
+    BlockEntity te = level.getBlockEntity(worldPosition.relative(side));
     if (te != null) {
       LazyOptional<IFluidHandler> handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite());
       if (handler.isPresent()) {
@@ -96,7 +96,7 @@ public class FaucetTileEntity extends MantleTileEntity implements ITickableTileE
    */
   private LazyOptional<IFluidHandler> getInputHandler() {
     if (inputHandler == null) {
-      inputHandler = findFluidHandler(getBlockState().get(FACING).getOpposite());
+      inputHandler = findFluidHandler(getBlockState().getValue(FACING).getOpposite());
       if (inputHandler.isPresent()) {
         inputHandler.addListener(inputListener);
       }
@@ -124,10 +124,10 @@ public class FaucetTileEntity extends MantleTileEntity implements ITickableTileE
    */
   public void neighborChanged(BlockPos neighbor) {
     // if the neighbor was below us, remove output
-    if (pos.equals(neighbor.up())) {
+    if (worldPosition.equals(neighbor.above())) {
       outputHandler = null;
       // neighbor behind us
-    } else if (pos.equals(neighbor.offset(getBlockState().get(FACING)))) {
+    } else if (worldPosition.equals(neighbor.relative(getBlockState().getValue(FACING)))) {
       inputHandler = null;
     }
   }
@@ -150,7 +150,7 @@ public class FaucetTileEntity extends MantleTileEntity implements ITickableTileE
    */
   public void activate() {
     // don't run on client
-    if (world == null || world.isRemote) {
+    if (level == null || level.isClientSide) {
       return;
     }
     // already pouring? we want to start
@@ -180,8 +180,8 @@ public class FaucetTileEntity extends MantleTileEntity implements ITickableTileE
     if (hasSignal != lastRedstoneState) {
       lastRedstoneState = hasSignal;
       if (hasSignal) {
-        if (world != null){
-          world.getPendingBlockTicks().scheduleTick(pos, this.getBlockState().getBlock(), 2);
+        if (level != null){
+          level.getBlockTicks().scheduleTick(worldPosition, this.getBlockState().getBlock(), 2);
         }
       } else if (faucetState == FaucetState.POWERED) {
         faucetState = FaucetState.OFF;
@@ -195,7 +195,7 @@ public class FaucetTileEntity extends MantleTileEntity implements ITickableTileE
 
   @Override
   public void tick() {
-    if (world == null || world.isRemote) {
+    if (level == null || level.isClientSide) {
       return;
     }
 
@@ -319,8 +319,8 @@ public class FaucetTileEntity extends MantleTileEntity implements ITickableTileE
 
   @Override
   @OnlyIn(Dist.CLIENT)
-  public AxisAlignedBB getRenderBoundingBox() {
-    return new AxisAlignedBB(pos.getX(), pos.getY() - 1, pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+  public AABB getRenderBoundingBox() {
+    return new AABB(worldPosition.getX(), worldPosition.getY() - 1, worldPosition.getZ(), worldPosition.getX() + 1, worldPosition.getY() + 1, worldPosition.getZ() + 1);
   }
 
 
@@ -333,8 +333,8 @@ public class FaucetTileEntity extends MantleTileEntity implements ITickableTileE
    */
   private void syncToClient(FluidStack fluid, boolean isPouring) {
     renderFluid = fluid.copy();
-    if (world instanceof ServerWorld) {
-      TinkerNetwork.getInstance().sendToClientsAround(new FaucetActivationPacket(pos, fluid, isPouring), (ServerWorld) world, getPos());
+    if (level instanceof ServerLevel) {
+      TinkerNetwork.getInstance().sendToClientsAround(new FaucetActivationPacket(worldPosition, fluid, isPouring), (ServerLevel) level, getBlockPos());
     }
   }
 
@@ -354,28 +354,28 @@ public class FaucetTileEntity extends MantleTileEntity implements ITickableTileE
   }
 
   @Override
-  protected void writeSynced(CompoundNBT compound) {
+  protected void writeSynced(CompoundTag compound) {
     super.writeSynced(compound);
     compound.putByte(TAG_STATE, (byte)faucetState.ordinal());
     if (!renderFluid.isEmpty()) {
-      compound.put(TAG_RENDER_FLUID, renderFluid.writeToNBT(new CompoundNBT()));
+      compound.put(TAG_RENDER_FLUID, renderFluid.writeToNBT(new CompoundTag()));
     }
   }
 
   @Override
-  public CompoundNBT write(CompoundNBT compound) {
-    compound = super.write(compound);
+  public CompoundTag save(CompoundTag compound) {
+    compound = super.save(compound);
     compound.putBoolean(TAG_STOP, stopPouring);
     compound.putBoolean(TAG_LAST_REDSTONE, lastRedstoneState);
     if (!drained.isEmpty()) {
-      compound.put(TAG_DRAINED, drained.writeToNBT(new CompoundNBT()));
+      compound.put(TAG_DRAINED, drained.writeToNBT(new CompoundTag()));
     }
     return compound;
   }
 
   @Override
-  public void read(BlockState state, CompoundNBT compound) {
-    super.read(state, compound);
+  public void load(BlockState state, CompoundTag compound) {
+    super.load(state, compound);
 
     faucetState = FaucetState.fromIndex(compound.getByte(TAG_STATE));
     stopPouring = compound.getBoolean(TAG_STOP);

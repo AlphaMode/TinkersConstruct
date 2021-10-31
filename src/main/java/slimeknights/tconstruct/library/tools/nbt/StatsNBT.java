@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.Constants.NBT;
 import slimeknights.tconstruct.TConstruct;
@@ -72,7 +72,7 @@ public class StatsNBT {
 
   /**
    * Reads the stat from NBT */
-  public static StatsNBT readFromNBT(@Nullable INBT inbt) {
+  public static StatsNBT readFromNBT(@Nullable Tag inbt) {
     if (inbt == null || inbt.getId() != Constants.NBT.TAG_COMPOUND) {
       return EMPTY;
     }
@@ -80,8 +80,8 @@ public class StatsNBT {
     ImmutableMap.Builder<IToolStat<?>, Float> builder = ImmutableMap.builder();
 
     // simply try each key as a tool stat
-    CompoundNBT nbt = (CompoundNBT)inbt;
-    for (String key : nbt.keySet()) {
+    CompoundTag nbt = (CompoundTag)inbt;
+    for (String key : nbt.getAllKeys()) {
       if (nbt.contains(key, NBT.TAG_ANY_NUMERIC)) {
         ToolStatId statName = ToolStatId.tryCreate(key);
         if (statName != null) {
@@ -99,8 +99,8 @@ public class StatsNBT {
   }
 
   /** Writes these stats to NBT */
-  public CompoundNBT serializeToNBT() {
-    CompoundNBT nbt = new CompoundNBT();
+  public CompoundTag serializeToNBT() {
+    CompoundTag nbt = new CompoundTag();
     for (Entry<IToolStat<?>,Float> entry : stats.entrySet()) {
       nbt.putFloat(entry.getKey().getName().toString(), entry.getValue());
     }

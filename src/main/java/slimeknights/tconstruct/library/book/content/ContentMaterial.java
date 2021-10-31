@@ -3,12 +3,12 @@ package slimeknights.tconstruct.library.book.content;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Lazy;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 
 @OnlyIn(Dist.CLIENT)
 public class ContentMaterial extends TinkerPage {
-  private static final ITextComponent PART_BUILDER = TConstruct.makeTranslation("book", "material.part_builder");
+  private static final Component PART_BUILDER = TConstruct.makeTranslation("book", "material.part_builder");
   private static final String CAST_FROM = TConstruct.makeTranslationKey("book", "material.cast_from");
   private static final String COMPOSITE_FROM = TConstruct.makeTranslationKey("book", "material.composite_from");
 
@@ -81,7 +81,7 @@ public class ContentMaterial extends TinkerPage {
   public void build(BookData book, ArrayList<BookElement> list, boolean rightSide) {
     IMaterial material = this.material.get();
 
-    this.addTitle(list, new TranslationTextComponent(material.getTranslationKey()).getString(), true, material.getColor().getColor());
+    this.addTitle(list, new TranslatableComponent(material.getTranslationKey()).getString(), true, material.getColor().getValue());
 
     // the cool tools to the left/right
     this.addDisplayItems(list, rightSide ? BookScreen.PAGE_WIDTH - 18 : 0, material.getIdentifier());
@@ -106,7 +106,7 @@ public class ContentMaterial extends TinkerPage {
     // inspirational quote, or boring description text
     MaterialId id = material.getIdentifier();
     String textKey = String.format(detailed ? "material.%s.%s.encyclopedia" : "material.%s.%s.flavor", id.getNamespace(), id.getPath());
-    if (I18n.hasKey(textKey)) {
+    if (I18n.exists(textKey)) {
       // using forge instead of I18n.format as that prevents % from being interpreted as a format key
       String translated = ForgeI18n.getPattern(textKey);
       if (!detailed) {
@@ -166,7 +166,7 @@ public class ContentMaterial extends TinkerPage {
       if (stats.getLocalizedDescriptions().get(i).getString().isEmpty()) {
         text.tooltips = null;
       } else {
-        text.tooltips = new ITextComponent[]{stats.getLocalizedDescriptions().get(i)};
+        text.tooltips = new Component[]{stats.getLocalizedDescriptions().get(i)};
       }
 
       lineData.add(text);

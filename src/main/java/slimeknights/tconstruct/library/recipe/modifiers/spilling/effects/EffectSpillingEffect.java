@@ -3,9 +3,9 @@ package slimeknights.tconstruct.library.recipe.modifiers.spilling.effects;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.potion.Effect;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
@@ -21,7 +21,7 @@ import java.util.Objects;
 public class EffectSpillingEffect implements ISpillingEffect {
   public static final Loader LOADER = new Loader();
 
-  private final Effect effect;
+  private final MobEffect effect;
   /** Potion time in seconds */
   private final int time;
   /** Potion level starting at 1 */

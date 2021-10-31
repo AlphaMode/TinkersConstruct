@@ -2,10 +2,10 @@ package slimeknights.tconstruct.tables.tileentity.chest;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.ItemStackHandler;
 import slimeknights.tconstruct.TConstruct;
@@ -39,12 +39,12 @@ public class TinkersChestTileEntity extends ChestTileEntity {
   }
 
   @Override
-  public boolean canInsert(PlayerEntity player, ItemStack heldItem) {
+  public boolean canInsert(Player player, ItemStack heldItem) {
     return false;
   }
 
   @Override
-  public void writeSynced(CompoundNBT tags) {
+  public void writeSynced(CompoundTag tags) {
     super.writeSynced(tags);
     if (hasColor) {
       tags.putInt(TAG_CHEST_COLOR, color);
@@ -52,8 +52,8 @@ public class TinkersChestTileEntity extends ChestTileEntity {
   }
 
   @Override
-  public void read(BlockState blockState, CompoundNBT tags) {
-    super.read(blockState, tags);
+  public void load(BlockState blockState, CompoundTag tags) {
+    super.load(blockState, tags);
     if (tags.contains(TAG_CHEST_COLOR, NBT.TAG_ANY_NUMERIC)) {
       setColor(tags.getInt(TAG_CHEST_COLOR));
     }

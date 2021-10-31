@@ -3,7 +3,7 @@ package slimeknights.tconstruct.plugin.jei.melting;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import mezz.jei.api.constants.VanillaTypes;
@@ -18,10 +18,10 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.FluidTooltipHandler;
@@ -38,7 +38,7 @@ public abstract class AbstractMeltingCategory implements IRecipeCategory<Melting
   protected static final String KEY_COOLING_TIME = TConstruct.makeTranslationKey("jei", "melting.time");
   protected static final String KEY_TEMPERATURE = TConstruct.makeTranslationKey("jei", "temperature");
   protected static final String KEY_MULTIPLIER = TConstruct.makeTranslationKey("jei", "melting.multiplier");
-  protected static final ITextComponent TOOLTIP_ORE = new TranslationTextComponent(TConstruct.makeTranslationKey("jei", "melting.ore"));
+  protected static final Component TOOLTIP_ORE = new TranslatableComponent(TConstruct.makeTranslationKey("jei", "melting.ore"));
 
   @Getter
   private final IDrawable background;
@@ -70,7 +70,7 @@ public abstract class AbstractMeltingCategory implements IRecipeCategory<Melting
   }
 
   @Override
-  public void draw(MeltingRecipe recipe, MatrixStack matrices, double mouseX, double mouseY) {
+  public void draw(MeltingRecipe recipe, PoseStack matrices, double mouseX, double mouseY) {
     // draw the arrow
     cachedArrows.getUnchecked(recipe.getTime() * 5).draw(matrices, 56, 18);
     if (recipe.isOre()) {

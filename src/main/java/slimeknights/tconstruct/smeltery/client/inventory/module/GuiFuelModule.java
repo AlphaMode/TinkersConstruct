@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.smeltery.client.inventory.module;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.client.screen.ScalableElementScreen;
 import slimeknights.tconstruct.TConstruct;
@@ -28,12 +28,12 @@ public class GuiFuelModule {
 
   // tooltips
   private static final String TOOLTIP_TEMPERATURE = TConstruct.makeTranslationKey("gui", "melting.fuel.temperature");
-  private static final List<ITextComponent> TOOLTIP_NO_TANK = Collections.singletonList(new TranslationTextComponent(TConstruct.makeTranslationKey("gui", "melting.fuel.no_tank")));
-  private static final List<ITextComponent> TOOLTIP_NO_FUEL = Collections.singletonList(new TranslationTextComponent(TConstruct.makeTranslationKey("gui", "melting.fuel.empty")));
-  private static final ITextComponent TOOLTIP_INVALID_FUEL = new TranslationTextComponent(TConstruct.makeTranslationKey("gui", "melting.fuel.invalid")).mergeStyle(TextFormatting.RED);
-  private static final ITextComponent TOOLTIP_SOLID_FUEL = new TranslationTextComponent(TConstruct.makeTranslationKey("gui", "melting.fuel.solid"));
+  private static final List<Component> TOOLTIP_NO_TANK = Collections.singletonList(new TranslatableComponent(TConstruct.makeTranslationKey("gui", "melting.fuel.no_tank")));
+  private static final List<Component> TOOLTIP_NO_FUEL = Collections.singletonList(new TranslatableComponent(TConstruct.makeTranslationKey("gui", "melting.fuel.empty")));
+  private static final Component TOOLTIP_INVALID_FUEL = new TranslatableComponent(TConstruct.makeTranslationKey("gui", "melting.fuel.invalid")).withStyle(ChatFormatting.RED);
+  private static final Component TOOLTIP_SOLID_FUEL = new TranslatableComponent(TConstruct.makeTranslationKey("gui", "melting.fuel.solid"));
 
-  private final ContainerScreen<?> screen;
+  private final AbstractContainerScreen<?> screen;
   private final FuelModule fuelModule;
   /** location to draw the tank */
   private final int x, y, width, height;
@@ -58,7 +58,7 @@ public class GuiFuelModule {
    * Draws the fuel at the correct location
    * @param matrices  Matrix stack instance
    */
-  public void draw(MatrixStack matrices) {
+  public void draw(PoseStack matrices) {
     // draw fire
     int fuel = fuelModule.getFuel();
     int fuelQuality = fuelModule.getFuelQuality();
@@ -139,8 +139,8 @@ public class GuiFuelModule {
         tooltip = hasTank ? TOOLTIP_NO_FUEL : TOOLTIP_NO_TANK;
       }
 
-      // TODO: func_243308_b->renderTooltip
-      screen.func_243308_b(matrices, tooltip, mouseX, mouseY);
+      // TODO: renderComponentTooltip->renderTooltip
+      screen.renderComponentTooltip(matrices, tooltip, mouseX, mouseY);
     }
   }
 

@@ -1,18 +1,18 @@
 package slimeknights.tconstruct.world;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ComposterBlock;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.FireBlock;
 import net.minecraft.block.SkullBlock;
-import net.minecraft.block.SlimeBlock;
-import net.minecraft.block.SoundType;
+import net.minecraft.world.level.block.SlimeBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.block.WallSkullBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.dispenser.IDispenseItemBehavior;
@@ -22,12 +22,12 @@ import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.item.ArmorItem;
-import net.minecraft.item.BlockItem;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.item.FireworkRocketItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.item.WallOrFloorItem;
 import net.minecraft.item.crafting.FireworkStarRecipe;
 import net.minecraft.particles.BasicParticleType;
@@ -96,7 +96,7 @@ public final class TinkerWorld extends TinkerModule {
 
   /** Tab for anything generated in the world */
   @SuppressWarnings("WeakerAccess")
-  public static final ItemGroup TAB_WORLD = new SupplierItemGroup(TConstruct.MOD_ID, "world", () -> new ItemStack(TinkerWorld.cobaltOre));
+  public static final CreativeModeTab TAB_WORLD = new SupplierItemGroup(TConstruct.MOD_ID, "world", () -> new ItemStack(TinkerWorld.cobaltOre));
 	static final Logger log = Util.getLogger("tinker_world");
 
   public static final PlantType SLIME_PLANT_TYPE = PlantType.get("slime");
@@ -104,10 +104,10 @@ public final class TinkerWorld extends TinkerModule {
   /*
    * Block base properties
    */
-  private static final Item.Properties WORLD_PROPS = new Item.Properties().group(TAB_WORLD);
+  private static final Item.Properties WORLD_PROPS = new Item.Properties().tab(TAB_WORLD);
   private static final Function<Block, ? extends BlockItem> DEFAULT_BLOCK_ITEM = (b) -> new BlockItem(b, WORLD_PROPS);
   private static final Function<Block, ? extends BlockItem> TOOLTIP_BLOCK_ITEM = (b) -> new BlockTooltipItem(b, WORLD_PROPS);
-  private static final Item.Properties HEAD_PROPS = new Item.Properties().group(TAB_WORLD).rarity(Rarity.UNCOMMON);
+  private static final Item.Properties HEAD_PROPS = new Item.Properties().tab(TAB_WORLD).rarity(Rarity.UNCOMMON);
 
   /** Flamable variant of clay, as in flamable shoveling material */
   public static final Material SLIME_WOOD = new Material.Builder(MaterialColor.CLAY).flammable().build();
@@ -116,12 +116,12 @@ public final class TinkerWorld extends TinkerModule {
    * Blocks
    */
   // ores
-  public static final ItemObject<Block> cobaltOre = BLOCKS.register("cobalt_ore", () -> new Block(builder(Material.ROCK, MaterialColor.NETHERRACK, ToolType.PICKAXE, SoundType.NETHER_ORE).setRequiresTool().harvestLevel(HarvestLevels.IRON).hardnessAndResistance(10.0F)), DEFAULT_BLOCK_ITEM);
-  public static final ItemObject<Block> copperOre = BLOCKS.register("copper_ore", builder(Material.ROCK, ToolType.PICKAXE, SoundType.STONE).setRequiresTool().harvestLevel(HarvestLevels.STONE).hardnessAndResistance(3.0F, 3.0F), DEFAULT_BLOCK_ITEM);
+  public static final ItemObject<Block> cobaltOre = BLOCKS.register("cobalt_ore", () -> new Block(builder(Material.STONE, MaterialColor.NETHER, ToolType.PICKAXE, SoundType.NETHER_ORE).requiresCorrectToolForDrops().harvestLevel(HarvestLevels.IRON).strength(10.0F)), DEFAULT_BLOCK_ITEM);
+  public static final ItemObject<Block> copperOre = BLOCKS.register("copper_ore", builder(Material.STONE, ToolType.PICKAXE, SoundType.STONE).requiresCorrectToolForDrops().harvestLevel(HarvestLevels.STONE).strength(3.0F, 3.0F), DEFAULT_BLOCK_ITEM);
 
   // slime
   public static final EnumObject<SlimeType, SlimeBlock> slime = Util.make(() -> {
-    Function<SlimeType,AbstractBlock.Properties> slimeProps = type -> builder(Material.CLAY, type.getMapColor(), NO_TOOL, SoundType.SLIME).slipperiness(0.8F).sound(SoundType.SLIME).notSolid();
+    Function<SlimeType,BlockBehaviour.Properties> slimeProps = type -> builder(Material.CLAY, type.getMapColor(), NO_TOOL, SoundType.SLIME).slipperiness(0.8F).sound(SoundType.SLIME).notSolid();
     return new EnumObject.Builder<SlimeType, SlimeBlock>(SlimeType.class)
       .putDelegate(SlimeType.EARTH, Blocks.SLIME_BLOCK.delegate)
       // sky slime: sticks to anything, but will not pull back
@@ -273,10 +273,10 @@ public final class TinkerWorld extends TinkerModule {
 
   @SubscribeEvent
   void entityAttributes(EntityAttributeCreationEvent event) {
-    event.put(earthSlimeEntity.get(), MonsterEntity.func_234295_eP_().create());
-    event.put(skySlimeEntity.get(), MonsterEntity.func_234295_eP_().create());
-    event.put(enderSlimeEntity.get(), MonsterEntity.func_234295_eP_().create());
-    event.put(terracubeEntity.get(), MonsterEntity.func_234295_eP_().create());
+    event.put(earthSlimeEntity.get(), MonsterEntity.createMonsterAttributes().create());
+    event.put(skySlimeEntity.get(), MonsterEntity.createMonsterAttributes().create());
+    event.put(enderSlimeEntity.get(), MonsterEntity.createMonsterAttributes().create());
+    event.put(terracubeEntity.get(), MonsterEntity.createMonsterAttributes().create());
   }
 
   /** Sets all fire info for the given wood */
@@ -315,7 +315,7 @@ public final class TinkerWorld extends TinkerModule {
       IDispenseItemBehavior dispenseArmor = new OptionalDispenseBehavior() {
         @Override
         protected ItemStack dispenseStack(IBlockSource source, ItemStack stack) {
-          this.setSuccessful(ArmorItem.func_226626_a_(source, stack));
+          this.setSuccessful(ArmorItem.dispenseArmor(source, stack));
           return stack;
         }
       };

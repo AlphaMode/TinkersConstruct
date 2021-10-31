@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.smeltery.tileentity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.LazyOptional;
@@ -24,12 +24,12 @@ import javax.annotation.Nullable;
 /** Tile entity for the heater block below the melter */
 public class HeaterTileEntity extends NamableTileEntity {
   private static final String TAG_ITEM = "item";
-  private static final ITextComponent TITLE = TConstruct.makeTranslation("gui", "heater");
+  private static final Component TITLE = TConstruct.makeTranslation("gui", "heater");
 
   private final HeaterItemHandler itemHandler = new HeaterItemHandler(this);
   private final LazyOptional<IItemHandler> itemCapability = LazyOptional.of(() -> itemHandler);
 
-  protected HeaterTileEntity(TileEntityType<?> type) {
+  protected HeaterTileEntity(BlockEntityType<?> type) {
     super(type, TITLE);
   }
 
@@ -39,7 +39,7 @@ public class HeaterTileEntity extends NamableTileEntity {
 
   @Nullable
   @Override
-  public Container createMenu(int id, PlayerInventory inventory, PlayerEntity playerEntity) {
+  public AbstractContainerMenu createMenu(int id, Inventory inventory, Player playerEntity) {
     return new SingleItemContainer(id, inventory, this);
   }
 
@@ -64,16 +64,16 @@ public class HeaterTileEntity extends NamableTileEntity {
   /* NBT */
 
   @Override
-  public void read(BlockState state, CompoundNBT tags) {
-    super.read(state, tags);
+  public void load(BlockState state, CompoundTag tags) {
+    super.load(state, tags);
     if (tags.contains(TAG_ITEM, NBT.TAG_COMPOUND)) {
       itemHandler.readFromNBT(tags.getCompound(TAG_ITEM));
     }
   }
 
   @Override
-  public CompoundNBT write(CompoundNBT tags) {
-    tags = super.write(tags);
+  public CompoundTag save(CompoundTag tags) {
+    tags = super.save(tags);
     tags.put(TAG_ITEM, itemHandler.writeToNBT());
     return tags;
   }

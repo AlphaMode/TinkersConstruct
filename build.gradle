@@ -22,18 +22,15 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.7', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath "io.freefair.gradle:lombok-plugin:4.+"
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'maven'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: "io.freefair.lombok"
-
-import net.minecraftforge.gradle.common.task.SignJar
 
 repositories {
     mavenCentral()
@@ -68,7 +65,7 @@ repositories {
 
 group = 'slimeknights.tconstruct'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
+java.toolchain.languageVersion = JavaLanguageVersion.of(16) // Mojang ships Java 16 to end users, so your mod should target Java 8.
 
 // sets version to the slimeKnights version format
 task buildInfo {
@@ -112,7 +109,7 @@ sourceSets {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: mappings_version
+    mappings channel: 'official', version: minecraft_version
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -203,24 +200,24 @@ configurations {
 dependencies {
     minecraft 'net.minecraftforge:forge:' + minecraft_version + '-' + forge_version
 
-    compile fg.deobf("slimeknights.mantle:Mantle:${minecraft_version}-${mantle_version}")
+    implementation fg.deobf("slimeknights.mantle:Mantle:${minecraft_version}-${mantle_version}")
 
     // compile against the JEI API but do not include it at runtime
     compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
     // at runtime, use the full JEI jar
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
 
-    compile fg.deobf("mcjty.theoneprobe:TheOneProbe-${minecraft_base_version}:${minecraft_base_version}-${probe_version}")
+    //implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-${minecraft_base_version}:${minecraft_base_version}-${probe_version}")
 
     compileOnly fg.deobf("com.blamejared.crafttweaker:CraftTweaker-${crt_version}")
     //runtimeOnly fg.deobf("curse.maven:MmmMmmMmmMmm-225738:3279930")
 
-    deployerJars 'org.apache.maven.wagon:wagon-ssh:2.2'
+    deployerJars 'org.apache.maven.wagon:wagon-ssh:3.4.3'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
-    testImplementation 'org.mockito:mockito-core:3.1.0'
-    testImplementation 'org.assertj:assertj-core:3.14.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation 'org.assertj:assertj-core:3.21.0'
 }
 
 test {
@@ -339,25 +336,25 @@ task("uploadJars", dependsOn: "build") {
     }
 }
 
-task signUniversal(type: SignJar, dependsOn: 'jar') {
-    onlyIf {
-        project.hasProperty('jarsigner')
-    }
-
-    def jarsigner = [:]
-
-    if (project.hasProperty('jarsigner'))
-        jarsigner = project.jarsigner
-
-    alias = 'tcon'
-    storePass = jarsigner.storepass
-    keyPass = jarsigner.keypass
-    keyStore = jarsigner.keystore
-    inputFile = jar.archivePath
-    outputFile = jar.archivePath
-}
-uploadArchives.dependsOn signUniversal
-build.dependsOn signUniversal
+//task signUniversal(type: SignJar, dependsOn: 'jar') {
+//    onlyIf {
+//        project.hasProperty('jarsigner')
+//    }
+//
+//    def jarsigner = [:]
+//
+//    if (project.hasProperty('jarsigner'))
+//        jarsigner = project.jarsigner
+//
+//    alias = 'tcon'
+//    storePass = jarsigner.storepass
+//    keyPass = jarsigner.keypass
+//    keyStore = jarsigner.keystore
+//    inputFile = jar.archivePath
+//    outputFile = jar.archivePath
+//}
+//uploadArchives.dependsOn signUniversal
+//build.dependsOn signUniversal
 
 publishing {
     publications {

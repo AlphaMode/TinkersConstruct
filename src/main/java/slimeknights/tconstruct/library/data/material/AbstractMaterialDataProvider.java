@@ -2,7 +2,7 @@ package slimeknights.tconstruct.library.data.material;
 
 import lombok.Data;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DirectoryCache;
+import net.minecraft.data.HashCache;
 import net.minecraft.util.text.Color;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.NotCondition;
@@ -68,7 +68,7 @@ public abstract class AbstractMaterialDataProvider extends GenericDataProvider {
   }
 
   @Override
-  public void act(DirectoryCache cache) {
+  public void run(HashCache cache) {
     ensureAddMaterialsRun();
     allMaterials.forEach((id, data) -> saveThing(cache, id, convert(data)));
   }

@@ -1,17 +1,17 @@
 package slimeknights.tconstruct.gadgets.entity;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.ProjectileItemEntity;
-import net.minecraft.item.Item;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.item.Item;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
 import slimeknights.tconstruct.gadgets.TinkerGadgets;
@@ -19,17 +19,17 @@ import slimeknights.tconstruct.shared.TinkerCommons;
 
 import javax.annotation.Nonnull;
 
-public class GlowballEntity extends ProjectileItemEntity implements IEntityAdditionalSpawnData {
+public class GlowballEntity extends ThrowableItemProjectile implements IEntityAdditionalSpawnData {
 
-  public GlowballEntity(EntityType<? extends GlowballEntity> p_i50159_1_, World p_i50159_2_) {
+  public GlowballEntity(EntityType<? extends GlowballEntity> p_i50159_1_, Level p_i50159_2_) {
     super(p_i50159_1_, p_i50159_2_);
   }
 
-  public GlowballEntity(World worldIn, LivingEntity throwerIn) {
+  public GlowballEntity(Level worldIn, LivingEntity throwerIn) {
     super(TinkerGadgets.glowBallEntity.get(), throwerIn, worldIn);
   }
 
-  public GlowballEntity(World worldIn, double x, double y, double z) {
+  public GlowballEntity(Level worldIn, double x, double y, double z) {
     super(TinkerGadgets.glowBallEntity.get(), x, y, z, worldIn);
   }
 
@@ -39,45 +39,45 @@ public class GlowballEntity extends ProjectileItemEntity implements IEntityAddit
   }
 
   @Override
-  protected void onImpact(RayTraceResult result) {
-    if (!this.world.isRemote) {
+  protected void onHit(HitResult result) {
+    if (!this.level.isClientSide) {
       BlockPos position = null;
       Direction direction = Direction.DOWN;
 
-      if (result.getType() == RayTraceResult.Type.ENTITY) {
-        position = ((EntityRayTraceResult) result).getEntity().getPosition();
+      if (result.getType() == HitResult.Type.ENTITY) {
+        position = ((EntityHitResult) result).getEntity().blockPosition();
       }
 
-      if (result.getType() == RayTraceResult.Type.BLOCK) {
-        BlockRayTraceResult blockraytraceresult = (BlockRayTraceResult) result;
-        position = blockraytraceresult.getPos().offset(blockraytraceresult.getFace());
-        direction = blockraytraceresult.getFace().getOpposite();
+      if (result.getType() == HitResult.Type.BLOCK) {
+        BlockHitResult blockraytraceresult = (BlockHitResult) result;
+        position = blockraytraceresult.getBlockPos().relative(blockraytraceresult.getDirection());
+        direction = blockraytraceresult.getDirection().getOpposite();
       }
 
       if (position != null) {
-        TinkerCommons.glow.get().addGlow(this.world, position, direction);
+        TinkerCommons.glow.get().addGlow(this.level, position, direction);
       }
     }
 
-    if (!this.world.isRemote) {
-      this.world.setEntityState(this, (byte) 3);
+    if (!this.level.isClientSide) {
+      this.level.broadcastEntityEvent(this, (byte) 3);
       this.remove();
     }
   }
 
   @Override
-  public void writeSpawnData(PacketBuffer buffer) {
-    buffer.writeItemStack(this.func_213882_k());
+  public void writeSpawnData(FriendlyByteBuf buffer) {
+    buffer.writeItem(this.getItemRaw());
   }
 
   @Override
-  public void readSpawnData(PacketBuffer additionalData) {
-    this.setItem(additionalData.readItemStack());
+  public void readSpawnData(FriendlyByteBuf additionalData) {
+    this.setItem(additionalData.readItem());
   }
 
   @Nonnull
   @Override
-  public IPacket<?> createSpawnPacket() {
+  public Packet<?> getAddEntityPacket() {
     return NetworkHooks.getEntitySpawningPacket(this);
   }
 }

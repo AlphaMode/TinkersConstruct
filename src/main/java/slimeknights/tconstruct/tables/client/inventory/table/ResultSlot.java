@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.tables.client.inventory.table;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.CraftingResultSlot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.ResultSlot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fml.hooks.BasicEventHooks;
 import slimeknights.mantle.inventory.CraftingCustomSlot;
 import slimeknights.mantle.inventory.IContainerCraftingCustom;
@@ -13,10 +13,10 @@ import javax.annotation.Nonnull;
 /**
  * Same as {@link CraftingCustomSlot}, but does not require an crafting inventory
  */
-public class ResultSlot extends CraftingResultSlot {
+public class ResultSlot extends ResultSlot {
   private final IContainerCraftingCustom callback;
   @SuppressWarnings("ConstantConditions")
-  public ResultSlot(IContainerCraftingCustom callback, PlayerEntity player, IInventory inv, int index, int x, int y) {
+  public ResultSlot(IContainerCraftingCustom callback, Player player, Container inv, int index, int x, int y) {
     // pass in null for CraftingInventory
     super(player, null, inv, index, x, y);
     this.callback = callback;
@@ -25,21 +25,21 @@ public class ResultSlot extends CraftingResultSlot {
   /* Methods that reference CraftingInventory */
 
   @Override
-  protected void onCrafting(ItemStack stack) {
-    if (this.amountCrafted > 0) {
-      stack.onCrafting(this.player.world, this.player, this.amountCrafted);
-      net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerCraftingEvent(this.player, stack, this.inventory);
+  protected void checkTakeAchievements(ItemStack stack) {
+    if (this.removeCount > 0) {
+      stack.onCraftedBy(this.player.level, this.player, this.removeCount);
+      net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerCraftingEvent(this.player, stack, this.container);
     }
 
-    this.amountCrafted = 0;
+    this.removeCount = 0;
   }
 
   @Override
   @Nonnull
-  public ItemStack onTake(PlayerEntity playerIn, @Nonnull ItemStack stack) {
-    BasicEventHooks.firePlayerCraftingEvent(playerIn, stack, this.inventory);
-    this.onCrafting(stack);
-    this.callback.onCrafting(playerIn, stack, this.inventory);
+  public ItemStack onTake(Player playerIn, @Nonnull ItemStack stack) {
+    BasicEventHooks.firePlayerCraftingEvent(playerIn, stack, this.container);
+    this.checkTakeAchievements(stack);
+    this.callback.onCrafting(playerIn, stack, this.container);
     return stack;
   }
 }

@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.common.recipe;
 
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.recipe.RecipeSerializer;
 import slimeknights.tconstruct.TConstruct;
 
@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
  * TODO: move to Mantle
  * @param <T>  Recipe class
  */
-public abstract class LoggingRecipeSerializer<T extends IRecipe<?>> extends RecipeSerializer<T> {
+public abstract class LoggingRecipeSerializer<T extends Recipe<?>> extends RecipeSerializer<T> {
   /**
    * Read the recipe from the packet
    * @param id      Recipe ID
@@ -22,7 +22,7 @@ public abstract class LoggingRecipeSerializer<T extends IRecipe<?>> extends Reci
    * @throws RuntimeException  If any errors happen, the exception will be logged automatically
    */
   @Nullable
-  protected abstract T readSafe(ResourceLocation id, PacketBuffer buffer);
+  protected abstract T readSafe(ResourceLocation id, FriendlyByteBuf buffer);
 
   /**
    * Write the method to the buffer
@@ -30,11 +30,11 @@ public abstract class LoggingRecipeSerializer<T extends IRecipe<?>> extends Reci
    * @param recipe  Recipe instance
    * @throws RuntimeException  If any errors happen, the exception will be logged automatically
    */
-  protected abstract void writeSafe(PacketBuffer buffer, T recipe);
+  protected abstract void writeSafe(FriendlyByteBuf buffer, T recipe);
 
   @Nullable
   @Override
-  public T read(ResourceLocation id, PacketBuffer buffer) {
+  public T fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
     try {
       return readSafe(id, buffer);
     } catch (RuntimeException e) {
@@ -44,7 +44,7 @@ public abstract class LoggingRecipeSerializer<T extends IRecipe<?>> extends Reci
   }
 
   @Override
-  public void write(PacketBuffer buffer, T recipe) {
+  public void toNetwork(FriendlyByteBuf buffer, T recipe) {
     try {
       writeSafe(buffer, recipe);
     } catch (RuntimeException e) {

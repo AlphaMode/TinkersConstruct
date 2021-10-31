@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.common.network;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.IPacket;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
 import slimeknights.mantle.network.NetworkWrapper;
@@ -88,9 +88,9 @@ public class TinkerNetwork extends NetworkWrapper {
    * @param player  Player
    * @param packet  Packet
    */
-  public void sendVanillaPacket(Entity player, IPacket<?> packet) {
-    if (player instanceof ServerPlayerEntity && ((ServerPlayerEntity) player).connection != null) {
-      ((ServerPlayerEntity) player).connection.sendPacket(packet);
+  public void sendVanillaPacket(Entity player, Packet<?> packet) {
+    if (player instanceof ServerPlayer && ((ServerPlayer) player).connection != null) {
+      ((ServerPlayer) player).connection.send(packet);
     }
   }
 
@@ -100,9 +100,9 @@ public class TinkerNetwork extends NetworkWrapper {
    * @param world     World instance
    * @param position  Target position
    */
-  public void sendToClientsAround(Object msg, @Nullable IWorld world, BlockPos position) {
-    if (world instanceof ServerWorld) {
-      sendToClientsAround(msg, (ServerWorld)world, position);
+  public void sendToClientsAround(Object msg, @Nullable LevelAccessor world, BlockPos position) {
+    if (world instanceof ServerLevel) {
+      sendToClientsAround(msg, (ServerLevel)world, position);
     }
   }
 

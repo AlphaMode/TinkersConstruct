@@ -12,11 +12,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.ITickableTileEntity;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.data.IModelData;
@@ -57,7 +57,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public abstract class HeatingStructureTileEntity extends NamableTileEntity implements ITickableTileEntity, IMasterLogic, ISmelteryTankHandler {
+public abstract class HeatingStructureTileEntity extends NamableTileEntity implements TickableBlockEntity, IMasterLogic, ISmelteryTankHandler {
   private static final String TAG_STRUCTURE = "structure";
   private static final String TAG_TANK = "tank";
   private static final String TAG_INVENTORY = "inventory";

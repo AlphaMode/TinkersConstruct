@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.library.modifiers;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
@@ -34,7 +34,7 @@ public class TankModifier extends Modifier {
   private static final ResourceLocation FLUID = TConstruct.getResource("tank_fluid");
 
   /** Helper function to parse a fluid from NBT */
-  public static final BiFunction<CompoundNBT, String, FluidStack> PARSE_FLUID = (nbt, key) -> FluidStack.loadFluidStackFromNBT(nbt.getCompound(key));
+  public static final BiFunction<CompoundTag, String, FluidStack> PARSE_FLUID = (nbt, key) -> FluidStack.loadFluidStackFromNBT(nbt.getCompound(key));
 
   private final ModifierTank tank = new ModifierTank();
   private final int capacity;
@@ -67,13 +67,13 @@ public class TankModifier extends Modifier {
   }
 
   @Override
-  public void addInformation(IModifierToolStack tool, int level, List<ITextComponent> tooltip, boolean isAdvanced, boolean detailed) {
+  public void addInformation(IModifierToolStack tool, int level, List<Component> tooltip, boolean isAdvanced, boolean detailed) {
     if (isOwner(tool)) {
       FluidStack current = getFluid(tool);
       if (!current.isEmpty()) {
-        tooltip.add(new TranslationTextComponent(FILLED_KEY, current.getAmount(), current.getDisplayName()));
+        tooltip.add(new TranslatableComponent(FILLED_KEY, current.getAmount(), current.getDisplayName()));
       }
-      tooltip.add(new TranslationTextComponent(CAPACITY_KEY, getCapacity(tool)));
+      tooltip.add(new TranslatableComponent(CAPACITY_KEY, getCapacity(tool)));
     }
   }
 
@@ -167,7 +167,7 @@ public class TankModifier extends Modifier {
     if (fluid.getAmount() > capacity) {
       fluid.setAmount(capacity);
     }
-    tool.getPersistentData().put(FLUID, fluid.writeToNBT(new CompoundNBT()));
+    tool.getPersistentData().put(FLUID, fluid.writeToNBT(new CompoundTag()));
     return fluid;
   }
 

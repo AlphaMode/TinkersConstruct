@@ -2,8 +2,8 @@ package slimeknights.tconstruct.library.recipe.modifiers.spilling.effects;
 
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.crafting.CraftingHelper;

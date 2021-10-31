@@ -2,20 +2,23 @@ package slimeknights.tconstruct.library.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 
 import javax.annotation.Nullable;
+
+import net.minecraftforge.eventbus.api.Event.HasResult;
+import net.minecraftforge.eventbus.api.Event.Result;
 
 @AllArgsConstructor
 @Getter
@@ -34,13 +37,13 @@ public abstract class TinkerToolEvent extends Event {
   @Getter
   public static class ToolHarvestEvent extends TinkerToolEvent {
     /** Item context, note this is the original context, so some information (such as position) may not be accurate */
-    private final ItemUseContext context;
-    private final ServerWorld world;
+    private final UseOnContext context;
+    private final ServerLevel world;
     private final BlockState state;
     private final BlockPos pos;
     @Nullable
-    private final PlayerEntity player;
-    public ToolHarvestEvent(ItemStack stack, IModifierToolStack tool, ItemUseContext context, ServerWorld world, BlockState state, BlockPos pos, @Nullable PlayerEntity player) {
+    private final Player player;
+    public ToolHarvestEvent(ItemStack stack, IModifierToolStack tool, UseOnContext context, ServerLevel world, BlockState state, BlockPos pos, @Nullable Player player) {
       super(stack, tool);
       this.context = context;
       this.world = world;
@@ -62,11 +65,11 @@ public abstract class TinkerToolEvent extends Event {
   @HasResult
   @Getter
   public static class ToolShearEvent extends TinkerToolEvent {
-    private final World world;
-    private final PlayerEntity player;
+    private final Level world;
+    private final Player player;
     private final Entity target;
     private final int fortune;
-    public ToolShearEvent(ItemStack stack, IModifierToolStack tool, World world, PlayerEntity player, Entity target, int fortune) {
+    public ToolShearEvent(ItemStack stack, IModifierToolStack tool, Level world, Player player, Entity target, int fortune) {
       super(stack, tool);
       this.world = world;
       this.player = player;

@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.world.worldgen.islands.variants;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.fluids.TinkerFluids;
 import slimeknights.tconstruct.shared.block.SlimeType;
@@ -23,7 +23,7 @@ public class SkySlimeIslandVariant extends AbstractSlimeIslandVariant {
 
   @Override
   public ResourceLocation getStructureName(String variantName) {
-    return TConstruct.getResource("slime_islands/sky/" + dirtType.getString() + "_" + variantName);
+    return TConstruct.getResource("slime_islands/sky/" + dirtType.getSerializedName() + "_" + variantName);
   }
 
   @Override
@@ -33,13 +33,13 @@ public class SkySlimeIslandVariant extends AbstractSlimeIslandVariant {
 
   @Override
   public BlockState getLakeFluid() {
-    return Objects.requireNonNull(TinkerFluids.skySlime.getBlock()).getDefaultState();
+    return Objects.requireNonNull(TinkerFluids.skySlime.getBlock()).defaultBlockState();
   }
 
   @Nullable
   @Override
   public BlockState getVines() {
-    return TinkerWorld.skySlimeVine.get().getDefaultState();
+    return TinkerWorld.skySlimeVine.get().defaultBlockState();
   }
 
   @Nullable

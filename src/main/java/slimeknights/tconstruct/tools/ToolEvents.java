@@ -10,13 +10,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.BeehiveTileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
@@ -49,7 +49,7 @@ public class ToolEvents {
   @SubscribeEvent
   static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
     // Note the way the subscribers are set up, technically works on anything that has the tic_modifiers tag
-    ItemStack stack = event.getPlayer().getHeldItemMainhand();
+    ItemStack stack = event.getPlayer().getMainHandItem();
     if (!TinkerTags.Items.HARVEST.contains(stack.getItem())) {
       return;
     }
@@ -58,9 +58,9 @@ public class ToolEvents {
       List<ModifierEntry> modifiers = tool.getModifierList();
       if (!modifiers.isEmpty()) {
         // modifiers using additive boosts may want info on the original boosts provided
-        PlayerEntity player = event.getPlayer();
+        Player player = event.getPlayer();
         float miningSpeedModifier = Modifier.getMiningModifier(player);
-        boolean isEffective = stack.canHarvestBlock(event.getState());
+        boolean isEffective = stack.isCorrectToolForDrops(event.getState());
         Direction direction = BlockSideHitListener.getSideHit(player);
         for (ModifierEntry entry : tool.getModifierList()) {
           entry.getModifier().onBreakSpeed(tool, entry.getLevel(), event, direction, isEffective, miningSpeedModifier);

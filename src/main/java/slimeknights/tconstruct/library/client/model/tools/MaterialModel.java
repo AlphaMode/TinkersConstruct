@@ -14,22 +14,22 @@ import lombok.extern.log4j.Log4j2;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.IModelTransform;
-import net.minecraft.client.renderer.model.IUnbakedModel;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.math.vector.TransformationMatrix;
-import net.minecraft.util.math.vector.Vector2f;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.client.model.BakedItemModel;
 import net.minecraftforge.client.model.IModelConfiguration;
@@ -74,11 +74,11 @@ public class MaterialModel implements IModelGeometry<MaterialModel> {
   /** Tint index and index of part in tool */
   private final int index;
   /** Transform matrix to apply to child parts */
-  private final Vector2f offset;
+  private final Vec2 offset;
 
   @Override
-  public Collection<RenderMaterial> getTextures(IModelConfiguration owner, Function<ResourceLocation,IUnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    Set<RenderMaterial> allTextures = Sets.newHashSet();
+  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+    Set<Material> allTextures = Sets.newHashSet();
     getMaterialTextures(allTextures, owner, "texture", material);
     return allTextures;
   }
@@ -89,12 +89,12 @@ public class MaterialModel implements IModelGeometry<MaterialModel> {
    * @param allTextures      Collection of textures
    * @return  Texture consumer
    */
-  public static Predicate<RenderMaterial> getTextureAdder(ResourceLocation textureLocation, Collection<RenderMaterial> allTextures, boolean logMissingTextures) {
+  public static Predicate<Material> getTextureAdder(ResourceLocation textureLocation, Collection<Material> allTextures, boolean logMissingTextures) {
     if (textureLocation.getPath().startsWith("item/tool")) {
       return mat -> {
         // either must be non-blocks, or must exist. We have fallbacks if it does not exist
-        ResourceLocation loc = mat.getTextureLocation();
-        if (!PlayerContainer.LOCATION_BLOCKS_TEXTURE.equals(mat.getAtlasLocation()) || TinkerClient.textureValidator.test(loc)) {
+        ResourceLocation loc = mat.texture();
+        if (!InventoryMenu.BLOCK_ATLAS.equals(mat.atlasLocation()) || TinkerClient.textureValidator.test(loc)) {
           allTextures.add(mat);
           return true;
         } else if (logMissingTextures && !SKIPPED_TEXTURES.contains(loc)) {

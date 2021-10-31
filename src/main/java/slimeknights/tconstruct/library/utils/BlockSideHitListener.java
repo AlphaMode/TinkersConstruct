@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.library.utils;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
@@ -29,12 +29,12 @@ public class BlockSideHitListener {
 
   /** Called when the player left clicks a block to store the face */
   private static void onLeftClickBlock(LeftClickBlock event) {
-    HIT_FACE.put(event.getPlayer().getUniqueID(), event.getFace());
+    HIT_FACE.put(event.getPlayer().getUUID(), event.getFace());
   }
 
   /** Called when a player leaves the server to clear the face */
   private static void onLeaveServer(PlayerLoggedOutEvent event) {
-    HIT_FACE.remove(event.getPlayer().getUniqueID());
+    HIT_FACE.remove(event.getPlayer().getUUID());
   }
 
   /**
@@ -42,7 +42,7 @@ public class BlockSideHitListener {
    * @param player  Player
    * @return  Side last hit
    */
-  public static Direction getSideHit(PlayerEntity player) {
-    return HIT_FACE.getOrDefault(player.getUniqueID(), Direction.UP);
+  public static Direction getSideHit(Player player) {
+    return HIT_FACE.getOrDefault(player.getUUID(), Direction.UP);
   }
 }

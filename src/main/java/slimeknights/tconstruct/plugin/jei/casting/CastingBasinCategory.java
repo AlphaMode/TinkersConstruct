@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.plugin.jei.casting;
 
 import mezz.jei.api.helpers.IGuiHelper;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.plugin.jei.TConstructRecipeCategoryUid;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 

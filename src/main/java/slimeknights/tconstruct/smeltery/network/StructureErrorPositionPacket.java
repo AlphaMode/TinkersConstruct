@@ -2,8 +2,8 @@ package slimeknights.tconstruct.smeltery.network;
 
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import slimeknights.mantle.network.packet.IThreadsafePacket;
 import slimeknights.mantle.util.TileEntityHelper;
@@ -20,7 +20,7 @@ public class StructureErrorPositionPacket implements IThreadsafePacket {
   @Nullable
   private final BlockPos errorPos;
 
-  public StructureErrorPositionPacket(PacketBuffer buffer) {
+  public StructureErrorPositionPacket(FriendlyByteBuf buffer) {
     this.controllerPos = buffer.readBlockPos();
     if (buffer.readBoolean()) {
       this.errorPos = buffer.readBlockPos();
@@ -30,7 +30,7 @@ public class StructureErrorPositionPacket implements IThreadsafePacket {
   }
 
   @Override
-  public void encode(PacketBuffer buffer) {
+  public void encode(FriendlyByteBuf buffer) {
     buffer.writeBlockPos(controllerPos);
     if (errorPos != null) {
       buffer.writeBoolean(true);
@@ -47,7 +47,7 @@ public class StructureErrorPositionPacket implements IThreadsafePacket {
 
   private static class HandleClient {
     private static void handle(StructureErrorPositionPacket packet) {
-      TileEntityHelper.getTile(HeatingStructureTileEntity.class, Minecraft.getInstance().world, packet.controllerPos)
+      TileEntityHelper.getTile(HeatingStructureTileEntity.class, Minecraft.getInstance().level, packet.controllerPos)
                       .ifPresent(te -> te.setErrorPos(packet.errorPos));
     }
   }

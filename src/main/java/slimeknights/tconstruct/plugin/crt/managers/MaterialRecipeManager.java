@@ -7,8 +7,8 @@ import com.blamejared.crafttweaker.api.item.IIngredient;
 import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker.api.managers.IRecipeManager;
 import com.blamejared.crafttweaker.impl.actions.recipes.ActionAddRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.resources.ResourceLocation;
 import org.openzen.zencode.java.ZenCodeType;
 import org.openzen.zencode.java.ZenCodeType.Optional;
 import slimeknights.mantle.recipe.FluidIngredient;
@@ -59,7 +59,7 @@ public class MaterialRecipeManager implements IRecipeManager {
   }
   
   @Override
-  public IRecipeType<MaterialRecipe> getRecipeType() {
+  public RecipeType<MaterialRecipe> getRecipeType() {
     return RecipeTypes.MATERIAL;
   }
   

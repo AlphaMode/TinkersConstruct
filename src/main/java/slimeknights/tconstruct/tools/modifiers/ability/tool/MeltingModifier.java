@@ -3,10 +3,10 @@ package slimeknights.tconstruct.tools.modifiers.ability.tool;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.loot.LootContext;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.tconstruct.common.config.Config;
 import slimeknights.tconstruct.library.modifiers.TankModifier;
@@ -37,7 +37,7 @@ public class MeltingModifier extends TankModifier {
   }
 
   @Override
-  public ITextComponent getDisplayName(int level) {
+  public Component getDisplayName(int level) {
     // display name without the level, single use
     return super.getDisplayName();
   }
@@ -48,7 +48,7 @@ public class MeltingModifier extends TankModifier {
    * @param world  World instance
    * @return  Fluid
    */
-  private static FluidStack meltItem(ItemStack stack, World world) {
+  private static FluidStack meltItem(ItemStack stack, Level world) {
     inventory.setStack(stack);
     // first, update inventory
     IMeltingRecipe recipe = lastRecipe;

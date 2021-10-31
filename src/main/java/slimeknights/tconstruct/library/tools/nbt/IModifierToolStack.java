@@ -2,9 +2,9 @@ package slimeknights.tconstruct.library.tools.nbt;
 
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
@@ -33,7 +33,7 @@ public interface IModifierToolStack {
   }
 
   /** Checks if the tool has the given tag */
-  default boolean hasTag(ITag<Item> tag) {
+  default boolean hasTag(Tag<Item> tag) {
     return tag.contains(getItem());
   }
 

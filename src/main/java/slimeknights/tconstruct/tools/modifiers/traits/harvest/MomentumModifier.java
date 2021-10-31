@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.modifiers.traits.harvest;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;

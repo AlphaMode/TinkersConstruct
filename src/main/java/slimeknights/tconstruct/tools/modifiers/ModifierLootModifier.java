@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.tools.modifiers;
 
 import com.google.gson.JsonObject;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
-import net.minecraft.loot.conditions.ILootCondition;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
@@ -18,20 +18,20 @@ import java.util.List;
 
 /** Global loot modifier for modifiers */
 public class ModifierLootModifier extends LootModifier {
-  protected ModifierLootModifier(ILootCondition[] conditionsIn) {
+  protected ModifierLootModifier(LootItemCondition[] conditionsIn) {
     super(conditionsIn);
   }
 
   @Override
   protected List<ItemStack> doApply(List<ItemStack> generatedLoot, LootContext context) {
     // tool is for harvest
-    ItemStack stack = context.get(LootParameters.TOOL);
+    ItemStack stack = context.getParamOrNull(LootContextParams.TOOL);
     // if null, try entity held item
     if (stack == null) {
-      Entity entity = context.get(LootParameters.KILLER_ENTITY);
+      Entity entity = context.getParamOrNull(LootContextParams.KILLER_ENTITY);
       if (entity instanceof LivingEntity) {
         LivingEntity living = (LivingEntity) entity;
-        stack = living.getHeldItem(ModifierLootingHandler.getLootingHand(living));
+        stack = living.getItemInHand(ModifierLootingHandler.getLootingHand(living));
       }
     }
     // hopefully one of the two worked

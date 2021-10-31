@@ -24,14 +24,14 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.Color;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.Util;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -91,13 +91,13 @@ public class Modifier implements IForgeRegistryEntry<Modifier> {
   private String translationKey;
   /** Cached text component for display names */
   @Nullable
-  private ITextComponent displayName;
+  private Component displayName;
   /** Cached text component for description */
   @Nullable
-  private List<ITextComponent> descriptionList;
+  private List<Component> descriptionList;
   /** Cached text component for description */
   @Nullable
-  private ITextComponent description;
+  private Component description;
 
   /**
    * Override this method to make your modifier run earlier or later.
@@ -147,7 +147,7 @@ public class Modifier implements IForgeRegistryEntry<Modifier> {
    * @return  Translation key
    */
   protected String makeTranslationKey() {
-    return Util.makeTranslationKey("modifier", registryName);
+    return Util.makeDescriptionId("modifier", registryName);
   }
 
   /**
@@ -165,8 +165,8 @@ public class Modifier implements IForgeRegistryEntry<Modifier> {
    * Overridable method to create the display name for this modifier, ideal to modify colors
    * @return  Display name
    */
-  protected ITextComponent makeDisplayName() {
-    return new TranslationTextComponent(getTranslationKey());
+  protected Component makeDisplayName() {
+    return new TranslatableComponent(getTranslationKey());
   }
 
   /**
@@ -174,17 +174,17 @@ public class Modifier implements IForgeRegistryEntry<Modifier> {
    * @param component  Component to modifiy
    * @return  Resulting component
    */
-  public IFormattableTextComponent applyStyle(IFormattableTextComponent component) {
-      return component.modifyStyle(style -> style.setColor(Color.fromInt(color)));
+  public MutableComponent applyStyle(MutableComponent component) {
+      return component.withStyle(style -> style.withColor(TextColor.fromRgb(color)));
   }
 
   /**
    * Gets the display name for this modifier
    * @return  Display name for this modifier
    */
-  public final ITextComponent getDisplayName() {
+  public final Component getDisplayName() {
     if (displayName == null) {
-      displayName = new TranslationTextComponent(getTranslationKey()).modifyStyle(style -> style.setColor(Color.fromInt(getColor())));
+      displayName = new TranslatableComponent(getTranslationKey()).withStyle(style -> style.withColor(TextColor.fromRgb(getColor())));
     }
     return displayName;
   }

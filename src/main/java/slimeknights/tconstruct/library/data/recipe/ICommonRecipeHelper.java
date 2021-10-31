@@ -2,16 +2,16 @@ package slimeknights.tconstruct.library.data.recipe;
 
 import net.minecraft.advancements.ICriterionInstance;
 import net.minecraft.advancements.criterion.ItemPredicate;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.RecipeProvider;
-import net.minecraft.data.ShapedRecipeBuilder;
-import net.minecraft.data.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.SingleItemRecipeBuilder;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.Tags;
 import slimeknights.mantle.registration.object.BuildingBlockObject;
 import slimeknights.mantle.registration.object.WallBuildingBlockObject;
@@ -33,22 +33,22 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
    * @param smallName  Small name
    * @param folder     Recipe folder
    */
-  default void packingRecipe(Consumer<IFinishedRecipe> consumer, String largeName, IItemProvider large, String smallName, IItemProvider small, String folder) {
+  default void packingRecipe(Consumer<FinishedRecipe> consumer, String largeName, ItemLike large, String smallName, ItemLike small, String folder) {
     // ingot to block
-    ShapedRecipeBuilder.shapedRecipe(large)
-                       .key('#', small)
-                       .patternLine("###")
-                       .patternLine("###")
-                       .patternLine("###")
-                       .addCriterion("has_item", RecipeProvider.hasItem(small))
-                       .setGroup(Objects.requireNonNull(large.asItem().getRegistryName()).toString())
-                       .build(consumer, wrap(large.asItem(), folder, String.format("_from_%ss", smallName)));
+    ShapedRecipeBuilder.shaped(large)
+                       .define('#', small)
+                       .pattern("###")
+                       .pattern("###")
+                       .pattern("###")
+                       .unlockedBy("has_item", RecipeProvider.has(small))
+                       .group(Objects.requireNonNull(large.asItem().getRegistryName()).toString())
+                       .save(consumer, wrap(large.asItem(), folder, String.format("_from_%ss", smallName)));
     // block to ingot
-    ShapelessRecipeBuilder.shapelessRecipe(small, 9)
-                          .addIngredient(large)
-                          .addCriterion("has_item", RecipeProvider.hasItem(large))
-                          .setGroup(Objects.requireNonNull(small.asItem().getRegistryName()).toString())
-                          .build(consumer, wrap(small.asItem(), folder, String.format("_from_%s", largeName)));
+    ShapelessRecipeBuilder.shapeless(small, 9)
+                          .requires(large)
+                          .unlockedBy("has_item", RecipeProvider.has(large))
+                          .group(Objects.requireNonNull(small.asItem().getRegistryName()).toString())
+                          .save(consumer, wrap(small.asItem(), folder, String.format("_from_%s", largeName)));
   }
 
   /**
@@ -61,24 +61,24 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
    * @param smallName  Small name
    * @param folder     Recipe folder
    */
-  default void packingRecipe(Consumer<IFinishedRecipe> consumer, String largeName, IItemProvider largeItem, String smallName, IItemProvider smallItem, ITag<Item> smallTag, String folder) {
+  default void packingRecipe(Consumer<FinishedRecipe> consumer, String largeName, ItemLike largeItem, String smallName, ItemLike smallItem, Tag<Item> smallTag, String folder) {
     // ingot to block
     // note our item is in the center, any mod allowed around the edges
-    ShapedRecipeBuilder.shapedRecipe(largeItem)
-                       .key('#', smallTag)
-                       .key('*', smallItem)
-                       .patternLine("###")
-                       .patternLine("#*#")
-                       .patternLine("###")
-                       .addCriterion("has_item", RecipeProvider.hasItem(smallItem))
-                       .setGroup(Objects.requireNonNull(largeItem.asItem().getRegistryName()).toString())
-                       .build(consumer, wrap(largeItem.asItem(), folder, String.format("_from_%ss", smallName)));
+    ShapedRecipeBuilder.shaped(largeItem)
+                       .define('#', smallTag)
+                       .define('*', smallItem)
+                       .pattern("###")
+                       .pattern("#*#")
+                       .pattern("###")
+                       .unlockedBy("has_item", RecipeProvider.has(smallItem))
+                       .group(Objects.requireNonNull(largeItem.asItem().getRegistryName()).toString())
+                       .save(consumer, wrap(largeItem.asItem(), folder, String.format("_from_%ss", smallName)));
     // block to ingot
-    ShapelessRecipeBuilder.shapelessRecipe(smallItem, 9)
-                          .addIngredient(largeItem)
-                          .addCriterion("has_item", RecipeProvider.hasItem(largeItem))
-                          .setGroup(Objects.requireNonNull(smallItem.asItem().getRegistryName()).toString())
-                          .build(consumer, wrap(smallItem.asItem(), folder, String.format("_from_%s", largeName)));
+    ShapelessRecipeBuilder.shapeless(smallItem, 9)
+                          .requires(largeItem)
+                          .unlockedBy("has_item", RecipeProvider.has(largeItem))
+                          .group(Objects.requireNonNull(smallItem.asItem().getRegistryName()).toString())
+                          .save(consumer, wrap(smallItem.asItem(), folder, String.format("_from_%s", largeName)));
   }
 
   /**
@@ -87,8 +87,8 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
    * @param metal     Metal object
    * @param folder    Folder for recipes
    */
-  default void metalCrafting(Consumer<IFinishedRecipe> consumer, MetalItemObject metal, String folder) {
-    IItemProvider ingot = metal.getIngot();
+  default void metalCrafting(Consumer<FinishedRecipe> consumer, MetalItemObject metal, String folder) {
+    ItemLike ingot = metal.getIngot();
     packingRecipe(consumer, "block", metal.get(), "ingot", ingot, metal.getIngotTag(), folder);
     packingRecipe(consumer, "ingot", ingot, "nugget", metal.getNugget(), metal.getNuggetTag(), folder);
   }

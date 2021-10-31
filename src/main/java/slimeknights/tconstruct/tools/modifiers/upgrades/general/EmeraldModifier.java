@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.general;
 
 import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Rarity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.util.text.ITextComponent;
 import slimeknights.tconstruct.library.modifiers.SingleLevelModifier;
 import slimeknights.tconstruct.library.tools.ToolDefinition;

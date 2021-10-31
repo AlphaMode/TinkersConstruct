@@ -2,16 +2,16 @@ package slimeknights.tconstruct.tables.tileentity.table;
 
 import lombok.Getter;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.RecipeManager;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.hooks.BasicEventHooks;
 import slimeknights.tconstruct.common.SoundUtils;
@@ -60,11 +60,11 @@ public class TinkerStationTileEntity extends RetexturedTableTileEntity implement
   }
 
   @Override
-  public ITextComponent getDefaultName() {
-    if (this.world == null) {
+  public Component getDefaultName() {
+    if (this.level == null) {
       return super.getDefaultName();
     }
-    return new TranslationTextComponent(this.getBlockState().getBlock().getTranslationKey());
+    return new TranslatableComponent(this.getBlockState().getBlock().getDescriptionId());
   }
 
   /**
@@ -72,7 +72,7 @@ public class TinkerStationTileEntity extends RetexturedTableTileEntity implement
    * @return  Input count
    */
   public int getInputCount() {
-    return getSizeInventory() - 1;
+    return getContainerSize() - 1;
   }
 
   @Override
@@ -83,15 +83,15 @@ public class TinkerStationTileEntity extends RetexturedTableTileEntity implement
 
   @Nullable
   @Override
-  public Container createMenu(int menuId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+  public AbstractContainerMenu createMenu(int menuId, Inventory playerInventory, Player playerEntity) {
     return new TinkerStationContainer(menuId, playerInventory, this);
   }
 
   /* Crafting */
 
   @Override
-  public ItemStack calcResult(@Nullable PlayerEntity player) {
-    if (this.world == null) {
+  public ItemStack calcResult(@Nullable Player player) {
+    if (this.level == null) {
       return ItemStack.EMPTY;
     }
 
@@ -99,14 +99,14 @@ public class TinkerStationTileEntity extends RetexturedTableTileEntity implement
     ItemStack result = ItemStack.EMPTY;
     this.currentError = ValidatedResult.PASS;
 
-    if (!this.world.isRemote && this.world.getServer() != null) {
-      RecipeManager manager = this.world.getServer().getRecipeManager();
+    if (!this.level.isClientSide && this.level.getServer() != null) {
+      RecipeManager manager = this.level.getServer().getRecipeManager();
 
       // first, try the cached recipe
       ITinkerStationRecipe recipe = lastRecipe;
       // if it does not match, find a new recipe
-      if (recipe == null || !recipe.matches(this.inventoryWrapper, this.world)) {
-        recipe = manager.getRecipe(RecipeTypes.TINKER_STATION, this.inventoryWrapper, this.world).orElse(null);
+      if (recipe == null || !recipe.matches(this.inventoryWrapper, this.level)) {
+        recipe = manager.getRecipeFor(RecipeTypes.TINKER_STATION, this.inventoryWrapper, this.level).orElse(null);
       }
 
       // if we have a recipe, fetch its result

@@ -2,9 +2,9 @@ package slimeknights.tconstruct.library.recipe.tinkerstation.building;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.recipe.RecipeHelper;
 import slimeknights.tconstruct.common.recipe.LoggingRecipeSerializer;
 import slimeknights.tconstruct.library.tools.item.IModifiable;
@@ -14,10 +14,10 @@ import javax.annotation.Nullable;
 public class ToolBuildingRecipeSerializer extends LoggingRecipeSerializer<ToolBuildingRecipe> {
 
   @Override
-  public ToolBuildingRecipe read(ResourceLocation recipeId, JsonObject json) {
-    String group = JSONUtils.getString(json, "group", "");
+  public ToolBuildingRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+    String group = GsonHelper.getAsString(json, "group", "");
     // output fetch as a modifiable item, its an error if it does not implement that interface or does not have parts
-    IModifiable item = RecipeHelper.deserializeItem(JSONUtils.getString(json, "result"), "result", IModifiable.class);
+    IModifiable item = RecipeHelper.deserializeItem(GsonHelper.getAsString(json, "result"), "result", IModifiable.class);
     if (!item.getToolDefinition().isMultipart()) {
       throw new JsonSyntaxException("Modifiable item must have tool parts to get a tool building recipe");
     }
@@ -26,15 +26,15 @@ public class ToolBuildingRecipeSerializer extends LoggingRecipeSerializer<ToolBu
 
   @Nullable
   @Override
-  protected ToolBuildingRecipe readSafe(ResourceLocation recipeId, PacketBuffer buffer) {
-    String group = buffer.readString(Short.MAX_VALUE);
+  protected ToolBuildingRecipe readSafe(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+    String group = buffer.readUtf(Short.MAX_VALUE);
     IModifiable result = RecipeHelper.readItem(buffer, IModifiable.class);
     return new ToolBuildingRecipe(recipeId, group, result);
   }
 
   @Override
-  protected void writeSafe(PacketBuffer buffer, ToolBuildingRecipe recipe) {
-    buffer.writeString(recipe.group);
+  protected void writeSafe(FriendlyByteBuf buffer, ToolBuildingRecipe recipe) {
+    buffer.writeUtf(recipe.group);
     RecipeHelper.writeItem(buffer, recipe.output);
   }
 }

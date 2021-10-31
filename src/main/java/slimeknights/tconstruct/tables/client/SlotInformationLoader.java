@@ -5,10 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.extern.log4j.Log4j2;
-import net.minecraft.client.resources.JsonReloadListener;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.tables.client.inventory.library.slots.SlotInformation;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 @Log4j2
-public class SlotInformationLoader extends JsonReloadListener {
+public class SlotInformationLoader extends SimpleJsonResourceReloadListener {
 
   /** GSON instance for this */
   private static final Gson GSON = new GsonBuilder()
@@ -41,7 +41,7 @@ public class SlotInformationLoader extends JsonReloadListener {
   }
 
   @Override
-  protected void apply(Map<ResourceLocation, JsonElement> map, IResourceManager resourceManager, IProfiler profiler) {
+  protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler) {
     this.slotInformationMap.clear();
     this.slotInformationList.clear();
 

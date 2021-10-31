@@ -1,17 +1,17 @@
 package slimeknights.tconstruct.smeltery;
 
-import net.minecraft.block.AbstractBlock.Properties;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.common.ToolType;
@@ -99,7 +99,7 @@ import java.util.function.Supplier;
 @SuppressWarnings("unused")
 public final class TinkerSmeltery extends TinkerModule {
   /** Tab for all blocks related to the smeltery */
-  public static final ItemGroup TAB_SMELTERY = new SupplierItemGroup(TConstruct.MOD_ID, "smeltery", () -> new ItemStack(TinkerSmeltery.smelteryController));
+  public static final CreativeModeTab TAB_SMELTERY = new SupplierItemGroup(TConstruct.MOD_ID, "smeltery", () -> new ItemStack(TinkerSmeltery.smelteryController));
   public static final Logger log = Util.getLogger("tinker_smeltery");
 
   /* Bricks */
@@ -108,28 +108,28 @@ public final class TinkerSmeltery extends TinkerModule {
   /*
    * Block base properties
    */
-  private static final Item.Properties SMELTERY_PROPS = new Item.Properties().group(TAB_SMELTERY);
+  private static final Item.Properties SMELTERY_PROPS = new Item.Properties().tab(TAB_SMELTERY);
   private static final Function<Block,? extends BlockItem> TOOLTIP_BLOCK_ITEM = (b) -> new BlockTooltipItem(b, SMELTERY_PROPS);
 
   /*
    * Blocks
    */
-  public static final ItemObject<Block> grout = BLOCKS.register("grout", builder(Material.SAND, MaterialColor.LIGHT_GRAY, ToolType.SHOVEL, SoundType.SAND).hardnessAndResistance(3.0f).slipperiness(0.8F), TOOLTIP_BLOCK_ITEM);
-  public static final ItemObject<Block> netherGrout = BLOCKS.register("nether_grout", builder(Material.SAND, ToolType.SHOVEL, SoundType.SOUL_SOIL).hardnessAndResistance(3.0f).slipperiness(0.8F), TOOLTIP_BLOCK_ITEM);
+  public static final ItemObject<Block> grout = BLOCKS.register("grout", builder(Material.SAND, MaterialColor.COLOR_LIGHT_GRAY, ToolType.SHOVEL, SoundType.SAND).strength(3.0f).friction(0.8F), TOOLTIP_BLOCK_ITEM);
+  public static final ItemObject<Block> netherGrout = BLOCKS.register("nether_grout", builder(Material.SAND, ToolType.SHOVEL, SoundType.SOUL_SOIL).strength(3.0f).friction(0.8F), TOOLTIP_BLOCK_ITEM);
 
   // seared blocks
   private static final Properties SEARED, TOUGH_SEARED, SEARED_GLASS, SEARED_NON_SOLID, SEARED_LANTERN;
   static {
     // solid
     IntFunction<Properties> solidProps = factor ->
-      builder(Material.ROCK, MaterialColor.GRAY, ToolType.PICKAXE, SoundType.METAL).setRequiresTool().hardnessAndResistance(3.0F * factor, 9.0F * factor)
-                                                                                   .setAllowsSpawn((s, r, p, e) -> !s.hasProperty(SearedBlock.IN_STRUCTURE) || !s.get(SearedBlock.IN_STRUCTURE));
+      builder(Material.STONE, MaterialColor.COLOR_GRAY, ToolType.PICKAXE, SoundType.METAL).requiresCorrectToolForDrops().strength(3.0F * factor, 9.0F * factor)
+                                                                                   .isValidSpawn((s, r, p, e) -> !s.hasProperty(SearedBlock.IN_STRUCTURE) || !s.getValue(SearedBlock.IN_STRUCTURE));
     SEARED = solidProps.apply(1);
     TOUGH_SEARED = solidProps.apply(2);
     // non-solid
-    Function<SoundType,Properties> nonSolidProps = sound -> builder(Material.ROCK, MaterialColor.GRAY, ToolType.PICKAXE, sound)
-      .setRequiresTool().hardnessAndResistance(3.0F, 9.0F).notSolid()
-      .setAllowsSpawn(Blocks::neverAllowSpawn).setOpaque(Blocks::isntSolid).setSuffocates(Blocks::isntSolid).setBlocksVision(Blocks::isntSolid);
+    Function<SoundType,Properties> nonSolidProps = sound -> builder(Material.STONE, MaterialColor.COLOR_GRAY, ToolType.PICKAXE, sound)
+      .requiresCorrectToolForDrops().strength(3.0F, 9.0F).noOcclusion()
+      .isValidSpawn(Blocks::never).isRedstoneConductor(Blocks::never).isSuffocating(Blocks::never).isViewBlocking(Blocks::never);
     SEARED_GLASS = nonSolidProps.apply(SoundType.GLASS);
     SEARED_NON_SOLID = nonSolidProps.apply(SoundType.METAL);
     SEARED_LANTERN = nonSolidProps.apply(SoundType.LANTERN);
@@ -159,13 +159,13 @@ public final class TinkerSmeltery extends TinkerModule {
   // scorched blocks
   private static final Properties SCORCHED, TOUGH_SCORCHED, SCORCHED_GLASS, SCORCHED_NON_SOLID, SCORCHED_LANTERN;
   static {
-    IntFunction<Properties> solidProps = factor -> builder(Material.ROCK, MaterialColor.BROWN_TERRACOTTA, ToolType.PICKAXE, SoundType.BASALT)
-      .setRequiresTool().hardnessAndResistance(2.5F * factor, 8.0F * factor).setAllowsSpawn((s, r, p, e) -> !s.hasProperty(SearedBlock.IN_STRUCTURE) || !s.get(SearedBlock.IN_STRUCTURE));
+    IntFunction<Properties> solidProps = factor -> builder(Material.STONE, MaterialColor.TERRACOTTA_BROWN, ToolType.PICKAXE, SoundType.BASALT)
+      .requiresCorrectToolForDrops().strength(2.5F * factor, 8.0F * factor).isValidSpawn((s, r, p, e) -> !s.hasProperty(SearedBlock.IN_STRUCTURE) || !s.getValue(SearedBlock.IN_STRUCTURE));
     SCORCHED = solidProps.apply(1);
     TOUGH_SCORCHED = solidProps.apply(3);
-    Function<SoundType,Properties> nonSolidProps = sound -> builder(Material.ROCK, MaterialColor.BROWN_TERRACOTTA, ToolType.PICKAXE, sound)
-      .setRequiresTool().hardnessAndResistance(2.5F, 8.0F).notSolid()
-      .setAllowsSpawn(Blocks::neverAllowSpawn).setOpaque(Blocks::isntSolid).setSuffocates(Blocks::isntSolid).setBlocksVision(Blocks::isntSolid);
+    Function<SoundType,Properties> nonSolidProps = sound -> builder(Material.STONE, MaterialColor.TERRACOTTA_BROWN, ToolType.PICKAXE, sound)
+      .requiresCorrectToolForDrops().strength(2.5F, 8.0F).noOcclusion()
+      .isValidSpawn(Blocks::never).isRedstoneConductor(Blocks::never).isSuffocating(Blocks::never).isViewBlocking(Blocks::never);
     SCORCHED_GLASS = nonSolidProps.apply(SoundType.GLASS);
     SCORCHED_NON_SOLID = nonSolidProps.apply(SoundType.BASALT);
     SCORCHED_LANTERN = nonSolidProps.apply(SoundType.LANTERN);

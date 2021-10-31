@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.library.tools.helper;
 
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Hand;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
@@ -33,7 +33,7 @@ public class ToolDamageUtil {
    * @return  True if broken
    */
   public static boolean isBroken(ItemStack stack) {
-    CompoundNBT nbt = stack.getTag();
+    CompoundTag nbt = stack.getTag();
     return nbt != null && nbt.getBoolean(ToolStack.TAG_BROKEN);
   }
 
@@ -48,7 +48,7 @@ public class ToolDamageUtil {
     if (isBroken(stack)) {
       return 0;
     }
-    return stack.getMaxDamage() - stack.getDamage();
+    return stack.getMaxDamage() - stack.getDamageValue();
   }
 
   /**
@@ -62,7 +62,7 @@ public class ToolDamageUtil {
     if (isBroken(stack)) {
       return stack.getMaxDamage();
     }
-    return stack.getDamage();
+    return stack.getDamageValue();
   }
 
   /**
@@ -71,7 +71,7 @@ public class ToolDamageUtil {
    * @return  True if it needs repair
    */
   public static boolean needsRepair(ItemStack stack) {
-    return stack.getDamage() > 0 || isBroken(stack);
+    return stack.getDamageValue() > 0 || isBroken(stack);
   }
 
 
@@ -86,7 +86,7 @@ public class ToolDamageUtil {
    * @return  True if the tool is broken now
    */
   public static boolean directDamage(IModifierToolStack tool, int amount, @Nullable LivingEntity entity, @Nullable ItemStack stack) {
-    if (entity instanceof PlayerEntity && ((PlayerEntity)entity).isCreative()) {
+    if (entity instanceof Player && ((Player)entity).isCreative()) {
       return false;
     }
 
@@ -98,11 +98,11 @@ public class ToolDamageUtil {
       // criteria updates
       int newDamage = damage + amount;
       // TODO: needed?
-      if (entity instanceof ServerPlayerEntity) {
+      if (entity instanceof ServerPlayer) {
         if (stack == null) {
-          stack = entity.getHeldItemMainhand();
+          stack = entity.getMainHandItem();
         }
-        CriteriaTriggers.ITEM_DURABILITY_CHANGED.trigger((ServerPlayerEntity)entity, stack, newDamage);
+        CriteriaTriggers.ITEM_DURABILITY_CHANGED.trigger((ServerPlayer)entity, stack, newDamage);
       }
 
       tool.setDamage(newDamage);

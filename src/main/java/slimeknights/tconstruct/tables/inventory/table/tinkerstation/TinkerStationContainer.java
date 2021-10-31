@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.tables.inventory.table.tinkerstation;
 
 import lombok.Getter;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -28,7 +28,7 @@ public class TinkerStationContainer extends BaseStationContainer<TinkerStationTi
    * @param inv   Player inventory
    * @param tile  Relevant tile entity
    */
-  public TinkerStationContainer(int id, PlayerInventory inv, @Nullable TinkerStationTileEntity tile) {
+  public TinkerStationContainer(int id, Inventory inv, @Nullable TinkerStationTileEntity tile) {
     super(TinkerTables.tinkerStationContainer.get(), id, inv, tile);
 
     // unfortunately, nothing works with no tile
@@ -41,7 +41,7 @@ public class TinkerStationContainer extends BaseStationContainer<TinkerStationTi
       inputSlots.add(this.addSlot(new TinkerableSlot(tile, TinkerStationTileEntity.TINKER_SLOT, 0, 0)));
 
       int index;
-      for (index = 0; index < tile.getSizeInventory() - 1; index++) {
+      for (index = 0; index < tile.getContainerSize() - 1; index++) {
         inputSlots.add(this.addSlot(new TinkerStationInputSlot(tile, index + TinkerStationTileEntity.INPUT_SLOT, 0, 0)));
       }
 

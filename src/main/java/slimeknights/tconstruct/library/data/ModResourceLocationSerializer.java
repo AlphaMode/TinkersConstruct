@@ -3,8 +3,8 @@ package slimeknights.tconstruct.library.data;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 
 import java.lang.reflect.Type;
 
@@ -20,7 +20,7 @@ public class ModResourceLocationSerializer extends ResourceLocation.Serializer {
 
   @Override
   public ResourceLocation deserialize(JsonElement element, Type type, JsonDeserializationContext context) throws JsonParseException {
-    String loc = JSONUtils.getString(element, "location");
+    String loc = GsonHelper.convertToString(element, "location");
     if (!loc.contains(":")) {
       loc = modId + ":" + loc;
     }

@@ -6,12 +6,12 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSyntaxException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import net.minecraft.loot.ILootSerializer;
-import net.minecraft.loot.LootConditionType;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.conditions.ILootCondition;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.storage.loot.Serializer;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ConfigEnabledCondition implements ICondition, ILootCondition {
+public class ConfigEnabledCondition implements ICondition, LootItemCondition {
   public static final ResourceLocation ID = TConstruct.getResource("config");
   public static final Serializer SERIALIZER = new Serializer();
   /* Map of config names to condition cache */
@@ -50,11 +50,11 @@ public class ConfigEnabledCondition implements ICondition, ILootCondition {
   }
 
   @Override
-  public LootConditionType getConditionType() {
+  public LootItemConditionType getType() {
     return TinkerCommons.lootConfig;
   }
 
-  private static class Serializer implements ILootSerializer<ConfigEnabledCondition>, IConditionSerializer<ConfigEnabledCondition> {
+  private static class Serializer implements Serializer<ConfigEnabledCondition>, IConditionSerializer<ConfigEnabledCondition> {
     @Override
     public ResourceLocation getID() {
       return ID;
@@ -67,7 +67,7 @@ public class ConfigEnabledCondition implements ICondition, ILootCondition {
 
     @Override
     public ConfigEnabledCondition read(JsonObject json) {
-      String prop = JSONUtils.getString(json, "prop");
+      String prop = GsonHelper.getAsString(json, "prop");
       ConfigEnabledCondition config = PROPS.get(prop.toLowerCase(Locale.ROOT));
       if (config == null) {
         throw new JsonSyntaxException("Invalid property name '" + prop + "'");

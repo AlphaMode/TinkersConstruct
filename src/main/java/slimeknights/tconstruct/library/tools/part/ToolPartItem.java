@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.library.tools.part;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.ForgeI18n;
@@ -23,11 +23,13 @@ import slimeknights.tconstruct.library.tools.helper.TooltipUtil;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.world.item.Item.Properties;
+
 /**
  * Extension of {@link MaterialItem} which adds stats to the tooltip and has a set stat type
  */
 public class ToolPartItem extends MaterialItem implements IToolPart {
-  private static final ITextComponent MISSING_INFO = TConstruct.makeTranslation("tooltip", "part.missing_info");
+  private static final Component MISSING_INFO = TConstruct.makeTranslation("tooltip", "part.missing_info");
   private static final String MISSING_MATERIAL_KEY = TConstruct.makeTranslationKey("tooltip", "part.missing_material");
   private static final String MISSING_STATS_KEY = TConstruct.makeTranslationKey("tooltip", "part.missing_stats");
 
@@ -51,7 +53,7 @@ public class ToolPartItem extends MaterialItem implements IToolPart {
 
   @Override
   @OnlyIn(Dist.CLIENT)
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+  public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
     IMaterial material = this.getMaterial(stack);
     // add all traits to the info
     if (!this.checkMissingMaterialTooltip(stack, material, tooltip)) {

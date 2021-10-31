@@ -1,16 +1,16 @@
 package slimeknights.tconstruct.smeltery.tileentity.component;
 
 import lombok.Getter;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -32,9 +32,9 @@ import javax.annotation.Nullable;
 /**
  * Filtered drain tile entity
  */
-public class DuctTileEntity extends SmelteryFluidIO implements INamedContainerProvider {
+public class DuctTileEntity extends SmelteryFluidIO implements MenuProvider {
   private static final String TAG_ITEM = "item";
-  private static final ITextComponent TITLE = TConstruct.makeTranslation("gui", "duct");
+  private static final Component TITLE = TConstruct.makeTranslation("gui", "duct");
 
   @Getter
   private final DuctItemHandler itemHandler = new DuctItemHandler(this);
@@ -46,7 +46,7 @@ public class DuctTileEntity extends SmelteryFluidIO implements INamedContainerPr
     this(TinkerSmeltery.duct.get());
   }
 
-  protected DuctTileEntity(TileEntityType<?> type) {
+  protected DuctTileEntity(BlockEntityType<?> type) {
     super(type);
   }
 
@@ -54,13 +54,13 @@ public class DuctTileEntity extends SmelteryFluidIO implements INamedContainerPr
   /* Container */
 
   @Override
-  public ITextComponent getDisplayName() {
+  public Component getDisplayName() {
     return TITLE;
   }
 
   @Nullable
   @Override
-  public Container createMenu(int id, PlayerInventory inventory, PlayerEntity playerEntity) {
+  public AbstractContainerMenu createMenu(int id, Inventory inventory, Player playerEntity) {
     return new SingleItemContainer(id, inventory, this);
   }
 
@@ -91,9 +91,9 @@ public class DuctTileEntity extends SmelteryFluidIO implements INamedContainerPr
     Fluid fluid = itemHandler.getFluid();
     modelData.setData(IDisplayFluidListener.PROPERTY, fluid);
     requestModelDataUpdate();
-    assert world != null;
+    assert level != null;
     BlockState state = getBlockState();
-    world.notifyBlockUpdate(pos, state, state, 48);
+    level.sendBlockUpdated(worldPosition, state, state, 48);
   }
 
 
@@ -105,23 +105,23 @@ public class DuctTileEntity extends SmelteryFluidIO implements INamedContainerPr
   }
 
   @Override
-  public void read(BlockState state, CompoundNBT tags) {
-    super.read(state, tags);
+  public void load(BlockState state, CompoundTag tags) {
+    super.load(state, tags);
     if (tags.contains(TAG_ITEM, NBT.TAG_COMPOUND)) {
       itemHandler.readFromNBT(tags.getCompound(TAG_ITEM));
     }
   }
 
   @Override
-  public void handleUpdateTag(BlockState state, CompoundNBT tag) {
+  public void handleUpdateTag(BlockState state, CompoundTag tag) {
     super.handleUpdateTag(state, tag);
-    if (world != null && world.isRemote) {
+    if (level != null && level.isClientSide) {
       updateFluid();
     }
   }
 
   @Override
-  public void writeSynced(CompoundNBT tags) {
+  public void writeSynced(CompoundTag tags) {
     super.writeSynced(tags);
     tags.put(TAG_ITEM, itemHandler.writeToNBT());
   }

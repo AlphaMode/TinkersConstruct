@@ -1,27 +1,27 @@
 package slimeknights.tconstruct.world;
 
-import net.minecraft.block.SkullBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.loot.ItemLootEntry;
-import net.minecraft.loot.LootEntry;
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.RandomValueRange;
-import net.minecraft.loot.functions.SetCount;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome.Category;
-import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.biome.MobSpawnInfo;
-import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.level.block.SkullBlock;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.RandomValueBounds;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome.BiomeCategory;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -53,42 +53,42 @@ public class WorldEvents {
   static void onBiomeLoad(BiomeLoadingEvent event) {
     BiomeGenerationSettingsBuilder generation = event.getGeneration();
 
-    Category category = event.getCategory();
-    if (category == Category.NETHER) {
+    BiomeCategory category = event.getCategory();
+    if (category == BiomeCategory.NETHER) {
       if (Config.COMMON.generateBloodIslands.get()) {
-        generation.withStructure(TinkerStructures.BLOOD_SLIME_ISLAND);
+        generation.addStructureStart(TinkerStructures.BLOOD_SLIME_ISLAND);
       }
 
       if (Config.COMMON.generateCobalt.get()) {
-        generation.withFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, TinkerWorld.COBALT_ORE_FEATURE_SMALL);
-        generation.withFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, TinkerWorld.COBALT_ORE_FEATURE_LARGE);
+        generation.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, TinkerWorld.COBALT_ORE_FEATURE_SMALL);
+        generation.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION, TinkerWorld.COBALT_ORE_FEATURE_LARGE);
       }
     }
-    else if (category != Category.THEEND) {
+    else if (category != BiomeCategory.THEEND) {
       // slime spawns anywhere, uses the grass and liquid
-      event.getSpawns().withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TinkerWorld.earthSlimeEntity.get(), 100, 2, 4));
-      event.getSpawns().withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TinkerWorld.skySlimeEntity.get(), 100, 2, 4));
+      event.getSpawns().addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TinkerWorld.earthSlimeEntity.get(), 100, 2, 4));
+      event.getSpawns().addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TinkerWorld.skySlimeEntity.get(), 100, 2, 4));
       // normal sky islands - anywhere
       if (Config.COMMON.generateSkySlimeIslands.get()) {
-        generation.withStructure(TinkerStructures.SKY_SLIME_ISLAND);
+        generation.addStructureStart(TinkerStructures.SKY_SLIME_ISLAND);
       }
       // clay islands - no forest like biomes
-      if (Config.COMMON.generateClayIslands.get() && category != Category.TAIGA && category != Category.JUNGLE && category != Category.FOREST && category != Category.OCEAN && category != Category.SWAMP) {
-        generation.withStructure(TinkerStructures.CLAY_ISLAND);
+      if (Config.COMMON.generateClayIslands.get() && category != BiomeCategory.TAIGA && category != BiomeCategory.JUNGLE && category != BiomeCategory.FOREST && category != BiomeCategory.OCEAN && category != BiomeCategory.SWAMP) {
+        generation.addStructureStart(TinkerStructures.CLAY_ISLAND);
       }
       // ocean islands - ocean
-      if (category == Category.OCEAN && Config.COMMON.generateEarthSlimeIslands.get()) {
-        generation.withStructure(TinkerStructures.EARTH_SLIME_ISLAND);
+      if (category == BiomeCategory.OCEAN && Config.COMMON.generateEarthSlimeIslands.get()) {
+        generation.addStructureStart(TinkerStructures.EARTH_SLIME_ISLAND);
       }
       if (Config.COMMON.generateCopper.get()) {
-        generation.withFeature(GenerationStage.Decoration.UNDERGROUND_ORES, TinkerWorld.COPPER_ORE_FEATURE);
+        generation.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, TinkerWorld.COPPER_ORE_FEATURE);
       }
     }
     else if (!doesNameMatchBiomes(event.getName(), Biomes.THE_END, Biomes.THE_VOID)) {
       // slime spawns anywhere, uses the grass and liquid
-      event.getSpawns().withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(TinkerWorld.enderSlimeEntity.get(), 10, 2, 4));
+      event.getSpawns().addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(TinkerWorld.enderSlimeEntity.get(), 10, 2, 4));
       if (Config.COMMON.generateEndSlimeIslands.get()) {
-        generation.withStructure(TinkerStructures.END_SLIME_ISLAND);
+        generation.addStructureStart(TinkerStructures.END_SLIME_ISLAND);
       }
     }
   }
@@ -98,9 +98,9 @@ public class WorldEvents {
    * @param name - The Name that will be compared to the given Biomes names
    * @param biomes - The Biome that will be used for the check
    */
-  private static boolean doesNameMatchBiomes(@Nullable ResourceLocation name, RegistryKey<?>... biomes) {
-    for (RegistryKey<?> biome : biomes) {
-      if (biome.getLocation().equals(name)) {
+  private static boolean doesNameMatchBiomes(@Nullable ResourceLocation name, ResourceKey<?>... biomes) {
+    for (ResourceKey<?> biome : biomes) {
+      if (biome.location().equals(name)) {
         return true;
       }
     }
@@ -118,11 +118,11 @@ public class WorldEvents {
    * @param entry  Entry
    */
   @SuppressWarnings("unchecked")
-  private static void addEntry(LootPool pool, LootEntry entry) {
+  private static void addEntry(LootPool pool, LootPoolEntryContainer entry) {
     // fetch field
     if (!foundField) {
       try {
-        lootEntries = ObfuscationReflectionHelper.findField(LootPool.class, "field_186453_a");
+        lootEntries = ObfuscationReflectionHelper.findField(LootPool.class, "entries");
         lootEntries.setAccessible(true);
         foundField = true;
       } catch (UnableToFindFieldException ex) {
@@ -135,7 +135,7 @@ public class WorldEvents {
     try {
       Object field = lootEntries.get(pool);
       if (field instanceof List) {
-        List<LootEntry> entries = (List<LootEntry>) field;
+        List<LootPoolEntryContainer> entries = (List<LootPoolEntryContainer>) field;
         entries.add(entry);
       }
     } catch (IllegalAccessException|ClassCastException ex) {
@@ -151,7 +151,7 @@ public class WorldEvents {
    * @param poolName   Pool name
    * @param entry      Entry to inject
    */
-  private static void injectInto(LootTableLoadEvent event, String tableName, String poolName, Supplier<LootEntry> entry) {
+  private static void injectInto(LootTableLoadEvent event, String tableName, String poolName, Supplier<LootPoolEntryContainer> entry) {
     ResourceLocation name = event.getName();
     if ("minecraft".equals(name.getNamespace()) && tableName.equals(name.getPath())) {
       LootPool pool = event.getTable().getPool(poolName);
@@ -164,10 +164,10 @@ public class WorldEvents {
 
   @SubscribeEvent
   static void onLootTableLoad(LootTableLoadEvent event) {
-    BiFunction<SlimeType, Integer, LootEntry> makeSeed = (type, weight) ->
-      ItemLootEntry.builder(TinkerWorld.slimeGrassSeeds.get(type)).weight(weight)
-                   .acceptFunction(SetCount.builder(new RandomValueRange(2, 4))).build();
-    BiFunction<SlimeType, Integer, LootEntry> makeSapling = (type, weight) -> ItemLootEntry.builder(TinkerWorld.slimeSapling.get(type)).weight(weight).build();
+    BiFunction<SlimeType, Integer, LootPoolEntryContainer> makeSeed = (type, weight) ->
+      LootItem.lootTableItem(TinkerWorld.slimeGrassSeeds.get(type)).setWeight(weight)
+                   .apply(SetItemCountFunction.setCount(new RandomValueBounds(2, 4))).build();
+    BiFunction<SlimeType, Integer, LootPoolEntryContainer> makeSapling = (type, weight) -> LootItem.lootTableItem(TinkerWorld.slimeSapling.get(type)).setWeight(weight).build();
     // sky
     injectInto(event, "chests/simple_dungeon", "pool1", () -> makeSeed.apply(SlimeType.EARTH, 3));
     injectInto(event, "chests/simple_dungeon", "pool1", () -> makeSeed.apply(SlimeType.SKY, 7));
@@ -181,8 +181,8 @@ public class WorldEvents {
     injectInto(event, "chests/end_city_treasure", "main", () -> makeSapling.apply(SlimeType.ENDER, 3));
     // barter for molten blaze lanterns
     injectInto(event, "gameplay/piglin_bartering", "main",
-               () -> ItemLootEntry.builder(TinkerSmeltery.scorchedLantern).weight(20)
-                                  .acceptFunction(SetFluidLootFunction.builder(new FluidStack(TinkerFluids.blazingBlood.get(), FluidAttributes.BUCKET_VOLUME / 10)))
+               () -> LootItem.lootTableItem(TinkerSmeltery.scorchedLantern).setWeight(20)
+                                  .apply(SetFluidLootFunction.builder(new FluidStack(TinkerFluids.blazingBlood.get(), FluidAttributes.BUCKET_VOLUME / 10)))
                                   .build());
   }
 
@@ -196,10 +196,10 @@ public class WorldEvents {
       return;
     }
     LivingEntity entity = event.getEntityLiving();
-    Item helmet = entity.getItemStackFromSlot(EquipmentSlotType.HEAD).getItem();
+    Item helmet = entity.getItemBySlot(EquipmentSlot.HEAD).getItem();
     Item item = helmet.getItem();
     if (item != Items.AIR && TinkerWorld.headItems.contains(item)) {
-      if (lookingEntity.getType() == ((TinkerHeadType)((SkullBlock)((BlockItem)item).getBlock()).skullType).getType()) {
+      if (lookingEntity.getType() == ((TinkerHeadType)((SkullBlock)((BlockItem)item).getBlock()).type).getType()) {
         event.modifyVisibility(0.5f);
       }
       EntityType<?> lookingType = lookingEntity.getType();
@@ -210,15 +210,15 @@ public class WorldEvents {
   public void creeperKill(LivingDropsEvent event) {
     DamageSource source = event.getSource();
     if (source != null) {
-      Entity entity = source.getTrueSource();
-      if (entity instanceof CreeperEntity) {
-        CreeperEntity creeper = (CreeperEntity)entity;
-        if (creeper.ableToCauseSkullDrop()) {
+      Entity entity = source.getEntity();
+      if (entity instanceof Creeper) {
+        Creeper creeper = (Creeper)entity;
+        if (creeper.canDropMobsSkull()) {
           LivingEntity dying = event.getEntityLiving();
           TinkerHeadType headType = TinkerHeadType.fromEntityType(dying.getType());
           if (headType != null && Config.COMMON.headDrops.get(headType).get()) {
-            creeper.incrementDroppedSkulls();
-            event.getDrops().add(dying.entityDropItem(TinkerWorld.heads.get(headType)));
+            creeper.increaseDroppedSkulls();
+            event.getDrops().add(dying.spawnAtLocation(TinkerWorld.heads.get(headType)));
           }
         }
       }

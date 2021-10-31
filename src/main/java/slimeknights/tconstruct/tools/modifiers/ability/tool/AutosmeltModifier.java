@@ -2,12 +2,12 @@ package slimeknights.tconstruct.tools.modifiers.ability.tool;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.FurnaceRecipe;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.loot.LootContext;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.common.recipe.RecipeCacheInvalidator;
 import slimeknights.tconstruct.library.modifiers.SingleUseModifier;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class AutosmeltModifier extends SingleUseModifier {
   /** Cache of relevant smelting recipes */
-  private final Cache<Item,Optional<FurnaceRecipe>> recipeCache = CacheBuilder
+  private final Cache<Item,Optional<SmeltingRecipe>> recipeCache = CacheBuilder
     .newBuilder()
     .maximumSize(64)
     .build();
@@ -44,7 +44,7 @@ public class AutosmeltModifier extends SingleUseModifier {
    * @param world  World instance
    * @return  Furnace recipe
    */
-  private Optional<FurnaceRecipe> findRecipe(ItemStack stack, World world) {
+  private Optional<SmeltingRecipe> findRecipe(ItemStack stack, Level world) {
     inventory.setStack(stack);
     return world.getRecipeManager().getRecipe(IRecipeType.SMELTING, inventory, world);
   }

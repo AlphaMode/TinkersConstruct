@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.smeltery.tileentity.module.alloying;
 
 import lombok.RequiredArgsConstructor;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.tileentity.MantleTileEntity;
 import slimeknights.tconstruct.library.recipe.RecipeTypes;
 import slimeknights.tconstruct.library.recipe.alloying.AlloyRecipe;
@@ -19,21 +19,21 @@ public class SingleAlloyingModule implements IAlloyingModule {
   private AlloyRecipe lastRecipe;
 
   /** Gets a nonnull world instance from the parent */
-  private World getWorld() {
-    return Objects.requireNonNull(parent.getWorld(), "Parent tile entity has null world");
+  private Level getWorld() {
+    return Objects.requireNonNull(parent.getLevel(), "Parent tile entity has null world");
   }
 
   /** Finds the recipe to perform */
   @Nullable
   private AlloyRecipe findRecipe() {
-    World world = getWorld();
+    Level world = getWorld();
     if (lastRecipe != null && lastRecipe.canPerform(alloyTank)) {
       return lastRecipe;
     }
     // fetch the first recipe that matches the inputs and fits in the tank
     // means if for some reason two recipes both are vaiud, the tank contents can be used to choose
     Optional<AlloyRecipe> recipe = world.getRecipeManager()
-                                        .getRecipes(RecipeTypes.ALLOYING)
+                                        .byType(RecipeTypes.ALLOYING)
                                         .values().stream()
                                         .filter(r -> r instanceof AlloyRecipe)
                                         .map(r -> (AlloyRecipe) r)

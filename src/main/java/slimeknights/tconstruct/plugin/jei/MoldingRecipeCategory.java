@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.plugin.jei;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -9,10 +9,10 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fml.ForgeI18n;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.GuiUtil;
@@ -27,7 +27,7 @@ import java.util.List;
 public class MoldingRecipeCategory implements IRecipeCategory<MoldingRecipe> {
   private static final ResourceLocation BACKGROUND_LOC = TConstruct.getResource("textures/gui/jei/casting.png");
   private static final String KEY_TITLE = TConstruct.makeTranslationKey("jei", "molding.title");
-  private static final ITextComponent TOOLTIP_PATTERN_CONSUMED = new TranslationTextComponent(TConstruct.makeTranslationKey("jei", "molding.pattern_consumed"));
+  private static final Component TOOLTIP_PATTERN_CONSUMED = new TranslatableComponent(TConstruct.makeTranslationKey("jei", "molding.pattern_consumed"));
 
   @Getter
   private final IDrawable background;
@@ -57,7 +57,7 @@ public class MoldingRecipeCategory implements IRecipeCategory<MoldingRecipe> {
   }
 
   @Override
-  public void draw(MoldingRecipe recipe, MatrixStack matrixStack, double mouseX, double mouseY) {
+  public void draw(MoldingRecipe recipe, PoseStack matrixStack, double mouseX, double mouseY) {
     // draw the main block
     IDrawable block = recipe.getType() == RecipeTypes.MOLDING_BASIN ? basin : table;
     block.draw(matrixStack, 3, 40);

@@ -3,8 +3,8 @@ package slimeknights.tconstruct.shared.command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.ArgumentSerializer;
-import net.minecraft.command.arguments.ArgumentTypes;
+import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
+import net.minecraft.commands.synchronization.ArgumentTypes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import slimeknights.tconstruct.TConstruct;
@@ -15,7 +15,7 @@ public class TConstructCommand {
 
   /** Registers all TConstruct command related content */
   public static void init() {
-    ArgumentTypes.register(TConstruct.resourceString("slot_type"), SlotTypeArgument.class, new ArgumentSerializer<>(SlotTypeArgument::slotType));
+    ArgumentTypes.register(TConstruct.resourceString("slot_type"), SlotTypeArgument.class, new EmptyArgumentSerializer<>(SlotTypeArgument::slotType));
 
     // add command listener
     MinecraftForge.EVENT_BUS.addListener(TConstructCommand::registerCommand);

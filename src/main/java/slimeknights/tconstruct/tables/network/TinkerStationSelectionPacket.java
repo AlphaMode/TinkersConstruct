@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.tables.network;
 
 import lombok.RequiredArgsConstructor;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.Item;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.network.packet.IThreadsafePacket;
@@ -19,14 +19,14 @@ public class TinkerStationSelectionPacket implements IThreadsafePacket {
   private final boolean tinkerSlotHidden;
   private final Item toolFilter;
 
-  public TinkerStationSelectionPacket(PacketBuffer buffer) {
+  public TinkerStationSelectionPacket(FriendlyByteBuf buffer) {
     this.activeSlots = buffer.readInt();
     this.tinkerSlotHidden = buffer.readBoolean();
     this.toolFilter = buffer.readRegistryIdUnsafe(ForgeRegistries.ITEMS);
   }
 
   @Override
-  public void encode(PacketBuffer buffer) {
+  public void encode(FriendlyByteBuf buffer) {
     buffer.writeInt(this.activeSlots);
     buffer.writeBoolean(this.tinkerSlotHidden);
     buffer.writeRegistryIdUnsafe(ForgeRegistries.ITEMS, toolFilter);
@@ -34,9 +34,9 @@ public class TinkerStationSelectionPacket implements IThreadsafePacket {
 
   @Override
   public void handleThreadsafe(Context context) {
-    ServerPlayerEntity sender = context.getSender();
+    ServerPlayer sender = context.getSender();
     if (sender != null) {
-      Container container = sender.openContainer;
+      AbstractContainerMenu container = sender.containerMenu;
       if (container instanceof TinkerStationContainer) {
         ToolDefinition filter = null;
         if (toolFilter instanceof IModifiable) {

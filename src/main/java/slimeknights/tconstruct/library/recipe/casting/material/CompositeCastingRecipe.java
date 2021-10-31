@@ -3,11 +3,11 @@ package slimeknights.tconstruct.library.recipe.casting.material;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.RecipeHelper;
 import slimeknights.tconstruct.common.recipe.LoggingRecipeSerializer;
@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
  * Casting recipe taking a part of a material and a fluid and outputting the part with a new material
  */
 public abstract class CompositeCastingRecipe extends MaterialCastingRecipe {
-  public CompositeCastingRecipe(IRecipeType<?> type, ResourceLocation id, String group, IMaterialItem result, int itemCost) {
-    super(type, id, group, Ingredient.fromItems(result), itemCost, result, true, false);
+  public CompositeCastingRecipe(RecipeType<?> type, ResourceLocation id, String group, IMaterialItem result, int itemCost) {
+    super(type, id, group, Ingredient.of(result), itemCost, result, true, false);
   }
 
   @Override
@@ -43,7 +43,7 @@ public abstract class CompositeCastingRecipe extends MaterialCastingRecipe {
   @Override
   public List<IDisplayableCastingRecipe> getRecipes() {
     if (multiRecipes == null) {
-      IRecipeType<?> type = getType();
+      RecipeType<?> type = getType();
       multiRecipes = MaterialCastingLookup
         .getAllCompositeFluids().stream()
         .filter(recipe -> {

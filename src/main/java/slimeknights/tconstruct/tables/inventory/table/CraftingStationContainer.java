@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.tables.inventory.table;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import slimeknights.tconstruct.tables.TinkerTables;
@@ -21,7 +21,7 @@ public class CraftingStationContainer extends BaseStationContainer<CraftingStati
    * @param inv   Player inventory
    * @param tile  Relevant tile entity
    */
-  public CraftingStationContainer(int id, PlayerInventory inv, @Nullable CraftingStationTileEntity tile) {
+  public CraftingStationContainer(int id, Inventory inv, @Nullable CraftingStationTileEntity tile) {
     super(TinkerTables.craftingStationContainer.get(), id, inv, tile);
 
     // unfortunately, nothing works with no tile

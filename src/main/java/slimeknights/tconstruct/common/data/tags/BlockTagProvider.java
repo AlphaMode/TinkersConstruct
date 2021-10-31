@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.common.data.tags;
 
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.data.BlockTagsProvider;
+import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.TagsProvider;
 import net.minecraft.tags.BlockTags;
@@ -25,6 +25,8 @@ import slimeknights.tconstruct.tables.TinkerTables;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 import slimeknights.tconstruct.world.TinkerWorld;
 
+import net.minecraft.data.tags.TagsProvider.TagAppender;
+
 public class BlockTagProvider extends BlockTagsProvider {
 
   public BlockTagProvider(DataGenerator generatorIn, ExistingFileHelper existingFileHelper) {
@@ -32,7 +34,7 @@ public class BlockTagProvider extends BlockTagsProvider {
   }
 
   @Override
-  protected void registerTags() {
+  protected void addTags() {
     this.addCommon();
     this.addTools();
     this.addWorld();
@@ -56,23 +58,23 @@ public class BlockTagProvider extends BlockTagsProvider {
     addMetalTags(TinkerMaterials.soulsteel);
     // tier 5
     addMetalTags(TinkerMaterials.knightslime);
-    this.getOrCreateBuilder(BlockTags.BEACON_BASE_BLOCKS).add(TinkerModifiers.silkyJewelBlock.get());
+    this.tag(BlockTags.BEACON_BASE_BLOCKS).add(TinkerModifiers.silkyJewelBlock.get());
 
     // glass
-    this.getOrCreateBuilder(Tags.Blocks.GLASS_COLORLESS).add(TinkerCommons.clearGlass.get());
-    this.getOrCreateBuilder(Tags.Blocks.GLASS_PANES_COLORLESS).add(TinkerCommons.clearGlassPane.get());
-    addGlass(TinkerCommons.clearStainedGlass, "glass/", getOrCreateBuilder(Tags.Blocks.STAINED_GLASS));
-    addGlass(TinkerCommons.clearStainedGlassPane, "glass_panes/", getOrCreateBuilder(Tags.Blocks.STAINED_GLASS_PANES));
+    this.tag(Tags.Blocks.GLASS_COLORLESS).add(TinkerCommons.clearGlass.get());
+    this.tag(Tags.Blocks.GLASS_PANES_COLORLESS).add(TinkerCommons.clearGlassPane.get());
+    addGlass(TinkerCommons.clearStainedGlass, "glass/", tag(Tags.Blocks.STAINED_GLASS));
+    addGlass(TinkerCommons.clearStainedGlassPane, "glass_panes/", tag(Tags.Blocks.STAINED_GLASS_PANES));
     // impermeable for all glass
-    Builder<Block> impermeable = getOrCreateBuilder(BlockTags.IMPERMEABLE);
+    TagAppender<Block> impermeable = tag(BlockTags.IMPERMEABLE);
     impermeable.add(TinkerCommons.clearGlass.get(), TinkerCommons.soulGlass.get(), TinkerSmeltery.searedGlass.get());
-    TinkerCommons.clearStainedGlass.forEach(impermeable::addItemEntry);
+    TinkerCommons.clearStainedGlass.forEach(impermeable::add);
 
     // soul speed on glass
-    this.getOrCreateBuilder(BlockTags.SOUL_SPEED_BLOCKS).add(TinkerCommons.soulGlass.get(), TinkerCommons.soulGlassPane.get());
-    this.getOrCreateBuilder(BlockTags.SOUL_FIRE_BASE_BLOCKS).add(TinkerCommons.soulGlass.get());
+    this.tag(BlockTags.SOUL_SPEED_BLOCKS).add(TinkerCommons.soulGlass.get(), TinkerCommons.soulGlassPane.get());
+    this.tag(BlockTags.SOUL_FIRE_BASE_BLOCKS).add(TinkerCommons.soulGlass.get());
 
-    TagsProvider.Builder<Block> builder = this.getOrCreateBuilder(TinkerTags.Blocks.ANVIL_METAL)
+    TagsProvider.Builder<Block> builder = this.tag(TinkerTags.Blocks.ANVIL_METAL)
         // tier 3
         .addTag(TinkerMaterials.slimesteel.getBlockTag())
         .addTag(TinkerMaterials.tinkersBronze.getBlockTag())

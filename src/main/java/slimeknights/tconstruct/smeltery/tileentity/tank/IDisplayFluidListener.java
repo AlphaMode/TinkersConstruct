@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.smeltery.tileentity.tank;
 
-import net.minecraft.fluid.Fluid;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.client.model.data.ModelProperty;
 
 /**

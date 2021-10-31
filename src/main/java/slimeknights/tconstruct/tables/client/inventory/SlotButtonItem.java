@@ -1,15 +1,17 @@
 package slimeknights.tconstruct.tables.client.inventory;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import slimeknights.mantle.client.screen.ElementScreen;
 import slimeknights.tconstruct.library.client.Icons;
 import slimeknights.tconstruct.tables.client.inventory.library.slots.SlotInformation;
+
+import net.minecraft.client.gui.components.Button.OnPress;
 
 public class SlotButtonItem extends Button {
 
@@ -27,7 +29,7 @@ public class SlotButtonItem extends Button {
   private ElementScreen hoverGui = BUTTON_HOVER_GUI;
   private ResourceLocation backgroundLocation = Icons.ICONS;
 
-  public SlotButtonItem(int buttonId, int x, int y, ITextComponent text, SlotInformation data, IPressable onPress) {
+  public SlotButtonItem(int buttonId, int x, int y, Component text, SlotInformation data, OnPress onPress) {
     super(x, y, 18, 18, text, onPress);
 
     this.icon = null;
@@ -35,8 +37,8 @@ public class SlotButtonItem extends Button {
     this.buttonId = buttonId;
   }
 
-  public SlotButtonItem(int buttonId, int x, int y, ItemStack icon, SlotInformation data, IPressable onPress) {
-    super(x, y, 18, 18, icon.getDisplayName(), onPress);
+  public SlotButtonItem(int buttonId, int x, int y, ItemStack icon, SlotInformation data, OnPress onPress) {
+    super(x, y, 18, 18, icon.getHoverName(), onPress);
 
     this.icon = icon;
     this.data = data;
@@ -53,9 +55,9 @@ public class SlotButtonItem extends Button {
   }
 
   @Override
-  public void renderWidget(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+  public void renderButton(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
     RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-    Minecraft.getInstance().getTextureManager().bindTexture(this.backgroundLocation);
+    Minecraft.getInstance().getTextureManager().bind(this.backgroundLocation);
 
     if (this.visible) {
       this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
@@ -72,7 +74,7 @@ public class SlotButtonItem extends Button {
     }
   }
 
-  protected void drawIcon(MatrixStack matrices, Minecraft mc) {
-    mc.getItemRenderer().renderItemIntoGUI(this.icon, this.x + 1, this.y + 1);
+  protected void drawIcon(PoseStack matrices, Minecraft mc) {
+    mc.getItemRenderer().renderGuiItem(this.icon, this.x + 1, this.y + 1);
   }
 }

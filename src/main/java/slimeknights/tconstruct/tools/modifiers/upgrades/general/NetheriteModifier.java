@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.general;
 
-import net.minecraft.item.Rarity;
+import net.minecraft.world.item.Rarity;
 import slimeknights.tconstruct.library.modifiers.SingleLevelModifier;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
 import slimeknights.tconstruct.library.tools.item.IModifiable;

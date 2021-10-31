@@ -2,10 +2,10 @@ package slimeknights.tconstruct.tools.data;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
 import net.minecraftforge.common.Tags;
@@ -39,14 +39,14 @@ public class ToolsRecipeProvider extends BaseRecipeProvider implements IMaterial
   }
 
   @Override
-  protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
+  protected void buildShapelessRecipes(Consumer<FinishedRecipe> consumer) {
     this.addToolBuildingRecipes(consumer);
     this.addPartRecipes(consumer);
     this.addMaterialsRecipes(consumer);
     this.addMaterialSmeltery(consumer);
   }
 
-  private void addToolBuildingRecipes(Consumer<IFinishedRecipe> consumer) {
+  private void addToolBuildingRecipes(Consumer<FinishedRecipe> consumer) {
     String folder = "tools/building/";
     String repairFolder = "tools/repair/";
     // stone
@@ -68,9 +68,9 @@ public class ToolsRecipeProvider extends BaseRecipeProvider implements IMaterial
     toolBuilding(consumer, TinkerTools.cleaver, folder);
 
     // specialized
-    ShapelessRecipeBuilder.shapelessRecipe(TinkerTools.flintAndBronze)
-                          .addIngredient(Items.FLINT)
-                          .addIngredient(TinkerMaterials.tinkersBronze.getIngotTag())
+    ShapelessRecipeBuilder.shapeless(TinkerTools.flintAndBronze)
+                          .requires(Items.FLINT)
+                          .requires(TinkerMaterials.tinkersBronze.getIngotTag())
                           .addCriterion("has_bronze", hasItem(TinkerMaterials.tinkersBronze.getIngotTag()))
                           .build(consumer, prefix(TinkerTools.flintAndBronze, folder));
     SpecializedRepairRecipeBuilder.repair(TinkerTools.flintAndBronze, MaterialIds.tinkersBronze)

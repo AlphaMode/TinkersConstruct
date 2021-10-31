@@ -4,12 +4,12 @@ import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.IMultiRecipe;
 import slimeknights.mantle.recipe.RecipeHelper;
@@ -38,7 +38,7 @@ public abstract class MaterialCastingRecipe extends AbstractCastingRecipe implem
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   protected Optional<MaterialFluidRecipe> cachedFluidRecipe = Optional.empty();
 
-  public MaterialCastingRecipe(IRecipeType<?> type, ResourceLocation id, String group, Ingredient cast, int itemCost, IMaterialItem result, boolean consumed, boolean switchSlots) {
+  public MaterialCastingRecipe(RecipeType<?> type, ResourceLocation id, String group, Ingredient cast, int itemCost, IMaterialItem result, boolean consumed, boolean switchSlots) {
     super(type, id, group, cast, consumed, switchSlots);
     this.itemCost = itemCost;
     this.result = result;
@@ -63,7 +63,7 @@ public abstract class MaterialCastingRecipe extends AbstractCastingRecipe implem
   }
 
   @Override
-  public boolean matches(ICastingInventory inv, World worldIn) {
+  public boolean matches(ICastingInventory inv, Level worldIn) {
     if (!this.cast.test(inv.getStack())) {
       return false;
     }

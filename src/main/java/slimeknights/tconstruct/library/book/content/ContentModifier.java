@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import slimeknights.mantle.client.book.data.BookData;
@@ -78,8 +78,8 @@ public class ContentModifier extends TinkerPage {
     }
 
     if (this.recipes == null) {
-      assert Minecraft.getInstance().world != null;
-      this.recipes = RecipeHelper.getJEIRecipes(Minecraft.getInstance().world.getRecipeManager(), RecipeTypes.TINKER_STATION, IDisplayModifierRecipe.class).stream().filter(recipe -> recipe.getDisplayResult().getModifier() == this.modifier).collect(Collectors.toList());
+      assert Minecraft.getInstance().level != null;
+      this.recipes = RecipeHelper.getJEIRecipes(Minecraft.getInstance().level.getRecipeManager(), RecipeTypes.TINKER_STATION, IDisplayModifierRecipe.class).stream().filter(recipe -> recipe.getDisplayResult().getModifier() == this.modifier).collect(Collectors.toList());
     }
   }
 

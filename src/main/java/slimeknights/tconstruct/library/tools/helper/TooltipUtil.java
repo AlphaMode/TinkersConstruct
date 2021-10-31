@@ -2,11 +2,11 @@ package slimeknights.tconstruct.library.tools.helper;
 
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
@@ -31,11 +31,11 @@ public class TooltipUtil {
   private TooltipUtil() {}
 
   /** Tooltip telling the player to hold shift for more info */
-  public static final ITextComponent TOOLTIP_HOLD_SHIFT = TConstruct.makeTranslation("tooltip", "hold_shift", TConstruct.makeTranslation("key", "shift").mergeStyle(TextFormatting.YELLOW, TextFormatting.ITALIC));
+  public static final Component TOOLTIP_HOLD_SHIFT = TConstruct.makeTranslation("tooltip", "hold_shift", TConstruct.makeTranslation("key", "shift").withStyle(ChatFormatting.YELLOW, ChatFormatting.ITALIC));
   /** Tooltip telling the player to hold control for part info */
-  public static final ITextComponent TOOLTIP_HOLD_CTRL = TConstruct.makeTranslation("tooltip", "hold_ctrl", TConstruct.makeTranslation("key", "ctrl").mergeStyle(TextFormatting.AQUA, TextFormatting.ITALIC));
+  public static final Component TOOLTIP_HOLD_CTRL = TConstruct.makeTranslation("tooltip", "hold_ctrl", TConstruct.makeTranslation("key", "ctrl").withStyle(ChatFormatting.AQUA, ChatFormatting.ITALIC));
   /** Tooltip for when tool data is missing */
-  private static final ITextComponent NO_DATA = TConstruct.makeTranslation("tooltip", "missing_data").mergeStyle(TextFormatting.GRAY);
+  private static final Component NO_DATA = TConstruct.makeTranslation("tooltip", "missing_data").withStyle(ChatFormatting.GRAY);
 
   /**
    * If true, this stack was created for display, so some of the tooltip is suppressed
@@ -43,14 +43,14 @@ public class TooltipUtil {
    * @return  True if marked display
    */
   public static boolean isDisplay(ItemStack stack) {
-    CompoundNBT nbt = stack.getTag();
+    CompoundTag nbt = stack.getTag();
     return nbt != null && nbt.getBoolean(KEY_DISPLAY);
   }
 
   /**
    * Full logic for adding tooltip information
    */
-  public static void addInformation(IModifiableDisplay item, ItemStack stack, List<ITextComponent> tooltip, TooltipKey tooltipKey, boolean isAdvanced) {
+  public static void addInformation(IModifiableDisplay item, ItemStack stack, List<Component> tooltip, TooltipKey tooltipKey, boolean isAdvanced) {
     // if the display tag is set, just show modifiers
     if (isDisplay(stack)) {
       ToolStack tool = ToolStack.from(stack);

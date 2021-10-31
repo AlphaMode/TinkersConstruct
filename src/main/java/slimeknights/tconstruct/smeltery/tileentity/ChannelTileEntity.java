@@ -1,15 +1,15 @@
 package slimeknights.tconstruct.smeltery.tileentity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Plane;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Plane;
+import net.minecraft.Util;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
@@ -40,7 +40,7 @@ import java.util.Map;
 /**
  * Logic for channel fluid transfer
  */
-public class ChannelTileEntity extends MantleTileEntity implements ITickableTileEntity, IFluidPacketReceiver {
+public class ChannelTileEntity extends MantleTileEntity implements TickableBlockEntity, IFluidPacketReceiver {
 	/** Channel internal tank */
 	private final ChannelTank tank = new ChannelTank(36, this);
 	/** Handler to return from channel top */
@@ -68,7 +68,7 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 		this(TinkerSmeltery.channel.get());
 	}
 
-	protected ChannelTileEntity(TileEntityType<?> type) {
+	protected ChannelTileEntity(BlockEntityType<?> type) {
 		super(type);
 	}
 
@@ -82,8 +82,8 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public AxisAlignedBB getRenderBoundingBox() {
-		return new AxisAlignedBB(pos.getX(), pos.getY() - 1, pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+	public AABB getRenderBoundingBox() {
+		return new AABB(worldPosition.getX(), worldPosition.getY() - 1, worldPosition.getZ(), worldPosition.getX() + 1, worldPosition.getY() + 1, worldPosition.getZ() + 1);
 	}
 
 	/** Called when a capability invalidates to clear the given side */
@@ -107,7 +107,7 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
       }
       // side tanks keep track of which side inserts
       if (side != Direction.DOWN) {
-        ChannelConnection connection = getBlockState().get(ChannelBlock.DIRECTION_MAP.get(side));
+        ChannelConnection connection = getBlockState().getValue(ChannelBlock.DIRECTION_MAP.get(side));
         if (connection == ChannelConnection.IN) {
           return sideHandlers.computeIfAbsent(side, s -> LazyOptional.of(() -> sideTanks.get(s))).cast();
         }
@@ -128,9 +128,9 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 	 * @return  Fluid handler, or empty
 	 */
 	private LazyOptional<IFluidHandler> getNeighborHandlerUncached(Direction side) {
-		assert world != null;
+		assert level != null;
 		// must have a TE with a fluid handler
-		TileEntity te = world.getTileEntity(pos.offset(side));
+		BlockEntity te = level.getBlockEntity(worldPosition.relative(side));
 		if (te != null) {
 			LazyOptional<IFluidHandler> handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite());
 			if (handler.isPresent()) {
@@ -166,11 +166,11 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 	public void refreshNeighbor(BlockState state, Direction side) {
 		// for below, only thing that needs to invalidate is if we are no longer connected down, remove the listener below
 		if (side == Direction.DOWN) {
-			if (!state.get(ChannelBlock.DOWN)) {
+			if (!state.getValue(ChannelBlock.DOWN)) {
 				neighborTanks.remove(Direction.DOWN);
 			}
 		} else if (side != Direction.UP) {
-			ChannelConnection connection = state.get(ChannelBlock.DIRECTION_MAP.get(side));
+			ChannelConnection connection = state.getValue(ChannelBlock.DIRECTION_MAP.get(side));
 			// if no longer flowing out, remove the neighbor tank
 			if (connection != ChannelConnection.OUT) {
 				neighborTanks.remove(Direction.DOWN);
@@ -218,7 +218,7 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 		if (side.getAxis().isVertical()) {
 			return 0;
 		}
-		return side.getIndex() - 1;
+		return side.get3DDataValue() - 1;
 	}
 
 	/**
@@ -236,7 +236,7 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 		isFlowing[index] = (byte)(flowing ? 2 : 0);
 
 		// send packet to client if it changed
-		if(wasFlowing != flowing && world != null && !world.isRemote) {
+		if(wasFlowing != flowing && level != null && !level.isClientSide) {
 			syncFlowToClient(side, flowing);
 		}
 	}
@@ -269,9 +269,9 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 		}
 		// down is boolean, sides is multistate
 		if(side == Direction.DOWN) {
-			return this.getBlockState().get(ChannelBlock.DOWN);
+			return this.getBlockState().getValue(ChannelBlock.DOWN);
 		}
-		return this.getBlockState().get(ChannelBlock.DIRECTION_MAP.get(side)) == ChannelConnection.OUT;
+		return this.getBlockState().getValue(ChannelBlock.DIRECTION_MAP.get(side)) == ChannelConnection.OUT;
 	}
 
 	/**
@@ -282,7 +282,7 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 	private static int countOutputs(BlockState state) {
 		int count = 0;
 		for (Direction direction : Plane.HORIZONTAL) {
-			if (state.get(ChannelBlock.DIRECTION_MAP.get(direction)) == ChannelConnection.OUT) {
+			if (state.getValue(ChannelBlock.DIRECTION_MAP.get(direction)) == ChannelConnection.OUT) {
 				count++;
 			}
 		}
@@ -295,7 +295,7 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 	 * @param flowing  Flowing state to sync
 	 */
 	private void syncFlowToClient(Direction side, boolean flowing) {
-		TinkerNetwork.getInstance().sendToClientsAround(new ChannelFlowPacket(pos, side, flowing), world, pos);
+		TinkerNetwork.getInstance().sendToClientsAround(new ChannelFlowPacket(worldPosition, side, flowing), level, worldPosition);
 	}
 
 
@@ -306,7 +306,7 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 	 */
 	@Override
 	public void tick() {
-		if(world == null || world.isRemote) {
+		if(level == null || level.isClientSide) {
 			return;
 		}
 
@@ -317,14 +317,14 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 			// if we have down and can flow, skip sides
 			boolean hasFlown = false;
 			BlockState state = getBlockState();
-			if(state.get(ChannelBlock.DOWN)) {
+			if(state.getValue(ChannelBlock.DOWN)) {
 				hasFlown = trySide(Direction.DOWN, FaucetTileEntity.MB_PER_TICK);
 			}
 			// try sides if we have any sides
 			int outputs = countOutputs(state);
 			if(!hasFlown && outputs > 0) {
 				// split the fluid evenly between sides
-				int flowRate = MathHelper.clamp(tank.getMaxUsable() / outputs, 1, FaucetTileEntity.MB_PER_TICK);
+				int flowRate = Mth.clamp(tank.getMaxUsable() / outputs, 1, FaucetTileEntity.MB_PER_TICK);
 				// then transfer on each side
 				for(Direction side : Plane.HORIZONTAL) {
 					trySide(side, flowRate);
@@ -341,7 +341,7 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 					if (i == 0) {
 						direction = Direction.DOWN;
 					} else {
-						direction = Direction.byIndex(i + 1);
+						direction = Direction.from3DDataValue(i + 1);
 					}
 					syncFlowToClient(direction, false);
 				}
@@ -407,8 +407,8 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 	 * Sends a fluid update to the client with the current fluid
 	 */
 	public void sendFluidUpdate() {
-		if (world != null && !world.isRemote) {
-			TinkerNetwork.getInstance().sendToClientsAround(new FluidUpdatePacket(pos, getFluid()), world, pos);
+		if (level != null && !level.isClientSide) {
+			TinkerNetwork.getInstance().sendToClientsAround(new FluidUpdatePacket(worldPosition, getFluid()), level, worldPosition);
 		}
 	}
 
@@ -423,15 +423,15 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
   }
 
   @Override
-  protected void writeSynced(CompoundNBT nbt) {
+  protected void writeSynced(CompoundTag nbt) {
     super.writeSynced(nbt);
     nbt.putByteArray(TAG_IS_FLOWING, isFlowing);
-    nbt.put(TAG_TANK, tank.writeToNBT(new CompoundNBT()));
+    nbt.put(TAG_TANK, tank.writeToNBT(new CompoundTag()));
   }
 
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundTag nbt) {
+		super.load(state, nbt);
 
 		// isFlowing
 		if (nbt.contains(TAG_IS_FLOWING)) {
@@ -450,7 +450,7 @@ public class ChannelTileEntity extends MantleTileEntity implements ITickableTile
 		}
 
 		// tank
-		CompoundNBT tankTag = nbt.getCompound(TAG_TANK);
+		CompoundTag tankTag = nbt.getCompound(TAG_TANK);
 		tank.readFromNBT(tankTag);
 	}
 }

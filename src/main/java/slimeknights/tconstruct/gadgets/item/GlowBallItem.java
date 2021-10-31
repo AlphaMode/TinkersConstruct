@@ -1,16 +1,16 @@
 package slimeknights.tconstruct.gadgets.item;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SnowballItem;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SnowballItem;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ActionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import slimeknights.mantle.util.TranslationHelper;
@@ -21,20 +21,22 @@ import slimeknights.tconstruct.gadgets.entity.GlowballEntity;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class GlowBallItem extends SnowballItem {
 
   public GlowBallItem() {
-    super((new Properties()).maxStackSize(16).group(TinkerGadgets.TAB_GADGETS));
+    super((new Properties()).stacksTo(16).tab(TinkerGadgets.TAB_GADGETS));
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-    ItemStack itemstack = playerIn.getHeldItem(handIn);
-    if (!playerIn.abilities.isCreativeMode) {
+  public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
+    ItemStack itemstack = playerIn.getItemInHand(handIn);
+    if (!playerIn.abilities.instabuild) {
       itemstack.shrink(1);
     }
 
-    worldIn.playSound(null, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ(), Sounds.THROWBALL_THROW.getSound(), SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
+    worldIn.playSound(null, playerIn.getX(), playerIn.getY(), playerIn.getZ(), Sounds.THROWBALL_THROW.getSound(), SoundCategory.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
     if (!worldIn.isRemote) {
       GlowballEntity glowballEntity = new GlowballEntity(worldIn, playerIn);
       glowballEntity.setItem(itemstack);

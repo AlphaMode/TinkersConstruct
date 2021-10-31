@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.general;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.GameRules;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -31,8 +31,8 @@ public class SoulboundModifier extends SingleUseModifier {
     }
     // only care about real players with keep inventory off
     LivingEntity entity = event.getEntityLiving();
-    if (!entity.getEntityWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY) && entity instanceof PlayerEntity && !(entity instanceof FakePlayer)) {
-      PlayerEntity player = (PlayerEntity) entity;
+    if (!entity.getCommandSenderWorld().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && entity instanceof Player && !(entity instanceof FakePlayer)) {
+      Player player = (Player) entity;
       Iterator<ItemEntity> iter = event.getDrops().iterator();
       while (iter.hasNext()) {
         ItemEntity itemEntity = iter.next();
@@ -41,7 +41,7 @@ public class SoulboundModifier extends SingleUseModifier {
         if (TinkerTags.Items.MODIFIABLE.contains(stack.getItem())) {
           ToolStack tool = ToolStack.from(stack);
           if (tool.getModifierLevel(this) > 0) {
-            player.inventory.addItemStackToInventory(stack);
+            player.inventory.add(stack);
             iter.remove();
           }
         }
@@ -54,20 +54,20 @@ public class SoulboundModifier extends SingleUseModifier {
     if (!event.isWasDeath()) {
       return;
     }
-    PlayerEntity original = event.getOriginal();
-    PlayerEntity clone = event.getPlayer();
+    Player original = event.getOriginal();
+    Player clone = event.getPlayer();
     // inventory already copied
-    if (clone.getEntityWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || original.isSpectator()) {
+    if (clone.getCommandSenderWorld().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || original.isSpectator()) {
       return;
     }
     // find the soulbound items
-    for(int i = 0; i < original.inventory.getSizeInventory(); i++) {
+    for(int i = 0; i < original.inventory.getContainerSize(); i++) {
       // find tools with soulbound
-      ItemStack stack = original.inventory.getStackInSlot(i);
+      ItemStack stack = original.inventory.getItem(i);
       if (!stack.isEmpty() && TinkerTags.Items.MODIFIABLE.contains(stack.getItem())) {
         ToolStack tool = ToolStack.from(stack);
         if (tool.getModifierLevel(this) > 0) {
-          clone.inventory.addItemStackToInventory(stack);
+          clone.inventory.add(stack);
         }
       }
     }

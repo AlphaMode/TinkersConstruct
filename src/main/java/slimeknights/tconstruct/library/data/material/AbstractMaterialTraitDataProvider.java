@@ -3,8 +3,8 @@ package slimeknights.tconstruct.library.data.material;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DirectoryCache;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.HashCache;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.library.data.GenericDataProvider;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
@@ -42,7 +42,7 @@ public abstract class AbstractMaterialTraitDataProvider extends GenericDataProvi
   protected abstract void addMaterialTraits();
 
   @Override
-  public void act(DirectoryCache cache) {
+  public void run(HashCache cache) {
     addMaterialTraits();
 
     // ensure we have traits for all materials

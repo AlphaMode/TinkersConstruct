@@ -17,9 +17,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
@@ -79,11 +79,11 @@ public class ToolModel implements IModelGeometry<ToolModel> {
   public static final Loader LOADER = new Loader();
 
   /** Color handler instance for all tools, handles both material and modifier colors */
-  public static final IItemColor COLOR_HANDLER = (stack, index) -> {
+  public static final ItemColor COLOR_HANDLER = (stack, index) -> {
     // TODO: reconsider material item colors, is there a usecase for dynamic colors as opposed to just an animated texture?
     if (index >= 0) {
       // for modifiers, we need the overrides instance to properly process
-      IBakedModel itemModel = Minecraft.getInstance().getItemRenderer().getItemModelMesher().getItemModel(stack.getItem());
+      BakedModel itemModel = Minecraft.getInstance().getItemRenderer().getItemModelShaper().getItemModel(stack.getItem());
       if (itemModel != null && itemModel.getOverrides() instanceof MaterialOverrideHandler) {
         MaterialOverrideHandler overrides = (MaterialOverrideHandler) itemModel.getOverrides();
         ToolStack tool = ToolStack.from(stack);

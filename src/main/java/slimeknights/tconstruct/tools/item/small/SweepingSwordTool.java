@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.item.small;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.entity.item.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.SoundEvents;
@@ -11,6 +11,8 @@ import slimeknights.tconstruct.library.tools.context.ToolAttackContext;
 import slimeknights.tconstruct.library.tools.helper.ToolAttackUtil;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 import slimeknights.tconstruct.tools.TinkerModifiers;
+
+import net.minecraft.world.item.Item.Properties;
 
 /** Sword that also has a sweep attack */
 public class SweepingSwordTool extends SwordTool {

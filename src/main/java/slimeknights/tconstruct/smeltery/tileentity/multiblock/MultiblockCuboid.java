@@ -9,11 +9,11 @@ import lombok.Setter;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Direction.Plane;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.utils.TagUtil;
@@ -42,27 +42,27 @@ public abstract class MultiblockCuboid<T extends MultiblockStructureData> {
   protected static final MultiblockResult TOO_HIGH = MultiblockResult.error(null, TConstruct.makeTranslation("multiblock", "generic.too_high"));
 
   /** Error if the structure inside is not valid */
-  protected static final ITextComponent INVALID_INNER_BLOCK = TConstruct.makeTranslation("multiblock", "generic.invalid_inner_block");
+  protected static final Component INVALID_INNER_BLOCK = TConstruct.makeTranslation("multiblock", "generic.invalid_inner_block");
   /** Error if the structure inside is not valid */
   protected static final String TOO_LARGE = TConstruct.makeTranslationKey("multiblock", "generic.too_large");
   /** Error if a block is invalid in the floor */
-  protected static final ITextComponent INVALID_FLOOR_BLOCK = TConstruct.makeTranslation("multiblock", "generic.invalid_floor_block");
+  protected static final Component INVALID_FLOOR_BLOCK = TConstruct.makeTranslation("multiblock", "generic.invalid_floor_block");
   /** Error if a block is invalid in the ceiling */
-  protected static final ITextComponent INVALID_CEILING_BLOCK = TConstruct.makeTranslation("multiblock", "generic.invalid_floor_block");
+  protected static final Component INVALID_CEILING_BLOCK = TConstruct.makeTranslation("multiblock", "generic.invalid_floor_block");
   /** Error if a block is invalid in the walls */
-  protected static final ITextComponent INVALID_WALL_BLOCK = TConstruct.makeTranslation("multiblock", "generic.invalid_wall_block");
+  protected static final Component INVALID_WALL_BLOCK = TConstruct.makeTranslation("multiblock", "generic.invalid_wall_block");
   /** Error if the structure floor has no frame */
-  protected static final ITextComponent INVALID_FLOOR_FRAME = TConstruct.makeTranslation("multiblock", "generic.invalid_floor_frame");
+  protected static final Component INVALID_FLOOR_FRAME = TConstruct.makeTranslation("multiblock", "generic.invalid_floor_frame");
   /** Error if the structure ceiling has no frame */
-  protected static final ITextComponent INVALID_CEILING_FRAME = TConstruct.makeTranslation("multiblock", "generic.invalid_ceiling_frame");
+  protected static final Component INVALID_CEILING_FRAME = TConstruct.makeTranslation("multiblock", "generic.invalid_ceiling_frame");
   /** Error if the structure wall has no frame */
-  protected static final ITextComponent INVALID_WALL_FRAME = TConstruct.makeTranslation("multiblock", "generic.invalid_wall_frame");
+  protected static final Component INVALID_WALL_FRAME = TConstruct.makeTranslation("multiblock", "generic.invalid_wall_frame");
 
   // constants to make code more readible
-  private static final int NORTH = Direction.NORTH.getHorizontalIndex();
-  private static final int EAST = Direction.EAST.getHorizontalIndex();
-  private static final int SOUTH = Direction.SOUTH.getHorizontalIndex();
-  private static final int WEST = Direction.WEST.getHorizontalIndex();
+  private static final int NORTH = Direction.NORTH.get2DDataValue();
+  private static final int EAST = Direction.EAST.get2DDataValue();
+  private static final int SOUTH = Direction.SOUTH.get2DDataValue();
+  private static final int WEST = Direction.WEST.get2DDataValue();
 
   /** If true, the multiblock requires a floor */
   protected final boolean hasFloor;
@@ -95,11 +95,11 @@ public abstract class MultiblockCuboid<T extends MultiblockStructureData> {
    * @return  Multiblock structue data
    */
   @Nullable
-  public T detectMultiblock(World world, BlockPos master, Direction facing) {
+  public T detectMultiblock(Level world, BlockPos master, Direction facing) {
     // list of blocks that are part of the multiblock, but not in a standard position
     ImmutableSet.Builder<BlockPos> extraBlocks = ImmutableSet.builder();
     // center is the lowest block behind in a position behind the controller
-    BlockPos center = getOuterPos(world, master.offset(facing.getOpposite()), Direction.DOWN, maxHeight).up();
+    BlockPos center = getOuterPos(world, master.relative(facing.getOpposite()), Direction.DOWN, maxHeight).above();
 
     // below lowest internal position
     if (master.getY() < center.getY() && (!hasFrame || !isInnerBlock(world, center))) {

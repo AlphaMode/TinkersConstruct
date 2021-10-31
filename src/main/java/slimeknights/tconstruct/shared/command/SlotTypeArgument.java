@@ -9,8 +9,8 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.TranslatableComponent;
 import slimeknights.tconstruct.library.tools.SlotType;
 import slimeknights.tconstruct.shared.command.SlotTypeArgument.SlotTypeFilter;
 
@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 @NoArgsConstructor(staticName = "slotType")
 public class SlotTypeArgument implements ArgumentType<SlotTypeFilter> {
   /* Tag collection name is invalid */
-  private static final DynamicCommandExceptionType SLOT_TYPE_NOT_FOUND = new DynamicCommandExceptionType(name -> new TranslationTextComponent("command.tconstruct.slot_type.not_found", name));
+  private static final DynamicCommandExceptionType SLOT_TYPE_NOT_FOUND = new DynamicCommandExceptionType(name -> new TranslatableComponent("command.tconstruct.slot_type.not_found", name));
 
   @Override
   public SlotTypeFilter parse(StringReader reader) throws CommandSyntaxException {
@@ -38,7 +38,7 @@ public class SlotTypeArgument implements ArgumentType<SlotTypeFilter> {
 
   @Override
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-    return ISuggestionProvider.suggest(Stream.concat(Stream.of("slotless"), SlotType.getAllSlotTypes().stream().map(SlotType::getName)), builder);
+    return SharedSuggestionProvider.suggest(Stream.concat(Stream.of("slotless"), SlotType.getAllSlotTypes().stream().map(SlotType::getName)), builder);
   }
 
   @Data

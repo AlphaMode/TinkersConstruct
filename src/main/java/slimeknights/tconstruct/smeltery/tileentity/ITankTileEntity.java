@@ -2,10 +2,10 @@ package slimeknights.tconstruct.smeltery.tileentity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.DistExecutor;
@@ -54,10 +54,10 @@ public interface ITankTileEntity extends IFluidTankUpdater, FluidUpdatePacket.IF
   @Override
   default void onTankContentsChanged() {
     int newStrength = this.comparatorStrength();
-    TileEntity te = getTE();
-    World world = te.getWorld();
+    BlockEntity te = getTE();
+    Level world = te.getLevel();
     if (newStrength != getLastStrength() && world != null) {
-      world.notifyNeighborsOfStateChange(te.getPos(), te.getBlockState().getBlock());
+      world.updateNeighborsAt(te.getBlockPos(), te.getBlockState().getBlock());
       setLastStrength(newStrength);
     }
   }

@@ -2,16 +2,18 @@ package slimeknights.tconstruct.library.recipe.casting.container;
 
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.recipe.data.AbstractRecipeBuilder;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Consumer;
+
+import slimeknights.mantle.recipe.data.AbstractRecipeBuilder.AbstractFinishedRecipe;
 
 /**
  * Builder for a container filling recipe. Takes an arbitrary fluid for a specific amount to fill a Forge {@link net.minecraftforge.fluids.capability.IFluidHandlerItem}
@@ -30,7 +32,7 @@ public class ContainerFillingRecipeBuilder extends AbstractRecipeBuilder<Contain
    * @param recipeSerializer  Serializer
    * @return  Builder instance
    */
-  public static ContainerFillingRecipeBuilder castingRecipe(IItemProvider result, int fluidAmount, ContainerFillingRecipeSerializer<?> recipeSerializer) {
+  public static ContainerFillingRecipeBuilder castingRecipe(ItemLike result, int fluidAmount, ContainerFillingRecipeSerializer<?> recipeSerializer) {
     return new ContainerFillingRecipeBuilder(Objects.requireNonNull(result.asItem().getRegistryName()), fluidAmount, recipeSerializer);
   }
 
@@ -50,7 +52,7 @@ public class ContainerFillingRecipeBuilder extends AbstractRecipeBuilder<Contain
    * @param fluidAmount       Container size
    * @return  Builder instance
    */
-  public static ContainerFillingRecipeBuilder basinRecipe(IItemProvider result, int fluidAmount) {
+  public static ContainerFillingRecipeBuilder basinRecipe(ItemLike result, int fluidAmount) {
     return castingRecipe(result, fluidAmount, TinkerSmeltery.basinFillingRecipeSerializer.get());
   }
 
@@ -70,17 +72,17 @@ public class ContainerFillingRecipeBuilder extends AbstractRecipeBuilder<Contain
    * @param fluidAmount       Container size
    * @return  Builder instance
    */
-  public static ContainerFillingRecipeBuilder tableRecipe(IItemProvider result, int fluidAmount) {
+  public static ContainerFillingRecipeBuilder tableRecipe(ItemLike result, int fluidAmount) {
     return castingRecipe(result, fluidAmount, TinkerSmeltery.tableFillingRecipeSerializer.get());
   }
 
   @Override
-  public void build(Consumer<IFinishedRecipe> consumer) {
+  public void build(Consumer<FinishedRecipe> consumer) {
     this.build(consumer, this.result);
   }
 
   @Override
-  public void build(Consumer<IFinishedRecipe> consumerIn, ResourceLocation id) {
+  public void build(Consumer<FinishedRecipe> consumerIn, ResourceLocation id) {
     ResourceLocation advancementId = this.buildOptionalAdvancement(id, "casting");
     consumerIn.accept(new ContainerFillingRecipeBuilder.Result(id, advancementId));
   }
@@ -91,12 +93,12 @@ public class ContainerFillingRecipeBuilder extends AbstractRecipeBuilder<Contain
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getType() {
       return recipeSerializer;
     }
 
     @Override
-    public void serialize(JsonObject json) {
+    public void serializeRecipeData(JsonObject json) {
       if (!group.isEmpty()) {
         json.addProperty("group", group);
       }

@@ -2,9 +2,9 @@ package slimeknights.tconstruct.tables.inventory.table;
 
 import lombok.Getter;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import slimeknights.mantle.util.sync.LambdaIntReference;
@@ -23,7 +23,7 @@ public class PartBuilderContainer extends BaseStationContainer<PartBuilderTileEn
   @Getter
   private final LazyResultSlot outputSlot;
 
-  public PartBuilderContainer(int windowIdIn, PlayerInventory playerInventoryIn, @Nullable PartBuilderTileEntity partBuilderTileEntity) {
+  public PartBuilderContainer(int windowIdIn, Inventory playerInventoryIn, @Nullable PartBuilderTileEntity partBuilderTileEntity) {
     super(TinkerTables.partBuilderContainer.get(), windowIdIn, playerInventoryIn, partBuilderTileEntity);
 
     // unfortunately, nothing works with no tile

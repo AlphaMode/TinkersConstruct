@@ -2,8 +2,8 @@ package slimeknights.tconstruct.library.materials.definition;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.Color;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.TextColor;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import slimeknights.mantle.network.packet.IThreadsafePacket;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
@@ -20,7 +20,7 @@ public class UpdateMaterialsPacket implements IThreadsafePacket {
   private final Collection<IMaterial> materials;
   private final Map<MaterialId,MaterialId> redirects;
 
-  public UpdateMaterialsPacket(PacketBuffer buffer) {
+  public UpdateMaterialsPacket(FriendlyByteBuf buffer) {
     int materialCount = buffer.readInt();
     this.materials = new ArrayList<>(materialCount);
 
@@ -31,7 +31,7 @@ public class UpdateMaterialsPacket implements IThreadsafePacket {
       boolean craftable = buffer.readBoolean();
       int color = buffer.readInt();
       boolean hidden = buffer.readBoolean();
-      this.materials.add(new Material(id, tier, sortOrder, craftable, Color.fromInt(color), hidden));
+      this.materials.add(new Material(id, tier, sortOrder, craftable, TextColor.fromRgb(color), hidden));
     }
     // process redirects
     int redirectCount = buffer.readVarInt();
@@ -40,13 +40,13 @@ public class UpdateMaterialsPacket implements IThreadsafePacket {
     } else {
       this.redirects = new HashMap<>(redirectCount);
       for (int i = 0; i < redirectCount; i++) {
-        this.redirects.put(new MaterialId(buffer.readString()), new MaterialId(buffer.readString()));
+        this.redirects.put(new MaterialId(buffer.readUtf()), new MaterialId(buffer.readUtf()));
       }
     }
   }
 
   @Override
-  public void encode(PacketBuffer buffer) {
+  public void encode(FriendlyByteBuf buffer) {
     buffer.writeInt(this.materials.size());
     this.materials.forEach(material -> {
       buffer.writeResourceLocation(material.getIdentifier());
@@ -54,13 +54,13 @@ public class UpdateMaterialsPacket implements IThreadsafePacket {
       buffer.writeVarInt(material.getSortOrder());
       buffer.writeBoolean(material.isCraftable());
       // the color int getter is private
-      buffer.writeInt(material.getColor().color);
+      buffer.writeInt(material.getColor().value);
       buffer.writeBoolean(material.isHidden());
     });
     buffer.writeVarInt(this.redirects.size());
     this.redirects.forEach((key, value) -> {
-      buffer.writeString(key.toString());
-      buffer.writeString(value.toString());
+      buffer.writeUtf(key.toString());
+      buffer.writeUtf(value.toString());
     });
   }
 

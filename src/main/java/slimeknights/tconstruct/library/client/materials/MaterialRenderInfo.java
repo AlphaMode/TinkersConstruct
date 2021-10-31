@@ -3,10 +3,10 @@ package slimeknights.tconstruct.library.client.materials;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.client.renderer.model.RenderMaterial;
-import net.minecraft.client.renderer.texture.MissingTextureSprite;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
 
@@ -40,9 +40,9 @@ public class MaterialRenderInfo {
    * @return  Sprite if valid, null if missing
    */
   @Nullable
-  private TextureAtlasSprite trySprite(RenderMaterial base, String suffix, Function<RenderMaterial,TextureAtlasSprite> spriteGetter) {
-    TextureAtlasSprite sprite = spriteGetter.apply(getMaterial(base.getTextureLocation(), suffix));
-    if (!MissingTextureSprite.getLocation().equals(sprite.getName())) {
+  private TextureAtlasSprite trySprite(Material base, String suffix, Function<Material,TextureAtlasSprite> spriteGetter) {
+    TextureAtlasSprite sprite = spriteGetter.apply(getMaterial(base.texture(), suffix));
+    if (!MissingTextureAtlasSprite.getLocation().equals(sprite.getName())) {
       return sprite;
     }
     return null;
@@ -54,7 +54,7 @@ public class MaterialRenderInfo {
    * @param spriteGetter  Logic to get a sprite
    * @return  Pair of the sprite, and a boolean indicating whether the sprite should be tinted
    */
-  public TintedSprite getSprite(RenderMaterial base, Function<RenderMaterial,TextureAtlasSprite> spriteGetter) {
+  public TintedSprite getSprite(Material base, Function<Material,TextureAtlasSprite> spriteGetter) {
     TextureAtlasSprite sprite;
     if (texture != null) {
       sprite = trySprite(base, getSuffix(texture), spriteGetter);

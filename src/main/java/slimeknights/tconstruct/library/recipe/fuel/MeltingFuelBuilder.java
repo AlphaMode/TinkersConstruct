@@ -2,9 +2,9 @@ package slimeknights.tconstruct.library.recipe.fuel;
 
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.FluidIngredient;
 import slimeknights.mantle.recipe.data.AbstractRecipeBuilder;
@@ -13,6 +13,8 @@ import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Consumer;
+
+import slimeknights.mantle.recipe.data.AbstractRecipeBuilder.AbstractFinishedRecipe;
 
 /**
  * Builds a new recipe for a melter or smeltery fuel
@@ -34,7 +36,7 @@ public class MeltingFuelBuilder extends AbstractRecipeBuilder<MeltingFuelBuilder
   }
 
   @Override
-  public void build(Consumer<IFinishedRecipe> consumer) {
+  public void build(Consumer<FinishedRecipe> consumer) {
     if (input.getFluids().isEmpty()) {
       throw new IllegalStateException("Must have at least one fluid for dynamic input");
     }
@@ -42,7 +44,7 @@ public class MeltingFuelBuilder extends AbstractRecipeBuilder<MeltingFuelBuilder
   }
 
   @Override
-  public void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id) {
+  public void build(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
     ResourceLocation advancementId = this.buildOptionalAdvancement(id, "melting_fuel");
     consumer.accept(new Result(id, advancementId));
   }
@@ -53,7 +55,7 @@ public class MeltingFuelBuilder extends AbstractRecipeBuilder<MeltingFuelBuilder
     }
 
     @Override
-    public void serialize(JsonObject json) {
+    public void serializeRecipeData(JsonObject json) {
       if (!group.isEmpty()) {
         json.addProperty("group", group);
       }
@@ -63,7 +65,7 @@ public class MeltingFuelBuilder extends AbstractRecipeBuilder<MeltingFuelBuilder
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getType() {
       return TinkerSmeltery.fuelSerializer.get();
     }
   }

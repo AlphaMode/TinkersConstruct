@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.library.utils;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -31,7 +31,7 @@ public class SlimeBounceHandler implements Consumer<LivingUpdateEvent> {
 
     if (bounce != 0) {
       // add one to the tick as there is a 1 tick delay between falling and ticking for many entities
-      this.bounceTick = entityLiving.ticksExisted + 1;
+      this.bounceTick = entityLiving.tickCount + 1;
     } else {
       this.bounceTick = 0;
     }
@@ -43,32 +43,32 @@ public class SlimeBounceHandler implements Consumer<LivingUpdateEvent> {
   @Override
   public void accept(LivingUpdateEvent event) {
     // this is only relevant for the local player
-    if (event.getEntityLiving() == this.entityLiving && !this.entityLiving.isElytraFlying()) {
+    if (event.getEntityLiving() == this.entityLiving && !this.entityLiving.isFallFlying()) {
       // bounce up. This is to circumvent the logic that resets y motion after landing
-      if (this.entityLiving.ticksExisted == this.bounceTick) {
-        Vector3d vec3d = this.entityLiving.getMotion();
-        this.entityLiving.setMotion(vec3d.x, this.bounce, vec3d.z);
+      if (this.entityLiving.tickCount == this.bounceTick) {
+        Vec3 vec3d = this.entityLiving.getDeltaMovement();
+        this.entityLiving.setDeltaMovement(vec3d.x, this.bounce, vec3d.z);
         this.bounceTick = 0;
       }
 
       // preserve motion
-      if (!this.entityLiving.isOnGround() && this.entityLiving.ticksExisted != this.bounceTick) {
-        if (this.lastMovX != this.entityLiving.getMotion().x || this.lastMovZ != this.entityLiving.getMotion().z) {
+      if (!this.entityLiving.isOnGround() && this.entityLiving.tickCount != this.bounceTick) {
+        if (this.lastMovX != this.entityLiving.getDeltaMovement().x || this.lastMovZ != this.entityLiving.getDeltaMovement().z) {
           double f = 0.91d + 0.025d;
           //System.out.println((entityLiving.worldObj.isRemote ? "client: " : "server: ") + entityLiving.motionX);
-          Vector3d vec3d = this.entityLiving.getMotion();
-          this.entityLiving.setMotion(vec3d.x / f, vec3d.y, vec3d.z / f);
-          this.entityLiving.isAirBorne = true;
-          this.lastMovX = this.entityLiving.getMotion().x;
-          this.lastMovZ = this.entityLiving.getMotion().z;
+          Vec3 vec3d = this.entityLiving.getDeltaMovement();
+          this.entityLiving.setDeltaMovement(vec3d.x / f, vec3d.y, vec3d.z / f);
+          this.entityLiving.hasImpulse = true;
+          this.lastMovX = this.entityLiving.getDeltaMovement().x;
+          this.lastMovZ = this.entityLiving.getDeltaMovement().z;
         }
       }
 
       // timing the effect out
       if (this.wasInAir && this.entityLiving.isOnGround()) {
         if (this.timer == 0) {
-          this.timer = this.entityLiving.ticksExisted;
-        } else if (this.entityLiving.ticksExisted - this.timer > 5) {
+          this.timer = this.entityLiving.tickCount;
+        } else if (this.entityLiving.tickCount - this.timer > 5) {
           MinecraftForge.EVENT_BUS.unregister(this);
           bouncingEntities.remove(this.entityLiving);
         }
@@ -101,7 +101,7 @@ public class SlimeBounceHandler implements Consumer<LivingUpdateEvent> {
       // updated bounce if needed
       handler.bounce = bounce;
       // add one to the tick as there is a 1 tick delay between falling and ticking for many entities
-      handler.bounceTick = entity.ticksExisted + 1;
+      handler.bounceTick = entity.tickCount + 1;
     }
   }
 }

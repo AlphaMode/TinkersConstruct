@@ -10,11 +10,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.minecraft.client.renderer.model.RenderMaterial;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.resources.IResource;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
@@ -73,8 +73,8 @@ public class ModifierModelManager implements IEarlySafeManagerReloadListener {
    * Initializes this manager, registering it with the resource manager
    * @param manager  Manager
    */
-  public static void init(IReloadableResourceManager manager) {
-    manager.addReloadListener(INSTANCE);
+  public static void init(ReloadableResourceManager manager) {
+    manager.registerReloadListener(INSTANCE);
   }
 
   /**
@@ -83,9 +83,9 @@ public class ModifierModelManager implements IEarlySafeManagerReloadListener {
    * @return  JSON object, or null if failed to parse
    */
   @Nullable
-  private static JsonObject getJson(IResource resource) {
+  private static JsonObject getJson(Resource resource) {
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-      return JSONUtils.fromJson(reader);
+      return GsonHelper.parse(reader);
     } catch (JsonParseException | IOException e) {
       log.error("Failed to load texture JSON " + resource.getLocation(), e);
       return null;

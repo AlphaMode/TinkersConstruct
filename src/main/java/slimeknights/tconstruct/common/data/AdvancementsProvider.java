@@ -9,7 +9,7 @@ import net.minecraft.advancements.IRequirementsStrategy;
 import net.minecraft.advancements.criterion.EnchantmentPredicate;
 import net.minecraft.advancements.criterion.EntityPredicate;
 import net.minecraft.advancements.criterion.EntityPredicate.AndPredicate;
-import net.minecraft.advancements.criterion.InventoryChangeTrigger;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.criterion.ItemDurabilityTrigger;
 import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.advancements.criterion.LocationPredicate;
@@ -23,9 +23,9 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.IItemProvider;
@@ -87,17 +87,17 @@ public class AdvancementsProvider extends GenericDataProvider {
   protected void generate() {
     // tinkering path
     Advancement materialsAndYou = builder(TinkerCommons.materialsAndYou, resource("tools/materials_and_you"), resource("textures/gui/advancement_background.png"), FrameType.TASK, builder ->
-      builder.withCriterion("crafted_book", hasItem(TinkerCommons.materialsAndYou)));
+      builder.addCriterion("crafted_book", hasItem(TinkerCommons.materialsAndYou)));
     Advancement partBuilder = builder(TinkerTables.partBuilder, resource("tools/part_builder"), materialsAndYou, FrameType.TASK, builder ->
-      builder.withCriterion("crafted_block", hasItem(TinkerTables.partBuilder)));
+      builder.addCriterion("crafted_block", hasItem(TinkerTables.partBuilder)));
     builder(TinkerToolParts.pickaxeHead.get().withMaterialForDisplay(MaterialIds.wood), resource("tools/make_part"), partBuilder, FrameType.TASK, builder ->
-      builder.withCriterion("crafted_part", hasTag(TinkerTags.Items.TOOL_PARTS)));
+      builder.addCriterion("crafted_part", hasTag(TinkerTags.Items.TOOL_PARTS)));
     Advancement tinkerStation = builder(TinkerTables.tinkerStation, resource("tools/tinker_station"), partBuilder, FrameType.TASK, builder ->
-      builder.withCriterion("crafted_block", hasItem(TinkerTables.tinkerStation)));
+      builder.addCriterion("crafted_block", hasItem(TinkerTables.tinkerStation)));
     Advancement tinkerTool = builder(TinkerTools.pickaxe.get().getRenderTool(), resource("tools/tinker_tool"), tinkerStation, FrameType.TASK, builder ->
-      builder.withCriterion("crafted_tool", hasTag(TinkerTags.Items.MULTIPART_TOOL)));
+      builder.addCriterion("crafted_tool", hasTag(TinkerTags.Items.MULTIPART_TOOL)));
     builder(TinkerMaterials.manyullyn.getIngot(), resource("tools/material_master"), tinkerTool, FrameType.CHALLENGE, builder -> {
-      Consumer<MaterialId> with = id -> builder.withCriterion(id.getPath(), InventoryChangeTrigger.Instance.forItems(ToolPredicate.builder().withMaterial(id).build()));
+      Consumer<MaterialId> with = id -> builder.addCriterion(id.getPath(), InventoryChangeTrigger.TriggerInstance.hasItems(ToolPredicate.builder().withMaterial(id).build()));
       // tier 1
       with.accept(MaterialIds.wood);
       with.accept(MaterialIds.flint);
@@ -123,7 +123,7 @@ public class AdvancementsProvider extends GenericDataProvider {
       with.accept(MaterialIds.queensSlime);
     });
     builder(TinkerTools.pickaxe.get().getRenderTool(), resource("tools/tool_smith"), tinkerTool, FrameType.CHALLENGE, builder -> {
-      Consumer<Item> with = item -> builder.withCriterion(Objects.requireNonNull(item.getRegistryName()).getPath(), hasItem(item));
+      Consumer<Item> with = item -> builder.addCriterion(Objects.requireNonNull(item.getRegistryName()).getPath(), hasItem(item));
       with.accept(TinkerTools.pickaxe.get());
       with.accept(TinkerTools.mattock.get());
       with.accept(TinkerTools.handAxe.get());
@@ -132,7 +132,7 @@ public class AdvancementsProvider extends GenericDataProvider {
       with.accept(TinkerTools.sword.get());
     });
     Advancement modified = builder(Items.REDSTONE, resource("tools/modified"), tinkerTool, FrameType.TASK, builder ->
-      builder.withCriterion("crafted_tool", InventoryChangeTrigger.Instance.forItems(ToolPredicate.builder().hasUpgrades(true).build())));
+      builder.addCriterion("crafted_tool", InventoryChangeTrigger.TriggerInstance.hasItems(ToolPredicate.builder().hasUpgrades(true).build())));
     //    builder(TinkerTools.cleaver.get().buildToolForRendering(), location("tools/glass_cannon"), modified, FrameType.CHALLENGE, builder ->
     //      builder.withCriterion("crafted_tool", InventoryChangeTrigger.Instance.forItems(ToolPredicate.builder()
     //                                                                                                  .withStat(StatPredicate.max(ToolStats.DURABILITY, 100))

@@ -1,12 +1,14 @@
 package slimeknights.tconstruct.gadgets.item.slimesling;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.library.utils.SlimeBounceHandler;
 import slimeknights.tconstruct.shared.block.SlimeType;
+
+import net.minecraft.world.item.Item.Properties;
 
 public class SkySlimeSlingItem extends BaseSlimeSlingItem {
 
@@ -29,29 +31,29 @@ public class SkySlimeSlingItem extends BaseSlimeSlingItem {
 
   /** Called when the player stops using an Item (stops holding the right mouse button). */
   @Override
-  public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
-    if (!(entityLiving instanceof PlayerEntity)) {
+  public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
+    if (!(entityLiving instanceof Player)) {
       return;
     }
 
-    PlayerEntity player = (PlayerEntity) entityLiving;
+    Player player = (Player) entityLiving;
 
     // don't allow free flight when using an elytra, should use fireworks
-    if (player.isElytraFlying()) {
+    if (player.isFallFlying()) {
       return;
     }
 
     float f = getForce(stack, timeLeft);
 
-    player.addExhaustion(0.2F);
-    player.getCooldownTracker().setCooldown(stack.getItem(), 3);
+    player.causeFoodExhaustion(0.2F);
+    player.getCooldowns().addCooldown(stack.getItem(), 3);
     player.setSprinting(true);
 
     float speed = f / 3F;
-    player.addVelocity(
-      (-MathHelper.sin(player.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(player.rotationPitch / 180.0F * (float) Math.PI) * speed),
+    player.push(
+      (-Mth.sin(player.yRot / 180.0F * (float) Math.PI) * Mth.cos(player.xRot / 180.0F * (float) Math.PI) * speed),
       speed,
-      (MathHelper.cos(player.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(player.rotationPitch / 180.0F * (float) Math.PI) * speed));
+      (Mth.cos(player.yRot / 180.0F * (float) Math.PI) * Mth.cos(player.xRot / 180.0F * (float) Math.PI) * speed));
 
     playerServerMovement(player);
     onSuccess(player, stack);

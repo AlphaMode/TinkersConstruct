@@ -1,33 +1,33 @@
 package slimeknights.tconstruct.tables.tileentity.table.crafting;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.RecipeItemHelper;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.StackedContents;
 
 /**
  * Extension of {@link CraftingInventory} to use instead wrap an existing {@link IInventory}
  */
-public class CraftingInventoryWrapper extends CraftingInventory {
-  private final IInventory crafter;
-  public CraftingInventoryWrapper(IInventory crafter, int width, int height) {
+public class CraftingInventoryWrapper extends CraftingContainer {
+  private final Container crafter;
+  public CraftingInventoryWrapper(Container crafter, int width, int height) {
     //noinspection ConstantConditions
     super(null, width, height);
-    Preconditions.checkArgument(crafter.getSizeInventory() == width * height, "Invalid width and height for inventroy size");
+    Preconditions.checkArgument(crafter.getContainerSize() == width * height, "Invalid width and height for inventroy size");
     this.crafter = crafter;
   }
 
   /** Inventory redirection */
 
   @Override
-  public ItemStack getStackInSlot(int index) {
-    return crafter.getStackInSlot(index);
+  public ItemStack getItem(int index) {
+    return crafter.getItem(index);
   }
 
   @Override
-  public int getSizeInventory() {
-    return crafter.getSizeInventory();
+  public int getContainerSize() {
+    return crafter.getContainerSize();
   }
 
   @Override
@@ -36,34 +36,34 @@ public class CraftingInventoryWrapper extends CraftingInventory {
   }
 
   @Override
-  public ItemStack removeStackFromSlot(int index) {
-    return crafter.removeStackFromSlot(index);
+  public ItemStack removeItemNoUpdate(int index) {
+    return crafter.removeItemNoUpdate(index);
   }
 
   @Override
-  public ItemStack decrStackSize(int index, int count) {
-    return crafter.decrStackSize(index, count);
+  public ItemStack removeItem(int index, int count) {
+    return crafter.removeItem(index, count);
   }
 
   @Override
-  public void setInventorySlotContents(int index, ItemStack stack) {
-    crafter.setInventorySlotContents(index, stack);
+  public void setItem(int index, ItemStack stack) {
+    crafter.setItem(index, stack);
   }
 
   @Override
-  public void markDirty() {
-    crafter.markDirty();
+  public void setChanged() {
+    crafter.setChanged();
   }
 
   @Override
-  public void clear() {
-    crafter.clear();
+  public void clearContent() {
+    crafter.clearContent();
   }
 
   @Override
-  public void fillStackedContents(RecipeItemHelper helper) {
-    for (int i = 0; i < crafter.getSizeInventory(); i++) {
-      helper.accountPlainStack(crafter.getStackInSlot(i));
+  public void fillStackedContents(StackedContents helper) {
+    for (int i = 0; i < crafter.getContainerSize(); i++) {
+      helper.accountSimpleStack(crafter.getItem(i));
     }
   }
 }

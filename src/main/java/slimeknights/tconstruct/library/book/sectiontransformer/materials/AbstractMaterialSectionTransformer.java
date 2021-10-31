@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.library.book.sectiontransformer.materials;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import slimeknights.mantle.client.book.data.BookData;
@@ -74,8 +74,8 @@ public abstract class AbstractMaterialSectionTransformer extends SectionTransfor
     ContentPageIconList overview = iter.next();
 
     for (IMaterial material : materialList) {
-      assert Minecraft.getInstance().world != null;
-      List<MaterialRecipe> recipes = RecipeHelper.getUIRecipes(Minecraft.getInstance().world.getRecipeManager(), RecipeTypes.MATERIAL, MaterialRecipe.class, recipe -> recipe.getMaterial() == material);
+      assert Minecraft.getInstance().level != null;
+      List<MaterialRecipe> recipes = RecipeHelper.getUIRecipes(Minecraft.getInstance().level.getRecipeManager(), RecipeTypes.MATERIAL, MaterialRecipe.class, recipe -> recipe.getMaterial() == material);
       List<ItemStack> displayStacks = new ArrayList<>();
 
       for (MaterialRecipe recipe : recipes) {
@@ -90,7 +90,7 @@ public abstract class AbstractMaterialSectionTransformer extends SectionTransfor
       PageData page = this.addPage(sectionData, material.getIdentifier().toString(), ContentMaterial.ID, this.getPageContent(material, displayStacks));
 
       SizedBookElement icon = new ItemElement(0, 0, 1f, displayStacks);
-      while (!overview.addLink(icon, new TranslationTextComponent(material.getTranslationKey()).modifyStyle(style -> style.setColor(material.getColor())), page)) {
+      while (!overview.addLink(icon, new TranslatableComponent(material.getTranslationKey()).withStyle(style -> style.withColor(material.getColor())), page)) {
         overview = iter.next();
       }
     }

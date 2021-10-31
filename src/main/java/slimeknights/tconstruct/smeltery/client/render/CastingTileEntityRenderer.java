@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.smeltery.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.item.ItemStack;
 import slimeknights.mantle.client.model.inventory.ModelItem;
 import slimeknights.mantle.client.model.util.ModelHelper;
@@ -18,13 +18,13 @@ import slimeknights.tconstruct.smeltery.tileentity.tank.CastingFluidHandler;
 
 import java.util.List;
 
-public class CastingTileEntityRenderer extends TileEntityRenderer<CastingTileEntity> {
-  public CastingTileEntityRenderer(TileEntityRendererDispatcher dispatcher) {
+public class CastingTileEntityRenderer extends BlockEntityRenderer<CastingTileEntity> {
+  public CastingTileEntityRenderer(BlockEntityRenderDispatcher dispatcher) {
     super(dispatcher);
   }
 
   @Override
-  public void render(CastingTileEntity casting, float partialTicks, MatrixStack matrices, IRenderTypeBuffer buffer, int light, int combinedOverlayIn) {
+  public void render(CastingTileEntity casting, float partialTicks, PoseStack matrices, MultiBufferSource buffer, int light, int combinedOverlayIn) {
     BlockState state = casting.getBlockState();
     CastingModel.BakedModel model = ModelHelper.getBakedModel(state, CastingModel.BakedModel.class);
     if (model != null) {

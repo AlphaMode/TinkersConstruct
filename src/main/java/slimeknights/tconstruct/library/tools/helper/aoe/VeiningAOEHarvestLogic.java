@@ -3,13 +3,13 @@ package slimeknights.tconstruct.library.tools.helper.aoe;
 import com.google.common.collect.AbstractIterator;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.library.tools.helper.ToolHarvestLogic;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 import slimeknights.tconstruct.tools.TinkerModifiers;
@@ -18,6 +18,8 @@ import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
+
+import slimeknights.tconstruct.library.tools.helper.ToolHarvestLogic.AOEMatchType;
 
 /**
  * Harvest logic that breaks a block plus neighbors of the same type
@@ -28,7 +30,7 @@ public class VeiningAOEHarvestLogic extends ToolHarvestLogic {
   private final int maxDistance;
 
   @Override
-  public Iterable<BlockPos> getAOEBlocks(IModifierToolStack tool, ItemStack stack, PlayerEntity player, BlockState state, World world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
+  public Iterable<BlockPos> getAOEBlocks(IModifierToolStack tool, ItemStack stack, Player player, BlockState state, Level world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
     int expanded = tool.getModifierLevel(TinkerModifiers.expanded.get());
     return calculate(state, world, origin, maxDistance + expanded);
   }
@@ -42,7 +44,7 @@ public class VeiningAOEHarvestLogic extends ToolHarvestLogic {
    * @param maxDistance  Max distance to vein
    * @return  Iterator for veining
    */
-  public static Iterable<BlockPos> calculate(BlockState state, World world, BlockPos origin, int maxDistance) {
+  public static Iterable<BlockPos> calculate(BlockState state, Level world, BlockPos origin, int maxDistance) {
     return () -> new VeiningIterator(world, origin, state.getBlock(), maxDistance);
   }
 
@@ -51,10 +53,10 @@ public class VeiningAOEHarvestLogic extends ToolHarvestLogic {
     private final Set<BlockPos> visited = new HashSet<>();
     private final Queue<DistancePos> queue = new ArrayDeque<>();
 
-    private final World world;
+    private final Level world;
     private final Block target;
     private final int maxDistance;
-    private VeiningIterator(World world, BlockPos origin, Block target, int maxDistance) {
+    private VeiningIterator(Level world, BlockPos origin, Block target, int maxDistance) {
       this.world = world;
       this.target = target;
       this.maxDistance = maxDistance;
@@ -73,7 +75,7 @@ public class VeiningAOEHarvestLogic extends ToolHarvestLogic {
      */
     private void enqueueNeighbors(BlockPos pos, int distance) {
       for (Direction direction : Direction.values()) {
-        BlockPos offset = pos.offset(direction);
+        BlockPos offset = pos.relative(direction);
         if (!visited.contains(offset)) {
           visited.add(offset); // mark position visited to prevent adding again before we get to it
           queue.add(new DistancePos(offset, distance));

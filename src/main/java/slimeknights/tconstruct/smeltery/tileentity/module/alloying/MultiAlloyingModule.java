@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.smeltery.tileentity.module.alloying;
 
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.tileentity.MantleTileEntity;
 import slimeknights.tconstruct.library.recipe.RecipeTypes;
 import slimeknights.tconstruct.library.recipe.alloying.AlloyRecipe;
@@ -37,8 +37,8 @@ public class MultiAlloyingModule implements IAlloyingModule {
   }
 
   /** Gets a nonnull world instance from the parent */
-  private World getWorld() {
-    return Objects.requireNonNull(parent.getWorld(), "Parent tile entity has null world");
+  private Level getWorld() {
+    return Objects.requireNonNull(parent.getLevel(), "Parent tile entity has null world");
   }
 
   /**
@@ -47,7 +47,7 @@ public class MultiAlloyingModule implements IAlloyingModule {
    */
   private List<AlloyRecipe> getRecipes() {
     if (lastRecipes == null) {
-      lastRecipes = getWorld().getRecipeManager().getRecipes(RecipeTypes.ALLOYING, alloyTank, getWorld());
+      lastRecipes = getWorld().getRecipeManager().getRecipesFor(RecipeTypes.ALLOYING, alloyTank, getWorld());
     }
     return lastRecipes;
   }
@@ -63,7 +63,7 @@ public class MultiAlloyingModule implements IAlloyingModule {
       return false;
     }
 
-    World world = getWorld();
+    Level world = getWorld();
     Iterator<AlloyRecipe> iterator = recipes.iterator();
     while (iterator.hasNext()) {
       // if the recipe no longer matches, remove

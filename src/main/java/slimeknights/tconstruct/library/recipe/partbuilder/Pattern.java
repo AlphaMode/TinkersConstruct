@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.library.recipe.partbuilder;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ResourceLocationException;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import slimeknights.tconstruct.library.utils.Util;
 import slimeknights.tconstruct.library.modifiers.ModifierId;
 
@@ -43,8 +43,8 @@ public class Pattern extends ResourceLocation {
    * Gets the display name for this pattern
    * @return  Display name
    */
-  public ITextComponent getDisplayName() {
-    return new TranslationTextComponent(Util.makeTranslationKey("pattern", this));
+  public Component getDisplayName() {
+    return new TranslatableComponent(Util.makeTranslationKey("pattern", this));
   }
 
   /**

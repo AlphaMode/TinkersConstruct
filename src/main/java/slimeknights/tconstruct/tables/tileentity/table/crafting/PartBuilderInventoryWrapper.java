@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tables.tileentity.table.crafting;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.library.recipe.RecipeTypes;
 import slimeknights.tconstruct.library.recipe.material.MaterialRecipe;
 import slimeknights.tconstruct.library.recipe.partbuilder.IPartBuilderInventory;
@@ -24,17 +24,17 @@ public class PartBuilderInventoryWrapper implements IPartBuilderInventory {
 
   @Override
   public ItemStack getStack() {
-    return builder.getStackInSlot(PartBuilderTileEntity.MATERIAL_SLOT);
+    return builder.getItem(PartBuilderTileEntity.MATERIAL_SLOT);
   }
 
   @Override
   public ItemStack getPatternStack() {
-    return builder.getStackInSlot(PartBuilderTileEntity.PATTERN_SLOT);
+    return builder.getItem(PartBuilderTileEntity.PATTERN_SLOT);
   }
 
   /** Gets the tiles world */
-  protected World getWorld() {
-    return Objects.requireNonNull(builder.getWorld(), "Tile entity world must be nonnull");
+  protected Level getWorld() {
+    return Objects.requireNonNull(builder.getLevel(), "Tile entity world must be nonnull");
   }
 
   /** Refreshes the stored material */
@@ -51,8 +51,8 @@ public class PartBuilderInventoryWrapper implements IPartBuilderInventory {
       if (getStack().isEmpty()) {
         this.material = null;
       } else {
-        World world = getWorld();
-        this.material = world.getRecipeManager().getRecipe(RecipeTypes.MATERIAL, this, world).orElse(null);
+        Level world = getWorld();
+        this.material = world.getRecipeManager().getRecipeFor(RecipeTypes.MATERIAL, this, world).orElse(null);
       }
     }
     return this.material;

@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.common;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.color.ItemColors;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.item.ItemColors;
 import slimeknights.mantle.registration.object.EnumObject;
 
 import java.util.function.Supplier;
@@ -18,7 +18,7 @@ public abstract class ClientEventBase {
    * @param block        Block to register
    */
   protected static void registerBlockItemColorAlias(BlockColors blockColors, ItemColors itemColors, Block block) {
-    itemColors.register((stack, index) -> blockColors.getColor(block.getDefaultState(), null, null, index), block);
+    itemColors.register((stack, index) -> blockColors.getColor(block.defaultBlockState(), null, null, index), block);
   }
 
   /**

@@ -4,9 +4,9 @@
 
 package slimeknights.tconstruct.library.utils;
 
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.fml.ForgeI18n;
 import net.minecraftforge.fml.ModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -65,7 +65,7 @@ public class Util {
    * @return  Translation key
    */
   public static String makeTranslationKey(String base, ResourceLocation name) {
-    return net.minecraft.util.Util.makeTranslationKey(base, name);
+    return net.minecraft.Util.makeDescriptionId(base, name);
   }
 
   /**
@@ -118,7 +118,7 @@ public class Util {
   public static Direction directionFromOffset(BlockPos pos, BlockPos neighbor) {
     BlockPos offset = neighbor.subtract(pos);
     for (Direction direction : Direction.values()) {
-      if (direction.getDirectionVec().equals(offset)) {
+      if (direction.getNormal().equals(offset)) {
         return direction;
       }
     }

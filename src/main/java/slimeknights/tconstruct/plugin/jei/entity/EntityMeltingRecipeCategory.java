@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.plugin.jei.entity;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
@@ -18,13 +18,13 @@ import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SpawnEggItem;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ForgeI18n;
 import slimeknights.tconstruct.TConstruct;
@@ -48,7 +48,7 @@ public class EntityMeltingRecipeCategory implements IRecipeCategory<EntityMeltin
   public static final ResourceLocation BACKGROUND_LOC = TConstruct.getResource("textures/gui/jei/melting.png");
   private static final String KEY_TITLE = TConstruct.makeTranslationKey("jei", "entity_melting.title");
   private static final String KEY_PER_HEARTS = TConstruct.makeTranslationKey("jei", "entity_melting.per_hearts");
-  private static final ITextComponent TOOLTIP_PER_HEART = new TranslationTextComponent(TConstruct.makeTranslationKey("jei", "entity_melting.per_heart")).mergeStyle(TextFormatting.GRAY);
+  private static final Component TOOLTIP_PER_HEART = new TranslatableComponent(TConstruct.makeTranslationKey("jei", "entity_melting.per_heart")).withStyle(ChatFormatting.GRAY);
 
   private static final Int2ObjectMap<ITooltipCallback<FluidStack>> TOOLTIP_MAP = new Int2ObjectOpenHashMap<>();
 
@@ -88,7 +88,7 @@ public class EntityMeltingRecipeCategory implements IRecipeCategory<EntityMeltin
    * @return  Input item stack list
    */
   public static List<List<ItemStack>> getSpawnEggs(Stream<EntityType<?>> entities) {
-    return ImmutableList.of(entities.map(SpawnEggItem::getEgg).filter(Objects::nonNull).map(ItemStack::new).collect(Collectors.toList()));
+    return ImmutableList.of(entities.map(SpawnEggItem::byId).filter(Objects::nonNull).map(ItemStack::new).collect(Collectors.toList()));
   }
 
   @Override
@@ -99,7 +99,7 @@ public class EntityMeltingRecipeCategory implements IRecipeCategory<EntityMeltin
   }
 
   @Override
-  public void draw(EntityMeltingRecipe recipe, MatrixStack matrices, double mouseX, double mouseY) {
+  public void draw(EntityMeltingRecipe recipe, PoseStack matrices, double mouseX, double mouseY) {
     arrow.draw(matrices, 71, 21);
 
     // draw damage string next to the heart icon

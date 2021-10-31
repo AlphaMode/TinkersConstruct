@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tables.client;
 
-import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import slimeknights.tconstruct.library.data.ResourceValidator;
@@ -21,7 +21,7 @@ public class PatternGuiTextureLoader extends ResourceValidator {
    * @param event
    */
   private void onTextureStitch(TextureStitchEvent.Pre event) {
-    if (PlayerContainer.LOCATION_BLOCKS_TEXTURE.equals(event.getMap().getTextureLocation())) {
+    if (InventoryMenu.BLOCK_ATLAS.equals(event.getMap().location())) {
       this.resources.forEach(event::addSprite);
     }
   }

@@ -1,15 +1,15 @@
 package slimeknights.tconstruct.tables.tileentity.chest;
 
 import lombok.Getter;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.LazyOptional;
@@ -28,8 +28,8 @@ public abstract class ChestTileEntity extends NamableTileEntity {
   @Getter
   private final ItemStackHandler itemHandler;
   private final LazyOptional<IItemHandler> capability;
-  protected ChestTileEntity(TileEntityType<?> tileEntityTypeIn, String name, ItemStackHandler itemHandler) {
-    super(tileEntityTypeIn, new TranslationTextComponent(name));
+  protected ChestTileEntity(BlockEntityType<?> tileEntityTypeIn, String name, ItemStackHandler itemHandler) {
+    super(tileEntityTypeIn, new TranslatableComponent(name));
     this.itemHandler = itemHandler;
     this.capability = LazyOptional.of(() -> itemHandler);
   }
@@ -50,7 +50,7 @@ public abstract class ChestTileEntity extends NamableTileEntity {
 
   @Nullable
   @Override
-  public Container createMenu(int menuId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+  public AbstractContainerMenu createMenu(int menuId, Inventory playerInventory, Player playerEntity) {
     return new TinkerChestContainer(menuId, playerInventory, this);
   }
 
@@ -60,31 +60,31 @@ public abstract class ChestTileEntity extends NamableTileEntity {
    * @param heldItem  Stack to insert
    * @return  Return true
    */
-  public boolean canInsert(PlayerEntity player, ItemStack heldItem) {
+  public boolean canInsert(Player player, ItemStack heldItem) {
     return true;
   }
 
   @Override
-  public CompoundNBT write(CompoundNBT tags) {
-    tags = super.write(tags);
+  public CompoundTag save(CompoundTag tags) {
+    tags = super.save(tags);
     // move the items from the serialized result
     // we don't care about the size and need it here for compat with old worlds
-    CompoundNBT handlerNBT = itemHandler.serializeNBT();
+    CompoundTag handlerNBT = itemHandler.serializeNBT();
     tags.put(KEY_ITEMS, handlerNBT.getList(KEY_ITEMS, NBT.TAG_COMPOUND));
     return tags;
   }
 
   /** Reads the inventory from NBT */
-  public void readInventory(CompoundNBT tags) {
+  public void readInventory(CompoundTag tags) {
     // copy in just the items key for deserializing, don't want to change the size
-    CompoundNBT handlerNBT = new CompoundNBT();
+    CompoundTag handlerNBT = new CompoundTag();
     handlerNBT.put(KEY_ITEMS, tags.getList(KEY_ITEMS, NBT.TAG_COMPOUND));
     itemHandler.deserializeNBT(handlerNBT);
   }
 
   @Override
-  public void read(BlockState blockState, CompoundNBT tags) {
-    super.read(blockState, tags);
+  public void load(BlockState blockState, CompoundTag tags) {
+    super.load(blockState, tags);
     readInventory(tags);
   }
 }

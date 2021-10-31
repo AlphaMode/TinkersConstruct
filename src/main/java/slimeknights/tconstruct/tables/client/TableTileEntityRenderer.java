@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.tables.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.tileentity.TileEntity;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.world.Container;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import slimeknights.mantle.client.model.inventory.ModelItem;
 import slimeknights.mantle.client.model.util.ModelHelper;
 import slimeknights.mantle.client.render.RenderingHelper;
@@ -19,13 +19,13 @@ import java.util.List;
  * TODO: migrate to an interface in Mantle
  * @param <T>  Tile entity type
  */
-public class TableTileEntityRenderer<T extends TileEntity & IInventory> extends TileEntityRenderer<T> {
-  public TableTileEntityRenderer(TileEntityRendererDispatcher dispatcher) {
+public class TableTileEntityRenderer<T extends BlockEntity & Container> extends BlockEntityRenderer<T> {
+  public TableTileEntityRenderer(BlockEntityRenderDispatcher dispatcher) {
     super(dispatcher);
   }
 
   @Override
-  public void render(T inventory, float partialTicks, MatrixStack matrices, IRenderTypeBuffer buffer, int light, int combinedOverlayIn) {
+  public void render(T inventory, float partialTicks, PoseStack matrices, MultiBufferSource buffer, int light, int combinedOverlayIn) {
     if (!inventory.isEmpty()) {
       BlockState state = inventory.getBlockState();
       TableModel.BakedModel model = ModelHelper.getBakedModel(state, TableModel.BakedModel.class);

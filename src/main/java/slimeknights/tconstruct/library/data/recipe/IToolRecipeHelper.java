@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.library.data.recipe;
 
-import net.minecraft.data.IFinishedRecipe;
+import net.minecraft.data.recipes.FinishedRecipe;
 import slimeknights.tconstruct.common.registration.CastItemObject;
 import slimeknights.tconstruct.library.recipe.casting.material.CompositeCastingRecipeBuilder;
 import slimeknights.tconstruct.library.recipe.casting.material.MaterialCastingRecipeBuilder;
@@ -25,7 +25,7 @@ public interface IToolRecipeHelper extends ICastCreationHelper {
    * @param tool     Tool
    * @param folder   Folder for recipe
    */
-  default void toolBuilding(Consumer<IFinishedRecipe> consumer, IModifiable tool, String folder) {
+  default void toolBuilding(Consumer<FinishedRecipe> consumer, IModifiable tool, String folder) {
     ToolBuildingRecipeBuilder.toolBuildingRecipe(tool)
                              .build(consumer, modResource(folder + Objects.requireNonNull(tool.asItem().getRegistryName()).getPath()));
   }

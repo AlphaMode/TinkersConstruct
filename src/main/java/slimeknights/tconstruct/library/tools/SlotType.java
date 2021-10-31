@@ -7,11 +7,11 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.Color;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.utils.JsonUtils;
 
@@ -74,7 +74,7 @@ public final class SlotType {
     if (!isValidName(name)) {
       throw new IllegalArgumentException("Non [a-z0-9_] character in slot name: " + name);
     }
-    SlotType type = new SlotType(name, Color.fromInt(color));
+    SlotType type = new SlotType(name, TextColor.fromRgb(color));
     SLOT_TYPES.put(name, type);
     ALL_SLOTS.add(type);
     return type;
@@ -96,8 +96,8 @@ public final class SlotType {
   }
 
   /** Reads the slot type from the packet buffer */
-  public static SlotType read(PacketBuffer buffer) {
-    return getOrCreate(buffer.readString());
+  public static SlotType read(FriendlyByteBuf buffer) {
+    return getOrCreate(buffer.readUtf());
   }
 
   /**
@@ -113,10 +113,10 @@ public final class SlotType {
   private final String name;
   /** Gets the color of this slot type */
   @Getter
-  private final Color color;
+  private final TextColor color;
 
   /** Cached text component display names */
-  private ITextComponent displayName = null;
+  private Component displayName = null;
 
   /** Gets the display name for display in a title */
   public String getPrefix() {
@@ -124,16 +124,16 @@ public final class SlotType {
   }
 
   /** Gets the display name for display in a sentence */
-  public ITextComponent getDisplayName() {
+  public Component getDisplayName() {
     if (displayName == null) {
-      displayName = new TranslationTextComponent(KEY_DISPLAY + name);
+      displayName = new TranslatableComponent(KEY_DISPLAY + name);
     }
     return displayName;
   }
 
   /** Writes this slot type to the packet buffer */
-  public void write(PacketBuffer buffer) {
-    buffer.writeString(name);
+  public void write(FriendlyByteBuf buffer) {
+    buffer.writeUtf(name);
   }
 
   @Override
@@ -168,7 +168,7 @@ public final class SlotType {
 
     /** Reads a slot count from the packet buffer */
     @Nullable
-    public static SlotCount read(PacketBuffer buffer) {
+    public static SlotCount read(FriendlyByteBuf buffer) {
       int count = buffer.readVarInt();
       if (count > 0) {
         SlotType type = SlotType.read(buffer);

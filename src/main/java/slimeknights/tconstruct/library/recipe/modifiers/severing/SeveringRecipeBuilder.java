@@ -2,10 +2,10 @@ package slimeknights.tconstruct.library.recipe.modifiers.severing;
 
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.recipe.EntityIngredient;
 import slimeknights.mantle.recipe.ItemOutput;
 import slimeknights.mantle.recipe.data.AbstractRecipeBuilder;
@@ -14,6 +14,8 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Consumer;
+
+import slimeknights.mantle.recipe.data.AbstractRecipeBuilder.AbstractFinishedRecipe;
 
 /** Builder for entity melting recipes */
 @RequiredArgsConstructor(staticName = "severing")
@@ -24,7 +26,7 @@ public class SeveringRecipeBuilder extends AbstractRecipeBuilder<SeveringRecipeB
   private ItemOutput childOutput = null;
 
   /** Creates a new builder from an item */
-  public static SeveringRecipeBuilder severing(EntityIngredient ingredient, IItemProvider output) {
+  public static SeveringRecipeBuilder severing(EntityIngredient ingredient, ItemLike output) {
     return SeveringRecipeBuilder.severing(ingredient, ItemOutput.fromItem(output));
   }
 
@@ -40,12 +42,12 @@ public class SeveringRecipeBuilder extends AbstractRecipeBuilder<SeveringRecipeB
   }
 
   @Override
-  public void build(Consumer<IFinishedRecipe> consumer) {
+  public void build(Consumer<FinishedRecipe> consumer) {
     build(consumer, Objects.requireNonNull(output.get().getItem().getRegistryName()));
   }
 
   @Override
-  public void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id) {
+  public void build(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
     ResourceLocation advancementId = this.buildOptionalAdvancement(id, "severing");
     consumer.accept(new FinishedRecipe(id, advancementId));
   }
@@ -56,7 +58,7 @@ public class SeveringRecipeBuilder extends AbstractRecipeBuilder<SeveringRecipeB
     }
 
     @Override
-    public void serialize(JsonObject json) {
+    public void serializeRecipeData(JsonObject json) {
       json.add("entity", ingredient.serialize());
       if (isAgeable) {
         json.add("adult_result", output.serialize());
@@ -69,7 +71,7 @@ public class SeveringRecipeBuilder extends AbstractRecipeBuilder<SeveringRecipeB
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getType() {
       return isAgeable ? TinkerModifiers.ageableSeveringSerializer.get() : TinkerModifiers.severingSerializer.get();
     }
   }

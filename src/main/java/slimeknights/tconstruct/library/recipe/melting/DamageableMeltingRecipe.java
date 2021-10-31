@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.library.recipe.melting;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
@@ -31,7 +31,7 @@ public class DamageableMeltingRecipe extends MeltingRecipe {
       return output.copy();
     }
     // scale output based on damage value, its possible 1mb is a lot for some high durability things, but whatever
-    return scaleOutput(output, input.getDamage(), maxDamage);
+    return scaleOutput(output, input.getDamageValue(), maxDamage);
   }
 
   @Override
@@ -42,7 +42,7 @@ public class DamageableMeltingRecipe extends MeltingRecipe {
       super.handleByproducts(inv, handler);
     } else {
       // fill byproducts until we run out of space or byproducts
-      int itemDamage = input.getDamage();
+      int itemDamage = input.getDamageValue();
       for (FluidStack fluidStack : byproducts) {
         handler.fill(scaleOutput(fluidStack, itemDamage, maxDamage), FluidAction.EXECUTE);
       }
@@ -50,7 +50,7 @@ public class DamageableMeltingRecipe extends MeltingRecipe {
   }
 
   @Override
-  public IRecipeSerializer<?> getSerializer() {
+  public RecipeSerializer<?> getSerializer() {
     return TinkerSmeltery.damagableMeltingSerializer.get();
   }
 }

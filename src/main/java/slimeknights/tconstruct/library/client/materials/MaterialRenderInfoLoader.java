@@ -5,10 +5,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import lombok.extern.log4j.Log4j2;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.resources.IResource;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.library.data.IEarlySafeManagerReloadListener;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
@@ -49,8 +49,8 @@ public class MaterialRenderInfoLoader implements IEarlySafeManagerReloadListener
   /**
    * Called on mod construct to register the resource listener
    */
-  public static void addResourceListener(IReloadableResourceManager manager)  {
-    manager.addReloadListener(INSTANCE);
+  public static void addResourceListener(ReloadableResourceManager manager)  {
+    manager.registerReloadListener(INSTANCE);
   }
 
   /** Map of all loaded materials */
@@ -76,18 +76,18 @@ public class MaterialRenderInfoLoader implements IEarlySafeManagerReloadListener
   }
 
   @Override
-  public void onReloadSafe(IResourceManager manager) {
+  public void onReloadSafe(ResourceManager manager) {
     // first, we need to fetch all relevant JSON files
     int trim = FOLDER.length() + 1;
     Map<MaterialId,MaterialRenderInfo> map = new HashMap<>();
-    for(ResourceLocation location : manager.getAllResourceLocations(FOLDER, (loc) -> loc.endsWith(".json"))) {
+    for(ResourceLocation location : manager.listResources(FOLDER, (loc) -> loc.endsWith(".json"))) {
       // clean up ID by trimming off the extension
       String path = location.getPath();
       MaterialId id = new MaterialId(location.getNamespace(), path.substring(trim, path.length() - 5));
 
       // read in the JSON data
       try (
-        IResource iresource = manager.getResource(location);
+        Resource iresource = manager.getResource(location);
         InputStream inputstream = iresource.getInputStream();
         Reader reader = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8))
       ) {

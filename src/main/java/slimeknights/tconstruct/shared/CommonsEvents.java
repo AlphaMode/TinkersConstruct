@@ -2,13 +2,13 @@ package slimeknights.tconstruct.shared;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -32,11 +32,11 @@ public class CommonsEvents {
     }
 
     // check if we jumped from a slime block
-    BlockPos pos = new BlockPos(event.getEntity().getPosX(), event.getEntity().getPosY(), event.getEntity().getPosZ());
-    if (event.getEntity().getEntityWorld().isAirBlock(pos)) {
-      pos = pos.down();
+    BlockPos pos = new BlockPos(event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ());
+    if (event.getEntity().getCommandSenderWorld().isEmptyBlock(pos)) {
+      pos = pos.below();
     }
-    BlockState state = event.getEntity().getEntityWorld().getBlockState(pos);
+    BlockState state = event.getEntity().getCommandSenderWorld().getBlockState(pos);
     Block block = state.getBlock();
 
     if (TinkerWorld.congealedSlime.contains(block)) {
@@ -47,7 +47,7 @@ public class CommonsEvents {
   }
 
   private static void bounce(Entity entity, float amount) {
-    entity.setMotion(entity.getMotion().add(0.0D, amount, 0.0D));
+    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0D, amount, 0.0D));
     entity.playSound(Sounds.SLIMY_BOUNCE.getSound(), 0.5f + amount, 1f);
   }
 

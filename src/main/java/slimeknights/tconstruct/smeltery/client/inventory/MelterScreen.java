@@ -2,10 +2,10 @@ package slimeknights.tconstruct.smeltery.client.inventory;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import slimeknights.mantle.client.screen.ElementScreen;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.GuiUtil;
@@ -18,7 +18,7 @@ import slimeknights.tconstruct.smeltery.tileentity.module.FuelModule;
 
 import javax.annotation.Nullable;
 
-public class MelterScreen extends ContainerScreen<MelterContainer> implements IScreenWithFluidTank {
+public class MelterScreen extends AbstractContainerScreen<MelterContainer> implements IScreenWithFluidTank {
   private static final ResourceLocation BACKGROUND = TConstruct.getResource("textures/gui/melter.png");
   private static final ElementScreen SCALA = new ElementScreen(176, 0, 52, 52, 256, 256);
   private static final ElementScreen FUEL_SLOT = new ElementScreen(176, 52, 18, 36, 256, 256);
@@ -27,7 +27,7 @@ public class MelterScreen extends ContainerScreen<MelterContainer> implements IS
   private final GuiMeltingModule melting;
   private final GuiFuelModule fuel;
   private final GuiTankModule tank;
-  public MelterScreen(MelterContainer container, PlayerInventory inv, ITextComponent name) {
+  public MelterScreen(MelterContainer container, Inventory inv, Component name) {
     super(container, inv, name);
     MelterTileEntity te = container.getTile();
     if (te != null) {

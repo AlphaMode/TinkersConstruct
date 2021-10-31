@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.melee;
 
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import slimeknights.tconstruct.common.TinkerTags;
@@ -10,12 +10,12 @@ import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 
 public class BaneOfSssssModifier extends ScaledTypeDamageModifier {
   public BaneOfSssssModifier() {
-    super(0xD39A88, CreatureAttribute.ARTHROPOD);
+    super(0xD39A88, MobType.ARTHROPOD);
   }
 
   @Override
   protected boolean isEffective(LivingEntity target) {
-    return super.isEffective(target) || target.getType().isContained(TinkerTags.EntityTypes.CREEPERS);
+    return super.isEffective(target) || target.getType().is(TinkerTags.EntityTypes.CREEPERS);
   }
 
   @Override

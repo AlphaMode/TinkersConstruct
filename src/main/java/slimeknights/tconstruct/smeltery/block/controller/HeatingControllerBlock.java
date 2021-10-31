@@ -1,16 +1,18 @@
 package slimeknights.tconstruct.smeltery.block.controller;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.util.TileEntityHelper;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.common.network.TinkerNetwork;
 import slimeknights.tconstruct.smeltery.network.StructureErrorPositionPacket;
 import slimeknights.tconstruct.smeltery.tileentity.controller.HeatingStructureTileEntity;
 import slimeknights.tconstruct.smeltery.tileentity.multiblock.MultiblockResult;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 /**
  * Multiblock that displays the error from the tile entity on right click
@@ -21,18 +23,18 @@ public abstract class HeatingControllerBlock extends ControllerBlock {
   }
 
   /** If true, the player is holding or wearing one of the debug items */
-  public static boolean holdingBook(PlayerEntity player) {
+  public static boolean holdingBook(Player player) {
     // either hand or head (mod compat goggles)
-    return TinkerTags.Items.STRUCTURE_DEBUG.contains(player.getHeldItemMainhand().getItem())
-           || TinkerTags.Items.STRUCTURE_DEBUG.contains(player.getHeldItemOffhand().getItem())
-           || TinkerTags.Items.STRUCTURE_DEBUG.contains(player.getItemStackFromSlot(EquipmentSlotType.HEAD).getItem());
+    return TinkerTags.Items.STRUCTURE_DEBUG.contains(player.getMainHandItem().getItem())
+           || TinkerTags.Items.STRUCTURE_DEBUG.contains(player.getOffhandItem().getItem())
+           || TinkerTags.Items.STRUCTURE_DEBUG.contains(player.getItemBySlot(EquipmentSlot.HEAD).getItem());
   }
 
   @Override
-  protected boolean openGui(PlayerEntity player, World world, BlockPos pos) {
+  protected boolean openGui(Player player, Level world, BlockPos pos) {
     super.openGui(player, world, pos);
     // only need to update if holding the book
-    if (!world.isRemote && holdingBook(player)) {
+    if (!world.isClientSide && holdingBook(player)) {
       TileEntityHelper.getTile(HeatingStructureTileEntity.class, world, pos).ifPresent(te -> {
         MultiblockResult result = te.getStructureResult();
         if (!result.isSuccess()) {

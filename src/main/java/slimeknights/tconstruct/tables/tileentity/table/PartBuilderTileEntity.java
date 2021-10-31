@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.tables.tileentity.table;
 
 import lombok.Getter;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.hooks.BasicEventHooks;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -63,21 +63,21 @@ public class PartBuilderTileEntity extends RetexturedTableTileEntity implements 
    * @return  List of recipes for the current inputs
    */
   protected Map<Pattern,IPartBuilderRecipe> getCurrentRecipes() {
-    if (world == null) {
+    if (level == null) {
       return Collections.emptyMap();
     }
     if (recipes == null) {
       // no recipes if we lack a pattern
-      if (getStackInSlot(PATTERN_SLOT).isEmpty()) {
+      if (getItem(PATTERN_SLOT).isEmpty()) {
         recipes = Collections.emptyMap();
         sortedButtons = Collections.emptyList();
       } else {
         // fetch all recipes that can match these inputs, the map ensures the patterns are unique
-        recipes = world.getRecipeManager().getRecipes(RecipeTypes.PART_BUILDER).values().stream()
+        recipes = level.getRecipeManager().byType(RecipeTypes.PART_BUILDER).values().stream()
                        .filter(r -> r instanceof IPartBuilderRecipe)
                        .map(r -> (IPartBuilderRecipe)r)
                        .filter(r -> r.partialMatch(inventoryWrapper))
-                       .sorted(Comparator.comparing(IRecipe::getId))
+                       .sorted(Comparator.comparing(Recipe::getId))
                        .collect(Collectors.toMap(IPartBuilderRecipe::getPattern, Function.identity(), (a, b) -> a));
         sortedButtons = recipes.values().stream()
                                .sorted((a, b) -> {
@@ -94,7 +94,7 @@ public class PartBuilderTileEntity extends RetexturedTableTileEntity implements 
 
   /** Gets the list of sorted buttons */
   public List<Pattern> getSortedButtons() {
-    if (world == null) {
+    if (level == null) {
       return Collections.emptyList();
     }
     if (sortedButtons == null) {
@@ -146,9 +146,9 @@ public class PartBuilderTileEntity extends RetexturedTableTileEntity implements 
       this.sortedButtons = null;
     }
     this.selectedPatternIndex = -2;
-    this.craftingResult.clear();
+    this.craftingResult.clearContent();
     // update screen display
-    if (refreshRecipeList && world != null && !world.isRemote) {
+    if (refreshRecipeList && level != null && !level.isClientSide) {
       syncToRelevantPlayers(this::syncScreen);
     }
   }
@@ -185,9 +185,9 @@ public class PartBuilderTileEntity extends RetexturedTableTileEntity implements 
   }
 
   @Override
-  public void setInventorySlotContents(int slot, ItemStack stack) {
-    ItemStack original = getStackInSlot(slot);
-    super.setInventorySlotContents(slot, stack);
+  public void setItem(int slot, ItemStack stack) {
+    ItemStack original = getItem(slot);
+    super.setItem(slot, stack);
     if (stack.getItem() != original.getItem()) {
       if (slot == MATERIAL_SLOT) {
         this.inventoryWrapper.refreshMaterial();
@@ -198,16 +198,16 @@ public class PartBuilderTileEntity extends RetexturedTableTileEntity implements 
 
   @Nullable
   @Override
-  public Container createMenu(int menuId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+  public AbstractContainerMenu createMenu(int menuId, Inventory playerInventory, Player playerEntity) {
     return new PartBuilderContainer(menuId, playerInventory, this);
   }
 
   @Override
-  public ItemStack calcResult(@Nullable PlayerEntity player) {
-    if (world != null) {
+  public ItemStack calcResult(@Nullable Player player) {
+    if (level != null) {
       IPartBuilderRecipe recipe = getPartRecipe();
-      if (recipe != null && recipe.matches(inventoryWrapper, world)) {
-        return recipe.getCraftingResult(inventoryWrapper);
+      if (recipe != null && recipe.matches(inventoryWrapper, level)) {
+        return recipe.assemble(inventoryWrapper);
       }
     }
     return ItemStack.EMPTY;
@@ -219,10 +219,10 @@ public class PartBuilderTileEntity extends RetexturedTableTileEntity implements 
    * @param amount  Amount to shrink
    */
   private void shrinkSlot(int slot, int amount) {
-    ItemStack stack = getStackInSlot(slot);
+    ItemStack stack = getItem(slot);
     if (!stack.isEmpty()) {
       if (stack.getCount() <= amount) {
-        setInventorySlotContents(slot, ItemStack.EMPTY);
+        setItem(slot, ItemStack.EMPTY);
       } else {
         stack.shrink(amount);
       }
@@ -230,8 +230,8 @@ public class PartBuilderTileEntity extends RetexturedTableTileEntity implements 
   }
 
   @Override
-  public ItemStack onCraft(PlayerEntity player, ItemStack result, int amount) {
-    if (amount == 0 || this.world == null) {
+  public ItemStack onCraft(Player player, ItemStack result, int amount) {
+    if (amount == 0 || this.level == null) {
       return ItemStack.EMPTY;
     }
     // the recipe should match if we got this far, but being null is a problem
@@ -241,7 +241,7 @@ public class PartBuilderTileEntity extends RetexturedTableTileEntity implements 
     }
 
     // we are definitely crafting at this point
-    result.onCrafting(this.world, player, amount);
+    result.onCraftedBy(this.level, player, amount);
     BasicEventHooks.firePlayerCraftingEvent(player, result, this.inventoryWrapper);
     this.playCraftSound(player);
 
@@ -256,7 +256,7 @@ public class PartBuilderTileEntity extends RetexturedTableTileEntity implements 
     shrinkSlot(PATTERN_SLOT, 1);
 
     // sync display, mainly for the material value
-    if (world != null && !world.isRemote) {
+    if (level != null && !level.isClientSide) {
       syncToRelevantPlayers(this::syncScreen);
     }
 

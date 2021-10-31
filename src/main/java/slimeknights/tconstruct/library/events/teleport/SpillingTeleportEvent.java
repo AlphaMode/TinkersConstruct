@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.library.events.teleport;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.event.entity.living.EntityTeleportEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 

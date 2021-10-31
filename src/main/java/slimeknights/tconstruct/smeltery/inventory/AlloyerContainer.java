@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.smeltery.inventory;
 
 import lombok.Getter;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.items.CapabilityItemHandler;
 import slimeknights.mantle.inventory.ItemHandlerSlot;
 import slimeknights.mantle.util.sync.ValidZeroIntReference;
@@ -23,14 +23,14 @@ import java.util.function.Consumer;
 public class AlloyerContainer extends TriggeringBaseContainer<AlloyerTileEntity> {
   @Getter
   private boolean hasFuelSlot = false;
-  public AlloyerContainer(int id, @Nullable PlayerInventory inv, @Nullable AlloyerTileEntity alloyer) {
+  public AlloyerContainer(int id, @Nullable Inventory inv, @Nullable AlloyerTileEntity alloyer) {
     super(TinkerSmeltery.alloyerContainer.get(), id, inv, alloyer);
 
     // create slots
     if (alloyer != null) {
       // refresh cache of neighboring tanks
-      World world = alloyer.getWorld();
-      if (world != null && world.isRemote) {
+      Level world = alloyer.getLevel();
+      if (world != null && world.isClientSide) {
         MixerAlloyTank alloyTank = alloyer.getAlloyTank();
         for (Direction direction : Direction.values()) {
           if (direction != Direction.DOWN) {

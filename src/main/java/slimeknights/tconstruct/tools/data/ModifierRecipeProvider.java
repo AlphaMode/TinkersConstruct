@@ -4,8 +4,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.data.CookingRecipeBuilder;
 import net.minecraft.data.CustomRecipeBuilder;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluids;
@@ -70,14 +70,14 @@ public class ModifierRecipeProvider extends BaseRecipeProvider {
   }
 
   @Override
-  protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
+  protected void buildShapelessRecipes(Consumer<FinishedRecipe> consumer) {
     addItemRecipes(consumer);
     addModifierRecipes(consumer);
     addHeadRecipes(consumer);
     addSpillingRecipes(consumer);
   }
 
-  private void addItemRecipes(Consumer<IFinishedRecipe> consumer) {
+  private void addItemRecipes(Consumer<FinishedRecipe> consumer) {
     String folder = "tools/modifiers/";
 
     // reinforcements
@@ -91,9 +91,9 @@ public class ModifierRecipeProvider extends BaseRecipeProvider {
                             .build(consumer, prefix(TinkerModifiers.slimesteelReinforcement, folder));
 
     // silky cloth
-    ShapedRecipeBuilder.shapedRecipe(TinkerModifiers.silkyCloth)
-                       .key('s', Tags.Items.STRING)
-                       .key('g', TinkerMaterials.roseGold.getIngotTag())
+    ShapedRecipeBuilder.shaped(TinkerModifiers.silkyCloth)
+                       .define('s', Tags.Items.STRING)
+                       .define('g', TinkerMaterials.roseGold.getIngotTag())
                        .patternLine("sss")
                        .patternLine("sgs")
                        .patternLine("sss")

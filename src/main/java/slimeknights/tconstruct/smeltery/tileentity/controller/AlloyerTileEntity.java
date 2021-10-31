@@ -7,7 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -36,7 +36,7 @@ import java.util.Collections;
 /**
  * Dedicated alloying block
  */
-public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEntity, ITickableTileEntity {
+public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEntity, TickableBlockEntity {
   /** Max capacity for the tank */
   private static final int TANK_CAPACITY = FluidValues.METAL_BLOCK * 3;
 

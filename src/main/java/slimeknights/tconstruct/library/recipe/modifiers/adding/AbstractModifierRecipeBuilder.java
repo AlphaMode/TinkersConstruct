@@ -3,10 +3,10 @@ package slimeknights.tconstruct.library.recipe.modifiers.adding;
 import com.google.gson.JsonObject;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.Item;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Lazy;
 import slimeknights.mantle.recipe.data.AbstractRecipeBuilder;
@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("unchecked")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRecipeBuilder<T>> extends AbstractRecipeBuilder<T> {
-  protected static final Lazy<Ingredient> DEFAULT_TOOL = Lazy.of(() -> Ingredient.fromTag(TinkerTags.Items.MODIFIABLE));
+  protected static final Lazy<Ingredient> DEFAULT_TOOL = Lazy.of(() -> Ingredient.of(TinkerTags.Items.MODIFIABLE));
 
   // shared
   protected final ModifierEntry result;
@@ -52,8 +52,8 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
    * @param tag  Tag
    * @return  Builder instance
    */
-  public T setTools(ITag<Item> tag) {
-    return this.setTools(Ingredient.fromTag(tag));
+  public T setTools(Tag<Item> tag) {
+    return this.setTools(Ingredient.of(tag));
   }
 
   /**
@@ -147,7 +147,7 @@ public abstract class AbstractModifierRecipeBuilder<T extends AbstractModifierRe
   }
 
   @Override
-  public void build(Consumer<IFinishedRecipe> consumer) {
+  public void build(Consumer<FinishedRecipe> consumer) {
     build(consumer, result.getModifier().getId());
   }
 

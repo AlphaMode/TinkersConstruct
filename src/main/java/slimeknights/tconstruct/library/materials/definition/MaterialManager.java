@@ -11,11 +11,11 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import lombok.extern.log4j.Log4j2;
-import net.minecraft.client.resources.JsonReloadListener;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.text.Color;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  * So if your mods name is "foobar", the location for your mods materials is "data/foobar/materials".
  */
 @Log4j2
-public class MaterialManager extends JsonReloadListener {
+public class MaterialManager extends SimpleJsonResourceReloadListener {
   public static final String FOLDER = "materials/definition";
   public static final Gson GSON = (new GsonBuilder())
     .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
@@ -136,7 +136,7 @@ public class MaterialManager extends JsonReloadListener {
   }
 
   @Override
-  protected void apply(Map<ResourceLocation, JsonElement> splashList, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+  protected void apply(Map<ResourceLocation, JsonElement> splashList, ResourceManager resourceManagerIn, ProfilerFiller profilerIn) {
     Map<MaterialId, MaterialId> redirects = new HashMap<>();
     this.materials = splashList.entrySet().stream()
       .filter(entry -> entry.getValue().isJsonObject())

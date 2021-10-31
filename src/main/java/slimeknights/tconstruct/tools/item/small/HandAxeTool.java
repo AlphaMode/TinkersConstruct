@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.tools.item.small;
 
 import com.google.common.collect.Sets;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
 import slimeknights.tconstruct.library.tools.context.ToolAttackContext;
 import slimeknights.tconstruct.library.tools.helper.ToolAttackUtil;
@@ -16,8 +16,10 @@ import slimeknights.tconstruct.tools.TinkerTools;
 
 import java.util.Set;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class HandAxeTool extends HarvestTool {
-  private static final Set<Material> EXTRA_MATERIALS = Sets.newHashSet(Material.WOOD, Material.NETHER_WOOD, Material.PLANTS, Material.TALL_PLANTS, Material.BAMBOO, Material.GOURD, Material.LEAVES);
+  private static final Set<Material> EXTRA_MATERIALS = Sets.newHashSet(Material.WOOD, Material.NETHER_WOOD, Material.PLANT, Material.REPLACEABLE_PLANT, Material.BAMBOO, Material.VEGETABLE, Material.LEAVES);
   public static final CircleAOEHarvestLogic HARVEST_LOGIC = new CircleAOEHarvestLogic(1, false) {
     @Override
     public boolean isEffectiveAgainst(IModifierToolStack tool, ItemStack stack, BlockState state) {

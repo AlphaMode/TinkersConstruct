@@ -2,14 +2,14 @@ package slimeknights.tconstruct.library.recipe.fuel;
 
 import com.google.gson.JsonObject;
 import lombok.Getter;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.FluidIngredient;
 import slimeknights.mantle.recipe.ICustomOutputRecipe;
@@ -50,7 +50,7 @@ public class MeltingFuel implements ICustomOutputRecipe<IFluidInventory> {
   /* Recipe methods */
 
   @Override
-  public boolean matches(IFluidInventory inv, World worldIn) {
+  public boolean matches(IFluidInventory inv, Level worldIn) {
     return matches(inv.getFluid());
   }
 
@@ -92,17 +92,17 @@ public class MeltingFuel implements ICustomOutputRecipe<IFluidInventory> {
   /* Recipe type methods */
 
   @Override
-  public IRecipeType<?> getType() {
+  public RecipeType<?> getType() {
     return RecipeTypes.FUEL;
   }
 
   @Override
-  public IRecipeSerializer<?> getSerializer() {
+  public RecipeSerializer<?> getSerializer() {
     return TinkerSmeltery.fuelSerializer.get();
   }
 
   @Override
-  public ItemStack getIcon() {
+  public ItemStack getToastSymbol() {
     return new ItemStack(TinkerSmeltery.searedTank.get(TankType.FUEL_TANK));
   }
 
@@ -111,17 +111,17 @@ public class MeltingFuel implements ICustomOutputRecipe<IFluidInventory> {
    */
   public static class Serializer extends LoggingRecipeSerializer<MeltingFuel> {
     @Override
-    public MeltingFuel read(ResourceLocation id, JsonObject json) {
-      String group = JSONUtils.getString(json, "group", "");
+    public MeltingFuel fromJson(ResourceLocation id, JsonObject json) {
+      String group = GsonHelper.getAsString(json, "group", "");
       FluidIngredient input = FluidIngredient.deserialize(json, "fluid");
-      int duration = JSONUtils.getInt(json, "duration");
-      int temperature = JSONUtils.getInt(json, "temperature");
+      int duration = GsonHelper.getAsInt(json, "duration");
+      int temperature = GsonHelper.getAsInt(json, "temperature");
       return new MeltingFuel(id, group, input, duration, temperature);
     }
 
     @Override
-    protected void writeSafe(PacketBuffer buffer, MeltingFuel recipe) {
-      buffer.writeString(recipe.group);
+    protected void writeSafe(FriendlyByteBuf buffer, MeltingFuel recipe) {
+      buffer.writeUtf(recipe.group);
       recipe.input.write(buffer);
       buffer.writeInt(recipe.duration);
       buffer.writeInt(recipe.temperature);
@@ -129,8 +129,8 @@ public class MeltingFuel implements ICustomOutputRecipe<IFluidInventory> {
 
     @Nullable
     @Override
-    protected MeltingFuel readSafe(ResourceLocation id, PacketBuffer buffer) {
-      String group = buffer.readString(Short.MAX_VALUE);
+    protected MeltingFuel readSafe(ResourceLocation id, FriendlyByteBuf buffer) {
+      String group = buffer.readUtf(Short.MAX_VALUE);
       FluidIngredient input = FluidIngredient.read(buffer);
       int duration = buffer.readInt();
       int temperature = buffer.readInt();

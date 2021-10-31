@@ -2,21 +2,21 @@ package slimeknights.tconstruct.smeltery.tileentity;
 
 import lombok.Getter;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -46,7 +46,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public abstract class CastingTileEntity extends TableTileEntity implements ITickableTileEntity, ISidedInventory, FluidUpdatePacket.IFluidPacketReceiver {
+public abstract class CastingTileEntity extends TableTileEntity implements TickableBlockEntity, WorldlyContainer, FluidUpdatePacket.IFluidPacketReceiver {
   // slots
   public static final int INPUT = 0;
   public static final int OUTPUT = 1;
@@ -62,7 +62,7 @@ public abstract class CastingTileEntity extends TableTileEntity implements ITick
 
   /* Casting recipes */
   /** Recipe type for casting recipes, may be basin or table */
-  private final IRecipeType<ICastingRecipe> castingType;
+  private final RecipeType<ICastingRecipe> castingType;
   /** Inventory for use in casting recipes */
   private final TileCastingWrapper castingInventory;
   /** Current recipe progress */
@@ -79,13 +79,13 @@ public abstract class CastingTileEntity extends TableTileEntity implements ITick
 
   /* Molding recipes */
   /** Recipe type for molding recipes, may be basin or table */
-  private final IRecipeType<MoldingRecipe> moldingType;
+  private final RecipeType<MoldingRecipe> moldingType;
   /** Inventory to use for molding recipes */
   private final MoldingInventoryWrapper moldingInventory;
   /** Cache recipe to reduce time during recipe lookups. Not saved to NBT */
   private MoldingRecipe lastMoldingRecipe;
 
-  protected CastingTileEntity(TileEntityType<?> tileEntityTypeIn, IRecipeType<ICastingRecipe> castingType, IRecipeType<MoldingRecipe> moldingType) {
+  protected CastingTileEntity(BlockEntityType<?> tileEntityTypeIn, RecipeType<ICastingRecipe> castingType, RecipeType<MoldingRecipe> moldingType) {
     super(tileEntityTypeIn, "gui.tconstruct.casting", 2, 1);
     this.itemHandler = new SidedInvWrapper(this, Direction.DOWN);
     this.castingType = castingType;
@@ -106,8 +106,8 @@ public abstract class CastingTileEntity extends TableTileEntity implements ITick
    * Called from {@link slimeknights.tconstruct.smeltery.block.AbstractCastingBlock#onBlockActivated(BlockState, World, BlockPos, PlayerEntity, Hand, BlockRayTraceResult)}
    * @param player Player activating the block.
    */
-  public void interact(PlayerEntity player, Hand hand) {
-    if (world == null || world.isRemote) {
+  public void interact(Player player, InteractionHand hand) {
+    if (level == null || level.isClientSide) {
       return;
     }
     // can't interact if liquid inside
@@ -115,9 +115,9 @@ public abstract class CastingTileEntity extends TableTileEntity implements ITick
       return;
     }
 
-    ItemStack held = player.getHeldItem(hand);
-    ItemStack input = getStackInSlot(INPUT);
-    ItemStack output = getStackInSlot(OUTPUT);
+    ItemStack held = player.getItemInHand(hand);
+    ItemStack input = getItem(INPUT);
+    ItemStack output = getItem(OUTPUT);
 
     // all molding recipes require a stack in the input slot and nothing in the output slot
     if (!input.isEmpty() && output.isEmpty()) {

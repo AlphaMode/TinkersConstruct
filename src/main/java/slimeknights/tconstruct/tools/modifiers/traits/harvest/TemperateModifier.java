@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.modifiers.traits.harvest;
 
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
@@ -18,7 +18,7 @@ public class TemperateModifier extends Modifier {
     if (isEffective) {
       BlockPos pos = event.getPos();
       // temperature ranges from 0 to 1.25. Division makes it 0 to 0.125 per level
-      float boost = Math.abs(event.getPlayer().world.getBiome(pos).getTemperature(pos) - BASELINE_TEMPERATURE) * level / 10;
+      float boost = Math.abs(event.getPlayer().level.getBiome(pos).getTemperature(pos) - BASELINE_TEMPERATURE) * level / 10;
       event.setNewSpeed(event.getNewSpeed() * (1 + boost));
     }
   }

@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.tools.modifiers.ability.tool;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.library.modifiers.SingleUseModifier;
 import slimeknights.tconstruct.library.tools.helper.ToolDamageUtil;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
@@ -23,23 +23,23 @@ public class GlowingModifier extends SingleUseModifier {
   }
   
   @Override
-  public ActionResultType afterBlockUse(IModifierToolStack tool, int level, ItemUseContext context) {
-    PlayerEntity player = context.getPlayer();
+  public InteractionResult afterBlockUse(IModifierToolStack tool, int level, UseOnContext context) {
+    Player player = context.getPlayer();
     if (tool.getCurrentDurability() >= 10) {
-      if (!context.getWorld().isRemote) {
-        World world = context.getWorld();
-        Direction face = context.getFace();
-        BlockPos pos = context.getPos().offset(face);
+      if (!context.getLevel().isClientSide) {
+        Level world = context.getLevel();
+        Direction face = context.getClickedFace();
+        BlockPos pos = context.getClickedPos().relative(face);
         if (TinkerCommons.glow.get().addGlow(world, pos, face.getOpposite())) {
           // damage the tool, showing animation if relevant
-          if (ToolDamageUtil.damage(tool, 10, player, context.getItem()) && player != null) {
-            player.sendBreakAnimation(context.getHand());
+          if (ToolDamageUtil.damage(tool, 10, player, context.getItemInHand()) && player != null) {
+            player.broadcastBreakEvent(context.getHand());
           }
-          world.playSound(null, pos, world.getBlockState(pos).getSoundType(world, pos, player).getPlaceSound(), SoundCategory.BLOCKS, 1.0f, 1.0f);
+          world.playSound(null, pos, world.getBlockState(pos).getSoundType(world, pos, player).getPlaceSound(), SoundSource.BLOCKS, 1.0f, 1.0f);
         }
       }
-      return ActionResultType.func_233537_a_(context.getWorld().isRemote);
+      return InteractionResult.sidedSuccess(context.getLevel().isClientSide);
     }
-    return ActionResultType.PASS;
+    return InteractionResult.PASS;
   }
 }

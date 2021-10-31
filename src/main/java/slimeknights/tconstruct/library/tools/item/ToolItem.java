@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.library.tools.item;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.ToolType;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
@@ -19,6 +19,8 @@ import slimeknights.tconstruct.library.tools.stat.ToolStats;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
+
+import net.minecraft.world.item.Item.Properties;
 
 /**
  * Extension of a modifiable tool that also is capable of harvesting blocks
@@ -42,7 +44,7 @@ public class ToolItem extends ModifiableItem implements IModifiableHarvest {
   }
 
   @Override
-  public int getHarvestLevel(ItemStack stack, ToolType toolClass, @Nullable PlayerEntity player, @Nullable BlockState blockState) {
+  public int getHarvestLevel(ItemStack stack, ToolType toolClass, @Nullable Player player, @Nullable BlockState blockState) {
     // brokenness is calculated in by the toolTypes check
     if (this.getToolTypes(stack).contains(toolClass)) {
       return ToolStack.from(stack).getStats().getInt(ToolStats.HARVEST_LEVEL);
@@ -52,15 +54,15 @@ public class ToolItem extends ModifiableItem implements IModifiableHarvest {
   }
 
   @Override
-  public boolean onBlockDestroyed(ItemStack stack, World worldIn, BlockState state, BlockPos pos, LivingEntity entityLiving) {
+  public boolean mineBlock(ItemStack stack, Level worldIn, BlockState state, BlockPos pos, LivingEntity entityLiving) {
     ToolStack tool = ToolStack.from(stack);
     if (tool.isBroken()) {
       return false;
     }
 
-    if (!worldIn.isRemote && worldIn instanceof ServerWorld) {
+    if (!worldIn.isClientSide && worldIn instanceof ServerLevel) {
       boolean isEffective = getToolHarvestLogic().isEffective(tool, stack, state);
-      ToolHarvestContext context = new ToolHarvestContext((ServerWorld) worldIn, entityLiving, state, pos, Direction.UP, true, isEffective);
+      ToolHarvestContext context = new ToolHarvestContext((ServerLevel) worldIn, entityLiving, state, pos, Direction.UP, true, isEffective);
       for (ModifierEntry entry : tool.getModifierList()) {
         entry.getModifier().afterBlockBreak(tool, entry.getLevel(), context);
       }

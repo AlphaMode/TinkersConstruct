@@ -9,13 +9,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.advancements.criterion.ItemPredicate;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tags.ITag;
+import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagCollectionManager;
 import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import slimeknights.mantle.recipe.RecipeHelper;
 import slimeknights.mantle.util.JsonHelper;
@@ -42,7 +42,7 @@ public class ToolPredicate extends ItemPredicate {
   @Nullable
   protected final Item item;
   @Nullable
-  protected final ITag<Item> tag;
+  protected final Tag<Item> tag;
   protected final List<MaterialId> materials;
   protected final boolean hasUpgrades;
   protected final ModifierMatch upgrades;
@@ -50,7 +50,7 @@ public class ToolPredicate extends ItemPredicate {
   protected final List<StatPredicate> stats;
 
   @Override
-  public boolean test(ItemStack stack) {
+  public boolean matches(ItemStack stack) {
     // first validate item and tag
     if (this.tag != null && !this.tag.contains(stack.getItem())) {
       return false;
@@ -59,7 +59,7 @@ public class ToolPredicate extends ItemPredicate {
       return false;
     }
     // prevent changing NBT for non-tools
-    if (!stack.getItem().isIn(Items.MODIFIABLE)) {
+    if (!stack.getItem().is(Items.MODIFIABLE)) {
       return false;
     }
     ToolStack tool = ToolStack.from(stack);

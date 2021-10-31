@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.library.modifiers;
 
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.util.Constants.NBT;
 import slimeknights.tconstruct.library.recipe.modifiers.ModifierRecipeLookup;
 import slimeknights.tconstruct.library.tools.nbt.IModDataReadOnly;
@@ -16,13 +16,13 @@ public class IncrementalModifier extends Modifier {
   }
 
   @Override
-  public ITextComponent getDisplayName(IModifierToolStack tool, int level) {
+  public Component getDisplayName(IModifierToolStack tool, int level) {
     int neededPerLevel = ModifierRecipeLookup.getNeededPerLevel(this);
-    ITextComponent name = this.getDisplayName(level);
+    Component name = this.getDisplayName(level);
     if (neededPerLevel > 0) {
       int amount = getAmount(tool);
       if (amount < neededPerLevel) {
-        return name.deepCopy().appendString(": " + amount + " / " + neededPerLevel);
+        return name.copy().append(": " + amount + " / " + neededPerLevel);
       }
     }
     return name;
@@ -120,7 +120,7 @@ public class IncrementalModifier extends Modifier {
    * @param levelAmount  Bonus per level
    * @param tooltip      Tooltip
    */
-  protected void addDamageTooltip(IModifierToolStack tool, int level, float levelAmount, List<ITextComponent> tooltip) {
+  protected void addDamageTooltip(IModifierToolStack tool, int level, float levelAmount, List<Component> tooltip) {
     addDamageTooltip(tool, getScaledLevel(tool, level) * levelAmount, tooltip);
   }
 }

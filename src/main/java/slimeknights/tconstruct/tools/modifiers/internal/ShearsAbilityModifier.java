@@ -3,15 +3,15 @@ package slimeknights.tconstruct.tools.modifiers.internal;
 import lombok.Getter;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.TripWireBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.IForgeShearable;
 import net.minecraftforge.eventbus.api.Event.Result;
 import slimeknights.tconstruct.library.events.TinkerToolEvent.ToolShearEvent;
@@ -46,9 +46,9 @@ public class ShearsAbilityModifier extends SingleUseModifier {
    * @param player the current player
    * @param hand the given hand the tool is in
    */
-  protected void swingTool(PlayerEntity player, Hand hand) {
-    player.swingArm(hand);
-    player.spawnSweepParticles();
+  protected void swingTool(Player player, InteractionHand hand) {
+    player.swing(hand);
+    player.sweepAttack();
   }
 
   /**
@@ -61,16 +61,16 @@ public class ShearsAbilityModifier extends SingleUseModifier {
   }
 
   @Override
-  public ActionResultType onEntityUseFirst(IModifierToolStack tool, int level, PlayerEntity player, Entity target, Hand hand) {
+  public InteractionResult onEntityUseFirst(IModifierToolStack tool, int level, Player player, Entity target, InteractionHand hand) {
     if (tool.isBroken()) {
-      return ActionResultType.PASS;
+      return InteractionResult.PASS;
     }
-    ItemStack stack = player.getHeldItem(hand);
+    ItemStack stack = player.getItemInHand(hand);
 
     // use looting instead of fortune, as that is our hook with entity access
     // modifier can always use tags or the nullable parameter to distinguish if needed
     int looting = ModifierUtil.getLootingLevel(tool, player, target, null);
-    World world = player.getEntityWorld();
+    Level world = player.getCommandSenderWorld();
     if (isShears(tool) && shearEntity(stack, tool, world, player, target, looting)) {
       boolean broken = ToolDamageUtil.damageAnimated(tool, 1, player, hand);
       this.swingTool(player, hand);
@@ -81,8 +81,8 @@ public class ShearsAbilityModifier extends SingleUseModifier {
         // if expanded, shear all in range
         int expanded = range + tool.getModifierLevel(TinkerModifiers.expanded.get());
         if (expanded > 0) {
-          for (LivingEntity aoeTarget : player.getEntityWorld().getEntitiesWithinAABB(LivingEntity.class, target.getBoundingBox().grow(expanded, 0.25D, expanded))) {
-            if (aoeTarget != player && aoeTarget != target && (!(aoeTarget instanceof ArmorStandEntity) || !((ArmorStandEntity)aoeTarget).hasMarker())) {
+          for (LivingEntity aoeTarget : player.getCommandSenderWorld().getEntitiesOfClass(LivingEntity.class, target.getBoundingBox().inflate(expanded, 0.25D, expanded))) {
+            if (aoeTarget != player && aoeTarget != target && (!(aoeTarget instanceof ArmorStand) || !((ArmorStand)aoeTarget).isMarker())) {
               if (shearEntity(stack, tool, world, player, aoeTarget, looting)) {
                 broken = ToolDamageUtil.damageAnimated(tool, 1, player, hand);
                 runShearHook(tool, player, aoeTarget, false);
@@ -95,14 +95,14 @@ public class ShearsAbilityModifier extends SingleUseModifier {
         }
       }
 
-      return ActionResultType.SUCCESS;
+      return InteractionResult.SUCCESS;
     }
 
-    return ActionResultType.PASS;
+    return InteractionResult.PASS;
   }
 
   /** Runs the hook after shearing an entity */
-  private static void runShearHook(IModifierToolStack tool, PlayerEntity player, Entity entity, boolean isTarget) {
+  private static void runShearHook(IModifierToolStack tool, Player player, Entity entity, boolean isTarget) {
     for (ModifierEntry entry : tool.getModifierList()) {
       IShearModifier shearModifier = entry.getModifier().getModule(IShearModifier.class);
       if (shearModifier != null) {

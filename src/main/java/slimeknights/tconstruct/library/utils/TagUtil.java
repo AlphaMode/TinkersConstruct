@@ -2,8 +2,8 @@ package slimeknights.tconstruct.library.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nullable;
@@ -20,8 +20,8 @@ public final class TagUtil {
    * @deprecated  Use {@link net.minecraft.nbt.NBTUtil#writeBlockPos(BlockPos)}, deprecated due to case difference
    */
   @Deprecated
-  public static CompoundNBT writePos(BlockPos pos) {
-    CompoundNBT tag = new CompoundNBT();
+  public static CompoundTag writePos(BlockPos pos) {
+    CompoundTag tag = new CompoundTag();
     tag.putInt("x", pos.getX());
     tag.putInt("y", pos.getY());
     tag.putInt("z", pos.getZ());
@@ -36,7 +36,7 @@ public final class TagUtil {
    */
   @Deprecated
   @Nullable
-  public static BlockPos readPos(CompoundNBT tag) {
+  public static BlockPos readPos(CompoundTag tag) {
     if (tag.contains("x", NBT.TAG_ANY_NUMERIC) && tag.contains("y", NBT.TAG_ANY_NUMERIC) && tag.contains("z", NBT.TAG_ANY_NUMERIC)) {
       return new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z"));
     }
@@ -50,7 +50,7 @@ public final class TagUtil {
    * @return  Block position, or null if invalid or missing
    */
   @Nullable
-  public static BlockPos readPos(CompoundNBT parent, String key) {
+  public static BlockPos readPos(CompoundTag parent, String key) {
     if (parent.contains(key, NBT.TAG_COMPOUND)) {
       return readPos(parent.getCompound(key));
     }

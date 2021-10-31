@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tools.modifiers.traits.melee;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.util.SoundCategory;
 import slimeknights.tconstruct.common.Sounds;
 import slimeknights.tconstruct.library.modifiers.Modifier;

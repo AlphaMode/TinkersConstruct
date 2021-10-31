@@ -2,12 +2,12 @@ package slimeknights.tconstruct.world.worldgen.islands.variants;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Features;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.data.worldgen.Features;
 import slimeknights.tconstruct.TConstruct;
 
 import javax.annotation.Nullable;
@@ -25,24 +25,24 @@ public class ClayIslandVariant implements IIslandVariant {
 
   @Override
   public BlockState getLakeBottom() {
-    return Blocks.CLAY.getDefaultState();
+    return Blocks.CLAY.defaultBlockState();
   }
 
   @Override
   public BlockState getLakeFluid() {
-    return Blocks.WATER.getDefaultState();
+    return Blocks.WATER.defaultBlockState();
   }
 
   @Override
   public BlockState getCongealedSlime(Random random) {
-    return Blocks.SAND.getDefaultState();
+    return Blocks.SAND.defaultBlockState();
   }
 
   @Nullable
   @Override
   public BlockState getPlant(Random random) {
     Block block = random.nextInt(8) == 0 ? Blocks.FERN : Blocks.GRASS;
-    return block.getDefaultState();
+    return block.defaultBlockState();
   }
 
   @Nullable

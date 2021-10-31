@@ -3,25 +3,25 @@ package slimeknights.tconstruct.gadgets.entity;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.ExplosionContext;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.ExplosionDamageCalculator;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -30,7 +30,7 @@ public class EFLNExplosion extends Explosion {
 
   protected ImmutableSet<BlockPos> affectedBlockPositionsInternal;
 
-  public EFLNExplosion(World world, @Nullable Entity entity, @Nullable DamageSource damage, @Nullable ExplosionContext context, double x, double y, double z, float size, boolean causesFire, Explosion.Mode mode) {
+  public EFLNExplosion(Level world, @Nullable Entity entity, @Nullable DamageSource damage, @Nullable ExplosionDamageCalculator context, double x, double y, double z, float size, boolean causesFire, Explosion.BlockInteraction mode) {
     super(world, entity, damage, context, x, y, z, size, causesFire, mode);
   }
 
@@ -38,11 +38,11 @@ public class EFLNExplosion extends Explosion {
    * Does the first part of the explosion (destroy blocks)
    */
   @Override
-  public void doExplosionA() {
+  public void explode() {
     ImmutableSet.Builder<BlockPos> builder = ImmutableSet.builder();
 
     // we do a sphere of a certain radius, and check if the blockpos is inside the radius
-    float r = this.size * this.size;
+    float r = this.radius * this.radius;
     int i = (int) r + 1;
 
     for (int j = -i; j < i; ++j) {
@@ -51,25 +51,25 @@ public class EFLNExplosion extends Explosion {
           int d = j * j + k * k + l * l;
           // inside the sphere?
           if (d <= r) {
-            BlockPos blockpos = new BlockPos(j, k, l).add(this.x, this.y, this.z);
+            BlockPos blockpos = new BlockPos(j, k, l).offset(this.x, this.y, this.z);
             // no air blocks
-            if (this.world.isAirBlock(blockpos)) {
+            if (this.level.isEmptyBlock(blockpos)) {
               continue;
             }
 
             // explosion "strength" at the current position
-            float f = this.size * (1f - d / (r));
-            BlockState blockstate = this.world.getBlockState(blockpos);
+            float f = this.radius * (1f - d / (r));
+            BlockState blockstate = this.level.getBlockState(blockpos);
 
-            FluidState ifluidstate = this.world.getFluidState(blockpos);
-            float f2 = Math.max(blockstate.getExplosionResistance(this.world, blockpos, this), ifluidstate.getExplosionResistance(this.world, blockpos, this));
-            if (this.exploder != null) {
-              f2 = this.exploder.getExplosionResistance(this, this.world, blockpos, blockstate, ifluidstate, f2);
+            FluidState ifluidstate = this.level.getFluidState(blockpos);
+            float f2 = Math.max(blockstate.getExplosionResistance(this.level, blockpos, this), ifluidstate.getExplosionResistance(this.level, blockpos, this));
+            if (this.source != null) {
+              f2 = this.source.getBlockExplosionResistance(this, this.level, blockpos, blockstate, ifluidstate, f2);
             }
 
             f -= (f2 + 0.3F) * 0.3F;
 
-            if (f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this, this.world, blockpos, blockstate, f))) {
+            if (f > 0.0F && (this.source == null || this.source.shouldBlockExplode(this, this.level, blockpos, blockstate, f))) {
               builder.add(blockpos);
             }
           }
@@ -81,44 +81,44 @@ public class EFLNExplosion extends Explosion {
   }
 
   @Override
-  public void doExplosionB(boolean spawnParticles) {
-    if (this.world.isRemote) {
-      this.world.playSound(this.x, this.y, this.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F) * 0.7F, false);
+  public void finalizeExplosion(boolean spawnParticles) {
+    if (this.level.isClientSide) {
+      this.level.playLocalSound(this.x, this.y, this.z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0F, (1.0F + (this.level.random.nextFloat() - this.level.random.nextFloat()) * 0.2F) * 0.7F, false);
     }
 
-    this.world.addParticle(ParticleTypes.EXPLOSION, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);
+    this.level.addParticle(ParticleTypes.EXPLOSION, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);
 
     ObjectArrayList<Pair<ItemStack, BlockPos>> arrayList = new ObjectArrayList<>();
-    Collections.shuffle(this.affectedBlockPositions, this.world.rand);
+    Collections.shuffle(this.toBlow, this.level.random);
 
-    for (BlockPos blockpos : this.affectedBlockPositions) {
-      BlockState blockstate = this.world.getBlockState(blockpos);
+    for (BlockPos blockpos : this.toBlow) {
+      BlockState blockstate = this.level.getBlockState(blockpos);
       Block block = blockstate.getBlock();
 
-      if (!blockstate.isAir(this.world, blockpos)) {
-        BlockPos blockpos1 = blockpos.toImmutable();
+      if (!blockstate.isAir(this.level, blockpos)) {
+        BlockPos blockpos1 = blockpos.immutable();
 
-        this.world.getProfiler().startSection("explosion_blocks");
+        this.level.getProfiler().push("explosion_blocks");
 
-        if (blockstate.canDropFromExplosion(this.world, blockpos, this) && this.world instanceof ServerWorld) {
-          TileEntity tileentity = blockstate.hasTileEntity() ? this.world.getTileEntity(blockpos) : null;
-          LootContext.Builder builder = (new LootContext.Builder((ServerWorld) this.world)).withRandom(this.world.rand).withParameter(LootParameters.ORIGIN, Vector3d.copyCentered(blockpos)).withParameter(LootParameters.TOOL, ItemStack.EMPTY).withNullableParameter(LootParameters.BLOCK_ENTITY, tileentity).withNullableParameter(LootParameters.THIS_ENTITY, this.exploder);
+        if (blockstate.canDropFromExplosion(this.level, blockpos, this) && this.level instanceof ServerLevel) {
+          BlockEntity tileentity = blockstate.hasTileEntity() ? this.level.getBlockEntity(blockpos) : null;
+          LootContext.Builder builder = (new LootContext.Builder((ServerLevel) this.level)).withRandom(this.level.random).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockpos)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withOptionalParameter(LootContextParams.BLOCK_ENTITY, tileentity).withOptionalParameter(LootContextParams.THIS_ENTITY, this.source);
 
-          if (this.mode == Explosion.Mode.DESTROY) {
-            builder.withParameter(LootParameters.EXPLOSION_RADIUS, this.size);
+          if (this.blockInteraction == Explosion.BlockInteraction.DESTROY) {
+            builder.withParameter(LootContextParams.EXPLOSION_RADIUS, this.radius);
           }
 
           blockstate.getDrops(builder).forEach((stack) -> addStack(arrayList, stack, blockpos1));
         }
 
-        blockstate.onBlockExploded(this.world, blockpos, this);
-        this.world.getProfiler().endSection();
+        blockstate.onBlockExploded(this.level, blockpos, this);
+        this.level.getProfiler().pop();
       }
     }
   }
 
   public void addAffectedBlock(BlockPos blockPos) {
-    this.affectedBlockPositions.add(blockPos);
+    this.toBlow.add(blockPos);
   }
 
   private static void addStack(ObjectArrayList<Pair<ItemStack, BlockPos>> arrayList, ItemStack merge, BlockPos blockPos) {
@@ -128,8 +128,8 @@ public class EFLNExplosion extends Explosion {
       Pair<ItemStack, BlockPos> pair = arrayList.get(j);
       ItemStack itemstack = pair.getFirst();
 
-      if (ItemEntity.canMergeStacks(itemstack, merge)) {
-        ItemStack itemstack1 = ItemEntity.mergeStacks(itemstack, merge, 16);
+      if (ItemEntity.areMergable(itemstack, merge)) {
+        ItemStack itemstack1 = ItemEntity.merge(itemstack, merge, 16);
         arrayList.set(j, Pair.of(itemstack1, pair.getSecond()));
 
         if (merge.isEmpty()) {

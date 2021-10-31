@@ -2,14 +2,14 @@ package slimeknights.tconstruct.library.tools.helper.aoe;
 
 import com.google.common.collect.AbstractIterator;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Plane;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Plane;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.tools.helper.ToolHarvestLogic;
 import slimeknights.tconstruct.library.tools.helper.aoe.RectangleAOEHarvestLogic.RectangleIterator;
@@ -22,6 +22,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import slimeknights.tconstruct.library.tools.helper.ToolHarvestLogic.AOEMatchType;
+
 /** Tree harvest logic that destroys a tree */
 @RequiredArgsConstructor
 public class TreeAOEHarvestLogic extends ToolHarvestLogic {
@@ -33,7 +35,7 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
   private final int fallbackHeight;
 
   @Override
-  public Iterable<BlockPos> getAOEBlocks(IModifierToolStack tool, ItemStack stack, PlayerEntity player, BlockState state, World world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
+  public Iterable<BlockPos> getAOEBlocks(IModifierToolStack tool, ItemStack stack, Player player, BlockState state, Level world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
     int expanded = tool.getModifierLevel(TinkerModifiers.expanded.get());
     return calculate(this, tool, stack, player, state, world, origin, sideHit,
                      extraWidth + (expanded + 1) / 2, extraDepth + expanded / 2, fallbackHeight, matchType);
@@ -55,25 +57,25 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
    * @param matchType       Match type to use when not a tree
    * @return  Correct iterator for the targeted block
    */
-  public static Iterable<BlockPos> calculate(ToolHarvestLogic self, IModifierToolStack tool, ItemStack stack, PlayerEntity player, BlockState state, World world, BlockPos origin, Direction sideHit, int extraWidth, int extraDepth, int fallbackHeight, AOEMatchType matchType) {
+  public static Iterable<BlockPos> calculate(ToolHarvestLogic self, IModifierToolStack tool, ItemStack stack, Player player, BlockState state, Level world, BlockPos origin, Direction sideHit, int extraWidth, int extraDepth, int fallbackHeight, AOEMatchType matchType) {
     Direction depthDir;
     Direction widthDir;
     // if we have expanders, add them in
     if (extraDepth > 0 || extraWidth > 0) {
       // if hit the top or bottom, use facing direction
       if (sideHit.getAxis().isVertical()) {
-        depthDir = player.getHorizontalFacing();
+        depthDir = player.getDirection();
       } else {
         depthDir = sideHit.getOpposite();
       }
-      widthDir = depthDir.rotateY();
+      widthDir = depthDir.getClockWise();
     } else {
       depthDir = Direction.UP;
       widthDir = Direction.UP;
     }
 
     // if logs, calculate a tree
-    if (state.getBlock().isIn(TinkerTags.Blocks.TREE_LOGS)) {
+    if (state.getBlock().is(TinkerTags.Blocks.TREE_LOGS)) {
       // TODO: would be nice to allow the stipped logs here as well as the logs
       return () -> new TreeIterator(world, state.getBlock(), origin, widthDir, extraWidth, depthDir, extraDepth);
     }
@@ -95,20 +97,20 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
     /** Queue of upcoming positions to try */
     private final Queue<TreePos> upcomingPositions = new ArrayDeque<>();
     /** Position for returns, saves some object allocation */
-    private final BlockPos.Mutable mutable = new BlockPos.Mutable();
+    private final BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
     /** Branches that have been visited already */
     private final Set<BlockPos> branchVisited = new HashSet<>();
 
-    private final World world;
+    private final Level world;
     private final Block filter;
     /** Bounds for branch detection */
     private final int minX, maxX, minZ, maxZ;
-    public TreeIterator(World world, Block filter, BlockPos origin, Direction widthDir, int extraWidth, Direction depthDir, int extraDepth) {
+    public TreeIterator(Level world, Block filter, BlockPos origin, Direction widthDir, int extraWidth, Direction depthDir, int extraDepth) {
       this.world = world;
       this.filter = filter;
 
       // first, enqueue the origin
-      upcomingPositions.add(new TreePos(origin.up(), false));
+      upcomingPositions.add(new TreePos(origin.above(), false));
 
       // next, start adding AOE
       int minX = origin.getX();
@@ -121,7 +123,7 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
           for (int w = -extraWidth; w <= extraWidth; w++) {
             if (d != 0 || w != 0) {
               // if its valid, queue
-              mutable.setPos(origin).move(depthDir, d).move(widthDir, w);
+              mutable.set(origin).move(depthDir, d).move(widthDir, w);
               if (isValidBlock(mutable)) {
                 upcomingPositions.add(new TreePos(mutable, true));
                 // update bounds
@@ -161,7 +163,7 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
       if ((deltaX + deltaZ) > MAX_BRANCK_DISTANCE || branchVisited.contains(pos)) {
         return false;
       }
-      branchVisited.add(pos.toImmutable());
+      branchVisited.add(pos.immutable());
       return isValidBlock(pos);
     }
 
@@ -177,7 +179,7 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
         // copies position, so safe to change after
         TreePos branchPos = new TreePos(mutable, direction);
         // must have a non-solid block below, and must be a corner or be 1-2 blocks tall (dark oak support/jungle sapling thick branches)
-        if (!world.getBlockState(mutable.move(0, -1, 0)).isSolid()) {
+        if (!world.getBlockState(mutable.move(0, -1, 0)).canOcclude()) {
           upcomingPositions.add(branchPos);
         }
       }
@@ -196,7 +198,7 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
           // find branches in all 4 directions if going up, assuming we are in the
           for (Direction direction : Plane.HORIZONTAL) {
             // if the position is a branch, meaning its a log with no log above it, queue it
-            mutable.setPos(treePos.pos).move(direction);
+            mutable.set(treePos.pos).move(direction);
             // if we did not find a log at the current position, treat the position as our new tree, for acacia
             tryBranch(!isTreeUp ? Direction.UP : direction);
           }
@@ -210,28 +212,28 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
             // if either min or max on both axis, but not both (1x1), we are a corner, do corner case
             if (isMinX) {
               if (isMinZ) {
-                mutable.setPos(treePos.pos).move(-1, 0, -1);
+                mutable.set(treePos.pos).move(-1, 0, -1);
                 tryBranch(Direction.WEST);
               }
               if (isMaxZ) {
-                mutable.setPos(treePos.pos).move(-1, 0, 1);
+                mutable.set(treePos.pos).move(-1, 0, 1);
                 tryBranch(Direction.WEST);
               }
             }
             if (isMaxX) {
               if (isMinZ) {
-                mutable.setPos(treePos.pos).move(1, 0, -1);
+                mutable.set(treePos.pos).move(1, 0, -1);
                 tryBranch(Direction.EAST);
               }
               if (isMaxZ) {
-                mutable.setPos(treePos.pos).move(1, 0, 1);
+                mutable.set(treePos.pos).move(1, 0, 1);
                 tryBranch(Direction.EAST);
               }
             }
 
             // finally, return this position
             // insert the updated position into the queue and return the current position
-            mutable.setPos(treePos.pos);
+            mutable.set(treePos.pos);
             upcomingPositions.add(treePos.move());
             // acacia can continue outside the original trunk, so start marking it visited to prevent redundancy
             if (outsideTrunk(treePos.pos)) {
@@ -242,7 +244,7 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
         } else {
           // branch logic, should always be checked ahead of time (question is which further branches can we find)
           // continue in same direction
-          mutable.setPos(treePos.pos).move(0, 1, 0);
+          mutable.set(treePos.pos).move(0, 1, 0);
           if (isBranch(mutable)) {
             addBranch(treePos.direction);
             // just direction, no up
@@ -253,8 +255,8 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
             addBranch(treePos.direction);
           }
           // try each side, we check pos, above, then continuing the side
-          Direction rotated = treePos.direction.rotateY();
-          mutable.setPos(treePos.pos).move(rotated);
+          Direction rotated = treePos.direction.getClockWise();
+          mutable.set(treePos.pos).move(rotated);
           if (isBranch(mutable)) {
             addBranch(rotated);
           } else if (isBranch(mutable.move(0, 1, 0))) {
@@ -265,7 +267,7 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
             addBranch(rotated);
           }
           rotated = rotated.getOpposite();
-          mutable.setPos(treePos.pos).move(rotated);
+          mutable.set(treePos.pos).move(rotated);
           if (isBranch(mutable)) {
             addBranch(rotated);
           } else if (isBranch(mutable.move(0, 1, 0))) {
@@ -284,21 +286,21 @@ public class TreeAOEHarvestLogic extends ToolHarvestLogic {
 
   /** Helper class for queue contents */
   private static class TreePos {
-    private final BlockPos.Mutable pos;
+    private final BlockPos.MutableBlockPos pos;
     private final Direction direction;
     /** If true, this position has been validated already for a log */
     private boolean isChecked;
 
     TreePos(BlockPos pos, boolean isChecked) {
       // note this copies the mutable if already mutable
-      this.pos = pos.toMutable();
+      this.pos = pos.mutable();
       this.direction = Direction.UP;
       this.isChecked = isChecked;
     }
 
     TreePos(BlockPos pos, Direction direction) {
       // note this copies the mutable if already mutable
-      this.pos = pos.toMutable();
+      this.pos = pos.mutable();
       this.direction = direction;
       this.isChecked = true;
     }

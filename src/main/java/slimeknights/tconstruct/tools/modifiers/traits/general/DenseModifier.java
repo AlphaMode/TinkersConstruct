@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.modifiers.traits.general;
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 import slimeknights.tconstruct.library.utils.Util;
 import slimeknights.tconstruct.tools.modifiers.upgrades.general.ReinforcedModifier;
@@ -27,8 +27,8 @@ public class DenseModifier extends ReinforcedModifier {
   }
 
   @Override
-  public void addInformation(IModifierToolStack tool, int level, List<ITextComponent> tooltip, boolean isAdvanced, boolean detailed) {
-    tooltip.add(applyStyle(new StringTextComponent(Util.PERCENT_FORMAT.format(getPercentage(getScaledLevel(tool, level))) + " ")
-                             .appendSibling(makeDisplayName())));
+  public void addInformation(IModifierToolStack tool, int level, List<Component> tooltip, boolean isAdvanced, boolean detailed) {
+    tooltip.add(applyStyle(new TextComponent(Util.PERCENT_FORMAT.format(getPercentage(getScaledLevel(tool, level))) + " ")
+                             .append(makeDisplayName())));
   }
 }

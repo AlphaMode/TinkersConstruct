@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.melee;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.modifiers.IncrementalModifier;
@@ -43,7 +43,7 @@ public class PiercingModifier extends IncrementalModifier {
   public int afterEntityHit(IModifierToolStack tool, int level, ToolAttackContext context, float damageDealt) {
     // deals 0.5 pierce damage per level, scaled, half of sharpness
     DamageSource source;
-    PlayerEntity player = context.getPlayerAttacker();
+    Player player = context.getPlayerAttacker();
     if (player != null) {
       source = DamageSource.causePlayerDamage(player);
     } else {

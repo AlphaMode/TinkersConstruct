@@ -1,15 +1,15 @@
 package slimeknights.tconstruct;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -211,7 +211,7 @@ public class TConstruct {
         case "cobalt_item_frame": return TinkerGadgets.itemFrame.get(FrameType.DIAMOND);
         case "jewel_item_frame": return TinkerGadgets.itemFrame.get(FrameType.GOLD);
       }
-      IItemProvider block = missingBlock(name);
+      ItemLike block = missingBlock(name);
       return block == null ? null : block.asItem();
     });
   }
@@ -295,8 +295,8 @@ public class TConstruct {
    * @param name  Object name
    * @return  Translation key
    */
-  public static IFormattableTextComponent makeTranslation(String base, String name) {
-    return new TranslationTextComponent(makeTranslationKey(base, name));
+  public static MutableComponent makeTranslation(String base, String name) {
+    return new TranslatableComponent(makeTranslationKey(base, name));
   }
 
   /**
@@ -306,7 +306,7 @@ public class TConstruct {
    * @param arguments  Additional arguments to the translation
    * @return  Translation key
    */
-  public static IFormattableTextComponent makeTranslation(String base, String name, Object... arguments) {
-    return new TranslationTextComponent(makeTranslationKey(base, name), arguments);
+  public static MutableComponent makeTranslation(String base, String name, Object... arguments) {
+    return new TranslatableComponent(makeTranslationKey(base, name), arguments);
   }
 }

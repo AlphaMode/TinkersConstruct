@@ -3,11 +3,11 @@ package slimeknights.tconstruct.smeltery.tileentity.module.alloying;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
 import net.minecraftforge.fluids.FluidStack;
@@ -131,7 +131,7 @@ public class MixerAlloyTank implements IMutableAlloyTank {
    */
   private void checkTanks() {
     // need world to do anything
-    World world = parent.getWorld();
+    Level world = parent.getLevel();
     if (world == null) {
       return;
     }
@@ -139,10 +139,10 @@ public class MixerAlloyTank implements IMutableAlloyTank {
       for (Direction direction : Direction.values()) {
         // update each direction we are missing
         if (direction != Direction.DOWN && !inputs.containsKey(direction)) {
-          BlockPos target = parent.getPos().offset(direction);
+          BlockPos target = parent.getBlockPos().relative(direction);
           // limit by blocks as that gives the modpack more control, say they want to allow only scorched tanks
-          if (world.getBlockState(target).isIn(TinkerTags.Blocks.ALLOYER_TANKS)) {
-            TileEntity te = world.getTileEntity(target);
+          if (world.getBlockState(target).is(TinkerTags.Blocks.ALLOYER_TANKS)) {
+            BlockEntity te = world.getBlockEntity(target);
             if (te != null) {
               // if we found a tank, increment the number of tanks
               LazyOptional<IFluidHandler> capability = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite());
@@ -167,10 +167,10 @@ public class MixerAlloyTank implements IMutableAlloyTank {
       needsRefresh = false;
 
       // close the UI for any players in this UI
-      if (!world.isRemote) {
-        for (PlayerEntity player : world.getPlayers()) {
-          if (player.openContainer instanceof BaseContainer && ((BaseContainer<?>)player.openContainer).getTile() == parent) {
-            player.closeScreen();
+      if (!world.isClientSide) {
+        for (Player player : world.players()) {
+          if (player.containerMenu instanceof BaseContainer && ((BaseContainer<?>)player.containerMenu).getTile() == parent) {
+            player.closeContainer();
           }
         }
       }

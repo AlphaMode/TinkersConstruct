@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.plugin.jei.melting;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -10,12 +10,12 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.gui.ingredient.ITooltipCallback;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ForgeI18n;
 import slimeknights.tconstruct.TConstruct;
@@ -35,10 +35,10 @@ public class MeltingCategory extends AbstractMeltingCategory {
   private static final String KEY_TITLE = TConstruct.makeTranslationKey("jei", "melting.title");
   private static final String KEY_TEMPERATURE = TConstruct.makeTranslationKey("jei", "temperature");
   private static final String KEY_MULTIPLIER = TConstruct.makeTranslationKey("jei", "melting.multiplier");
-  private static final ITextComponent SOLID_TEMPERATURE = new TranslationTextComponent(KEY_TEMPERATURE, FuelModule.SOLID_TEMPERATURE).mergeStyle(TextFormatting.GRAY);
-  private static final ITextComponent SOLID_MULTIPLIER = new TranslationTextComponent(KEY_MULTIPLIER, FuelModule.SOLID_TEMPERATURE / 1000f).mergeStyle(TextFormatting.GRAY);
-  private static final ITextComponent TOOLTIP_SMELTERY = TConstruct.makeTranslation("jei", "melting.smeltery").mergeStyle(TextFormatting.GRAY, TextFormatting.UNDERLINE);
-  private static final ITextComponent TOOLTIP_MELTER = TConstruct.makeTranslation("jei", "melting.melter").mergeStyle(TextFormatting.GRAY, TextFormatting.UNDERLINE);
+  private static final Component SOLID_TEMPERATURE = new TranslatableComponent(KEY_TEMPERATURE, FuelModule.SOLID_TEMPERATURE).withStyle(ChatFormatting.GRAY);
+  private static final Component SOLID_MULTIPLIER = new TranslatableComponent(KEY_MULTIPLIER, FuelModule.SOLID_TEMPERATURE / 1000f).withStyle(ChatFormatting.GRAY);
+  private static final Component TOOLTIP_SMELTERY = TConstruct.makeTranslation("jei", "melting.smeltery").withStyle(ChatFormatting.GRAY, ChatFormatting.UNDERLINE);
+  private static final Component TOOLTIP_MELTER = TConstruct.makeTranslation("jei", "melting.melter").withStyle(ChatFormatting.GRAY, ChatFormatting.UNDERLINE);
 
   /** Tooltip callback for items */
   private static final ITooltipCallback<ItemStack> ITEM_TOOLTIP = (index, isInput, stack, list) -> {
@@ -72,7 +72,7 @@ public class MeltingCategory extends AbstractMeltingCategory {
   }
 
   @Override
-  public void draw(MeltingRecipe recipe, MatrixStack matrices, double mouseX, double mouseY) {
+  public void draw(MeltingRecipe recipe, PoseStack matrices, double mouseX, double mouseY) {
     super.draw(recipe, matrices, mouseX, mouseY);
 
     // solid fuel slot
@@ -117,10 +117,10 @@ public class MeltingCategory extends AbstractMeltingCategory {
     }
 
     @Override
-    protected boolean addOreTooltip(FluidStack stack, List<ITextComponent> list) {
+    protected boolean addOreTooltip(FluidStack stack, List<Component> list) {
       list.add(TOOLTIP_SMELTERY);
       boolean shift = FluidTooltipHandler.appendMaterialNoShift(stack.getFluid(), IMeltingInventory.applyOreBoost(stack.getAmount(), Config.COMMON.smelteryNuggetsPerOre.get()), list);
-      list.add(StringTextComponent.EMPTY);
+      list.add(TextComponent.EMPTY);
       list.add(TOOLTIP_MELTER);
       shift = FluidTooltipHandler.appendMaterialNoShift(stack.getFluid(), IMeltingInventory.applyOreBoost(stack.getAmount(), Config.COMMON.melterNuggetsPerOre.get()), list) || shift;
       return shift;

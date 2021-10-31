@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.ResourceLocation;
 import slimeknights.tconstruct.library.tools.SlotType;
@@ -21,13 +21,13 @@ import java.util.function.BiFunction;
 public class ModDataNBT implements IModDataReadOnly {
   /** Compound representing modifier data */
   @Getter(AccessLevel.PROTECTED)
-  private final CompoundNBT data;
+  private final CompoundTag data;
 
   /**
    * Creates a new mod data containing empty data
    */
   public ModDataNBT() {
-    this(new CompoundNBT());
+    this(new CompoundTag());
   }
 
   @Override

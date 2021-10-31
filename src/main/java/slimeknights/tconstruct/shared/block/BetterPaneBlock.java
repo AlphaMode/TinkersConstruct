@@ -1,17 +1,19 @@
 package slimeknights.tconstruct.shared.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.PaneBlock;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Plane;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.IronBarsBlock;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Plane;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.EnumMap;
 
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
 /** Pane block with sensible culling */
-public class BetterPaneBlock extends PaneBlock {
+public class BetterPaneBlock extends IronBarsBlock {
   public static final EnumMap<Direction,BooleanProperty> DIRECTIONS;
   static {
     DIRECTIONS = new EnumMap<>(Direction.class);
@@ -27,17 +29,17 @@ public class BetterPaneBlock extends PaneBlock {
 
   @Override
   @OnlyIn(Dist.CLIENT)
-  public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
+  public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
     // cull top and bottom if all props that we have are contained in the above or below
     if (adjacentBlockState.getBlock() == this && side.getAxis().isVertical()) {
       for (Direction dir : Plane.HORIZONTAL) {
         BooleanProperty prop = DIRECTIONS.get(dir);
-        if (state.get(prop) && !adjacentBlockState.get(prop)) {
+        if (state.getValue(prop) && !adjacentBlockState.getValue(prop)) {
           return false;
         }
       }
       return true;
     }
-    return super.isSideInvisible(state, adjacentBlockState, side);
+    return super.skipRendering(state, adjacentBlockState, side);
   }
 }

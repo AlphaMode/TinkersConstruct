@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.tables.client.inventory.module;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.util.text.ITextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.network.chat.Component;
 import slimeknights.mantle.client.screen.ModuleScreen;
 import slimeknights.mantle.client.screen.MultiModuleScreen;
 
@@ -17,11 +17,11 @@ public class SideButtonsScreen extends ModuleScreen {
 
   public int spacing = 4;
 
-  public SideButtonsScreen(MultiModuleScreen parent, Container container, PlayerInventory playerInventory, ITextComponent title, int columns) {
+  public SideButtonsScreen(MultiModuleScreen parent, AbstractContainerMenu container, Inventory playerInventory, Component title, int columns) {
     this(parent, container, playerInventory, title, columns, false);
   }
 
-  public SideButtonsScreen(MultiModuleScreen parent, Container container, PlayerInventory playerInventory, ITextComponent title, int columns, boolean right) {
+  public SideButtonsScreen(MultiModuleScreen parent, AbstractContainerMenu container, Inventory playerInventory, Component title, int columns, boolean right) {
     super(parent, container, playerInventory, title, right, false);
     this.columns = columns;
   }
@@ -29,18 +29,18 @@ public class SideButtonsScreen extends ModuleScreen {
   public void addSideButton(Button button) {
     int rows = (this.buttonCount - 1) / this.columns + 1;
 
-    this.xSize = button.getWidth() * this.columns + this.spacing * (this.columns - 1);
-    this.ySize = button.getHeight() * rows + this.spacing * (rows - 1);
+    this.imageWidth = button.getWidth() * this.columns + this.spacing * (this.columns - 1);
+    this.imageHeight = button.getHeight() * rows + this.spacing * (rows - 1);
 
     int offset = this.buttonCount;
     int x = (offset % columns) * (button.getWidth() + this.spacing);
     int y = (offset / columns) * (button.getHeight() + this.spacing);
 
-    button.x = guiLeft + x;
-    button.y = guiTop + y;
+    button.x = leftPos + x;
+    button.y = topPos + y;
 
     if (this.right) {
-      button.x += parent.xSize;
+      button.x += parent.imageWidth;
     }
 
     this.buttons.add(button);
@@ -50,7 +50,7 @@ public class SideButtonsScreen extends ModuleScreen {
   @Override
   public boolean handleMouseClicked(double mouseX, double mouseY, int mouseButton) {
     if (mouseButton == 0) {
-      for (Widget widget : this.buttons) {
+      for (AbstractWidget widget : this.buttons) {
         if (widget instanceof Button) {
           Button button = (Button) widget;
 
@@ -77,13 +77,13 @@ public class SideButtonsScreen extends ModuleScreen {
   }
 
   @Override
-  protected void drawGuiContainerBackgroundLayer(MatrixStack matrices, float partialTicks, int mouseX, int mouseY) {
-    for (Widget widget : this.buttons) {
+  protected void renderBg(PoseStack matrices, float partialTicks, int mouseX, int mouseY) {
+    for (AbstractWidget widget : this.buttons) {
       widget.render(matrices, mouseX, mouseY, partialTicks);
     }
   }
 
   @Override
-  protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int x, int y) {
+  protected void renderLabels(PoseStack matrixStack, int x, int y) {
   }
 }

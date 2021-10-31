@@ -2,7 +2,7 @@ package slimeknights.tconstruct.library.recipe.modifiers.spilling.effects;
 
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.JSONUtils;

@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.plugin.jei.transfer;
 
 import mezz.jei.api.recipe.transfer.IRecipeTransferInfo;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.plugin.jei.TConstructRecipeCategoryUid;
 import slimeknights.tconstruct.tables.inventory.table.tinkerstation.TinkerStationContainer;
 

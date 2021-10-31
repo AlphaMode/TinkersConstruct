@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.tools.modifiers.slotless;
 
-import net.minecraft.item.Item;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.util.Constants.NBT;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.modifiers.SingleUseModifier;
@@ -33,8 +33,8 @@ public class CreativeSlotModifier extends SingleUseModifier {
   @Override
   public void addVolatileData(Item item, ToolDefinition toolDefinition, StatsNBT baseStats, IModDataReadOnly persistentData, int level, ModDataNBT volatileData) {
     if (persistentData.contains(KEY_SLOTS, NBT.TAG_COMPOUND)) {
-      CompoundNBT slots = persistentData.getCompound(KEY_SLOTS);
-      for (String key : slots.keySet()) {
+      CompoundTag slots = persistentData.getCompound(KEY_SLOTS);
+      for (String key : slots.getAllKeys()) {
         SlotType slotType = SlotType.getIfPresent(key);
         if (slotType != null) {
           volatileData.addSlots(slotType, slots.getInt(key));
@@ -44,25 +44,25 @@ public class CreativeSlotModifier extends SingleUseModifier {
   }
 
   @Override
-  public void addInformation(IModifierToolStack tool, int level, List<ITextComponent> tooltip, boolean isAdvanced, boolean detailed) {
+  public void addInformation(IModifierToolStack tool, int level, List<Component> tooltip, boolean isAdvanced, boolean detailed) {
     if (detailed) {
       IModDataReadOnly persistentData = tool.getPersistentData();
       if (persistentData.contains(KEY_SLOTS, NBT.TAG_COMPOUND)) {
-        CompoundNBT slots = persistentData.getCompound(KEY_SLOTS);
+        CompoundTag slots = persistentData.getCompound(KEY_SLOTS);
 
         // first, find the first valid slot
-        Iterator<String> keys = slots.keySet().iterator();
+        Iterator<String> keys = slots.getAllKeys().iterator();
         while (keys.hasNext()) {
           String key = keys.next();
           SlotType slotType = SlotType.getIfPresent(key);
           if (slotType != null) {
-            tooltip.add(new TranslationTextComponent(SLOT_PREFIX));
+            tooltip.add(new TranslatableComponent(SLOT_PREFIX));
 
 
             tooltip.add(
-              new StringTextComponent("* +" + slots.getInt(key) + " ")
-                .appendSibling(slotType.getDisplayName())
-                .modifyStyle(style -> style.setColor(slotType.getColor())));
+              new TextComponent("* +" + slots.getInt(key) + " ")
+                .append(slotType.getDisplayName())
+                .withStyle(style -> style.withColor(slotType.getColor())));
 
             // after that, the next valid slots need comma separation
             while (keys.hasNext()) {

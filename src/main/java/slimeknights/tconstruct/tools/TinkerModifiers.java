@@ -1,14 +1,14 @@
 package slimeknights.tconstruct.tools;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.item.Item;
-import net.minecraft.item.Rarity;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.SpecialRecipeSerializer;
-import net.minecraft.potion.EffectType;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -160,7 +160,7 @@ public final class TinkerModifiers extends TinkerModule {
    */
   public static final ItemObject<Item> silkyCloth = ITEMS.register("silky_cloth", GENERAL_PROPS);
   public static final ItemObject<Item> silkyJewel = ITEMS.register("silky_jewel", HIDDEN_PROPS);
-  public static final ItemObject<Item> dragonScale = ITEMS.register("dragon_scale", () -> new DragonScaleItem(new Item.Properties().group(TAB_GENERAL).rarity(Rarity.RARE)));
+  public static final ItemObject<Item> dragonScale = ITEMS.register("dragon_scale", () -> new DragonScaleItem(new Item.Properties().tab(TAB_GENERAL).rarity(Rarity.RARE)));
   // reinforcements
   public static final ItemObject<Item> ironReinforcement = ITEMS.register("iron_reinforcement", GENERAL_PROPS);
   public static final ItemObject<Item> slimesteelReinforcement = ITEMS.register("slimesteel_reinforcement", GENERAL_PROPS);
@@ -205,9 +205,9 @@ public final class TinkerModifiers extends TinkerModule {
 
   // damage boost
   public static final RegistryObject<PiercingModifier> piercing = MODIFIERS.register("piercing", PiercingModifier::new);
-  public static final RegistryObject<ScaledTypeDamageModifier> smite = MODIFIERS.register("smite", () -> new ScaledTypeDamageModifier(0xCC9720, CreatureAttribute.UNDEAD));
+  public static final RegistryObject<ScaledTypeDamageModifier> smite = MODIFIERS.register("smite", () -> new ScaledTypeDamageModifier(0xCC9720, MobType.UNDEAD));
   public static final RegistryObject<BaneOfSssssModifier> baneOfSssss = MODIFIERS.register("bane_of_sssss", BaneOfSssssModifier::new);
-  public static final RegistryObject<ScaledTypeDamageModifier> antiaquatic = MODIFIERS.register("antiaquatic", () -> new ScaledTypeDamageModifier(0xD58520, CreatureAttribute.WATER));
+  public static final RegistryObject<ScaledTypeDamageModifier> antiaquatic = MODIFIERS.register("antiaquatic", () -> new ScaledTypeDamageModifier(0xD58520, MobType.WATER));
   public static final RegistryObject<CoolingModifier> cooling = MODIFIERS.register("cooling", CoolingModifier::new);
   public static final RegistryObject<SharpnessModifier> sharpness = MODIFIERS.register("sharpness", SharpnessModifier::new);
   public static final RegistryObject<SweepingEdgeModifier> sweeping = MODIFIERS.register("sweeping_edge", SweepingEdgeModifier::new);
@@ -232,16 +232,16 @@ public final class TinkerModifiers extends TinkerModule {
   
   // right click abilities
   public static final RegistryObject<GlowingModifier> glowing = MODIFIERS.register("glowing", GlowingModifier::new);
-  public static final RegistryObject<BlockTransformModifier> pathing = MODIFIERS.register("pathing", () -> new BlockTransformModifier(0x8a361e, 75, ToolType.SHOVEL, SoundEvents.ITEM_SHOVEL_FLATTEN, true));
-  public static final RegistryObject<BlockTransformModifier> stripping = MODIFIERS.register("stripping", () -> new BlockTransformModifier(0xab7a55, 75, ToolType.AXE, SoundEvents.ITEM_AXE_STRIP, false));
-  public static final RegistryObject<BlockTransformModifier> tilling = MODIFIERS.register("tilling", () -> new BlockTransformModifier(0x633c1e, 75, ToolType.HOE, SoundEvents.ITEM_HOE_TILL, true));
+  public static final RegistryObject<BlockTransformModifier> pathing = MODIFIERS.register("pathing", () -> new BlockTransformModifier(0x8a361e, 75, ToolType.SHOVEL, SoundEvents.SHOVEL_FLATTEN, true));
+  public static final RegistryObject<BlockTransformModifier> stripping = MODIFIERS.register("stripping", () -> new BlockTransformModifier(0xab7a55, 75, ToolType.AXE, SoundEvents.AXE_STRIP, false));
+  public static final RegistryObject<BlockTransformModifier> tilling = MODIFIERS.register("tilling", () -> new BlockTransformModifier(0x633c1e, 75, ToolType.HOE, SoundEvents.HOE_TILL, true));
   public static final RegistryObject<FirestarterModifier> firestarter = MODIFIERS.register("firestarter", () -> new FirestarterModifier(0x5D342C, 70));
   public static final RegistryObject<SingleLevelModifier> fireprimer = MODIFIERS.register("fireprimer", () -> new SingleLevelModifier(0x4A281D));
 
   // internal abilities
-  public static final RegistryObject<BlockTransformModifier> shovelTransformHidden = MODIFIERS.register("shovel_transform_hidden", () -> new BlockTransformModifier(0x8a361e, Integer.MIN_VALUE + 50, ToolType.SHOVEL, SoundEvents.ITEM_SHOVEL_FLATTEN, true));
-  public static final RegistryObject<BlockTransformModifier> axeTransformHidden = MODIFIERS.register("axe_transform_hidden", () -> new BlockTransformModifier(0xab7a55, Integer.MIN_VALUE + 50, ToolType.AXE, SoundEvents.ITEM_AXE_STRIP, false));
-  public static final RegistryObject<BlockTransformModifier> hoeTransformHidden = MODIFIERS.register("hoe_transform_hidden", () -> new BlockTransformModifier(0x633c1e, Integer.MIN_VALUE + 50, ToolType.HOE, SoundEvents.ITEM_HOE_TILL, true));
+  public static final RegistryObject<BlockTransformModifier> shovelTransformHidden = MODIFIERS.register("shovel_transform_hidden", () -> new BlockTransformModifier(0x8a361e, Integer.MIN_VALUE + 50, ToolType.SHOVEL, SoundEvents.SHOVEL_FLATTEN, true));
+  public static final RegistryObject<BlockTransformModifier> axeTransformHidden = MODIFIERS.register("axe_transform_hidden", () -> new BlockTransformModifier(0xab7a55, Integer.MIN_VALUE + 50, ToolType.AXE, SoundEvents.AXE_STRIP, false));
+  public static final RegistryObject<BlockTransformModifier> hoeTransformHidden = MODIFIERS.register("hoe_transform_hidden", () -> new BlockTransformModifier(0x633c1e, Integer.MIN_VALUE + 50, ToolType.HOE, SoundEvents.HOE_TILL, true));
   public static final RegistryObject<FirestarterModifier> firestarterHidden = MODIFIERS.register("firestarter_hidden", () -> new FirestarterModifier(-1, Integer.MIN_VALUE + 50));
 
   public static final RegistryObject<ShearsAbilityModifier> shears = MODIFIERS.register("shears", () -> new ShearsAbilityModifier(0xd8e3e1, 0, Short.MIN_VALUE));
@@ -320,7 +320,7 @@ public final class TinkerModifiers extends TinkerModule {
   /*
    * Internal effects
    */
-  private static final IntFunction<Supplier<TinkerEffect>> MARKER_EFFECT = color -> () -> new TinkerEffect(EffectType.BENEFICIAL, color, false);
+  private static final IntFunction<Supplier<TinkerEffect>> MARKER_EFFECT = color -> () -> new TinkerEffect(MobEffectCategory.BENEFICIAL, color, false);
   public static RegistryObject<BleedingEffect> bleeding = POTIONS.register("bleeding", BleedingEffect::new);
   public static RegistryObject<MagneticEffect> magneticEffect = POTIONS.register("magnetic", MagneticEffect::new);
   public static RegistryObject<TinkerEffect> momentumEffect = POTIONS.register("momentum", MARKER_EFFECT.apply(0x60496b));
@@ -335,7 +335,7 @@ public final class TinkerModifiers extends TinkerModule {
   public static final RegistryObject<ModifierRemovalRecipe.Serializer> removeModifierSerializer = RECIPE_SERIALIZERS.register("remove_modifier", ModifierRemovalRecipe.Serializer::new);
   public static final RegistryObject<ModifierSalvage.Serializer> modifierSalvageSerializer = RECIPE_SERIALIZERS.register("modifier_salvage", ModifierSalvage.Serializer::new);
   public static final RegistryObject<IncrementalModifierSalvage.Serializer> incrementalModifierSalvageSerializer = RECIPE_SERIALIZERS.register("incremental_modifier_salvage", IncrementalModifierSalvage.Serializer::new);
-  public static final RegistryObject<SpecialRecipeSerializer<CreativeSlotRecipe>> creativeSlotSerializer = RECIPE_SERIALIZERS.register("creative_slot_modifier", () -> new SpecialRecipeSerializer<>(CreativeSlotRecipe::new));
+  public static final RegistryObject<SimpleRecipeSerializer<CreativeSlotRecipe>> creativeSlotSerializer = RECIPE_SERIALIZERS.register("creative_slot_modifier", () -> new SimpleRecipeSerializer<>(CreativeSlotRecipe::new));
   // modifiers
   public static final RegistryObject<SpillingRecipe.Serializer> spillingSerializer = RECIPE_SERIALIZERS.register("spilling", SpillingRecipe.Serializer::new);
   public static final RegistryObject<ModifierRepairRecipeSerializer<?>> modifierRepair = RECIPE_SERIALIZERS.register("modifier_repair", () -> new ModifierRepairRecipeSerializer<>(ModifierRepairTinkerStationRecipe::new));
@@ -344,10 +344,10 @@ public final class TinkerModifiers extends TinkerModule {
   public static final RegistryObject<SeveringRecipe.Serializer> severingSerializer = RECIPE_SERIALIZERS.register("severing", SeveringRecipe.Serializer::new);
   public static final RegistryObject<AgeableSeveringRecipe.Serializer> ageableSeveringSerializer = RECIPE_SERIALIZERS.register("ageable_severing", AgeableSeveringRecipe.Serializer::new);
   // special severing
-  public static final RegistryObject<SpecialRecipeSerializer<PlayerBeheadingRecipe>> playerBeheadingSerializer = RECIPE_SERIALIZERS.register("player_beheading", () -> new SpecialRecipeSerializer<>(PlayerBeheadingRecipe::new));
-  public static final RegistryObject<SpecialRecipeSerializer<SnowGolemBeheadingRecipe>> snowGolemBeheadingSerializer = RECIPE_SERIALIZERS.register("snow_golem_beheading", () -> new SpecialRecipeSerializer<>(SnowGolemBeheadingRecipe::new));
-  public static final RegistryObject<SpecialRecipeSerializer<MooshroomDemushroomingRecipe>> mooshroomDemushroomingSerializer = RECIPE_SERIALIZERS.register("mooshroom_demushrooming", () -> new SpecialRecipeSerializer<>(MooshroomDemushroomingRecipe::new));
-  public static final RegistryObject<SpecialRecipeSerializer<SheepShearingRecipe>> sheepShearing = RECIPE_SERIALIZERS.register("sheep_shearing", () -> new SpecialRecipeSerializer<>(SheepShearingRecipe::new));
+  public static final RegistryObject<SimpleRecipeSerializer<PlayerBeheadingRecipe>> playerBeheadingSerializer = RECIPE_SERIALIZERS.register("player_beheading", () -> new SimpleRecipeSerializer<>(PlayerBeheadingRecipe::new));
+  public static final RegistryObject<SimpleRecipeSerializer<SnowGolemBeheadingRecipe>> snowGolemBeheadingSerializer = RECIPE_SERIALIZERS.register("snow_golem_beheading", () -> new SimpleRecipeSerializer<>(SnowGolemBeheadingRecipe::new));
+  public static final RegistryObject<SimpleRecipeSerializer<MooshroomDemushroomingRecipe>> mooshroomDemushroomingSerializer = RECIPE_SERIALIZERS.register("mooshroom_demushrooming", () -> new SimpleRecipeSerializer<>(MooshroomDemushroomingRecipe::new));
+  public static final RegistryObject<SimpleRecipeSerializer<SheepShearingRecipe>> sheepShearing = RECIPE_SERIALIZERS.register("sheep_shearing", () -> new SimpleRecipeSerializer<>(SheepShearingRecipe::new));
 
   /*
    * Global loot managers
@@ -355,7 +355,7 @@ public final class TinkerModifiers extends TinkerModule {
   public static final RegistryObject<ModifierLootModifier.Serializer> modifierLootModifier = GLOBAL_LOOT_MODIFIERS.register("modifier_hook", ModifierLootModifier.Serializer::new);
 
   @SubscribeEvent
-  void registerSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event) {
+  void registerSerializers(RegistryEvent.Register<RecipeSerializer<?>> event) {
     SpillingRecipeLookup.registerEffect(TConstruct.getResource("damage"), DamageSpillingEffect.LOADER);
     SpillingRecipeLookup.registerEffect(TConstruct.getResource("effect"), EffectSpillingEffect.LOADER);
     SpillingRecipeLookup.registerEffect(TConstruct.getResource("set_fire"), SetFireSpillingEffect.LOADER);

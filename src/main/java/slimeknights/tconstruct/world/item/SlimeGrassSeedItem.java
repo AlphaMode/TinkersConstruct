@@ -1,21 +1,23 @@
 package slimeknights.tconstruct.world.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.NonNullList;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.item.TooltipItem;
 import slimeknights.tconstruct.shared.block.SlimeType;
 import slimeknights.tconstruct.world.TinkerWorld;
 
 import javax.annotation.Nullable;
+
+import net.minecraft.world.item.Item.Properties;
 
 public class SlimeGrassSeedItem extends TooltipItem {
   private final SlimeType foliage;
@@ -36,30 +38,30 @@ public class SlimeGrassSeedItem extends TooltipItem {
   }
 
   @Override
-  public ActionResultType onItemUse(ItemUseContext context) {
-    BlockPos pos = context.getPos();
-    World world = context.getWorld();
+  public InteractionResult useOn(UseOnContext context) {
+    BlockPos pos = context.getClickedPos();
+    Level world = context.getLevel();
     BlockState state = world.getBlockState(pos);
     SlimeType type = getSlimeType(state.getBlock());
     if (type != null) {
-      if (!world.isRemote) {
-        BlockState grassState = TinkerWorld.slimeGrass.get(type).get(foliage).getDefaultState();
-        world.setBlockState(pos, grassState);
-        world.playSound(null, pos, grassState.getSoundType(world, pos, context.getPlayer()).getPlaceSound(), SoundCategory.BLOCKS, 1.0f, 1.0f);
-        PlayerEntity player = context.getPlayer();
+      if (!world.isClientSide) {
+        BlockState grassState = TinkerWorld.slimeGrass.get(type).get(foliage).defaultBlockState();
+        world.setBlockAndUpdate(pos, grassState);
+        world.playSound(null, pos, grassState.getSoundType(world, pos, context.getPlayer()).getPlaceSound(), SoundSource.BLOCKS, 1.0f, 1.0f);
+        Player player = context.getPlayer();
         if (player == null || !player.isCreative()) {
-          context.getItem().shrink(1);
+          context.getItemInHand().shrink(1);
         }
       }
-      return ActionResultType.SUCCESS;
+      return InteractionResult.SUCCESS;
     }
-    return ActionResultType.PASS;
+    return InteractionResult.PASS;
   }
 
   @Override
-  public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+  public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
     if (this.foliage != SlimeType.ICHOR) {
-      super.fillItemGroup(group, items);
+      super.fillItemCategory(group, items);
     }
   }
 }

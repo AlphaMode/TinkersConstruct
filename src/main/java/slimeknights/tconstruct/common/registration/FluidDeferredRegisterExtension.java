@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.common.registration;
 
-import net.minecraft.block.material.Material;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.fluids.FluidAttributes.Builder;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fluids.ForgeFlowingFluid.Properties;

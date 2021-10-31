@@ -2,9 +2,9 @@ package slimeknights.tconstruct.smeltery.client.inventory;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import slimeknights.mantle.client.screen.ElementScreen;
 import slimeknights.mantle.client.screen.MultiModuleScreen;
 import slimeknights.tconstruct.TConstruct;
@@ -30,7 +30,7 @@ public class HeatingStructureScreen extends MultiModuleScreen<HeatingStructureCo
   public final GuiMeltingModule melting;
   private final GuiFuelModule fuel;
 
-  public HeatingStructureScreen(HeatingStructureContainer container, PlayerInventory playerInventory, ITextComponent title) {
+  public HeatingStructureScreen(HeatingStructureContainer container, Inventory playerInventory, Component title) {
     super(container, playerInventory, title);
 
     HeatingStructureTileEntity te = container.getTile();

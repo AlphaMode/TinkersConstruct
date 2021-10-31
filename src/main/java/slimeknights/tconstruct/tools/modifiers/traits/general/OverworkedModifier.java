@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tools.modifiers.traits.general;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
 import slimeknights.tconstruct.library.tools.nbt.IModDataReadOnly;

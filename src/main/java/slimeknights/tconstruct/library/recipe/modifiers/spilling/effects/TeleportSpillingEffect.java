@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.library.recipe.modifiers.spilling.effects;
 
 import com.google.gson.JsonObject;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.tconstruct.library.events.teleport.SpillingTeleportEvent;

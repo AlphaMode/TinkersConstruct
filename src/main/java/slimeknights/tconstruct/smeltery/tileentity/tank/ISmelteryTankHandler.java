@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.smeltery.tileentity.tank;
 
-import net.minecraft.fluid.Fluid;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.extensions.IForgeTileEntity;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;

@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.plugin.jei.partbuilder;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -11,10 +11,10 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ForgeI18n;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
@@ -58,16 +58,16 @@ public class PartBuilderCategory implements IRecipeCategory<IDisplayPartBuilderR
   public void setIngredients(IDisplayPartBuilderRecipe recipe, IIngredients ingredients) {
     ingredients.setInputLists(VanillaTypes.ITEM, Arrays.asList(MaterialItemList.getItems(recipe.getMaterialId()), recipe.getPatternItems()));
     ingredients.setInput(JEIPlugin.PATTERN_TYPE, recipe.getPattern());
-    ingredients.setOutput(VanillaTypes.ITEM, recipe.getRecipeOutput());
+    ingredients.setOutput(VanillaTypes.ITEM, recipe.getResultItem());
   }
 
   @Override
-  public void draw(IDisplayPartBuilderRecipe recipe, MatrixStack matrixStack, double mouseX, double mouseY) {
-    FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
+  public void draw(IDisplayPartBuilderRecipe recipe, PoseStack matrixStack, double mouseX, double mouseY) {
+    Font fontRenderer = Minecraft.getInstance().font;
     IMaterial material = recipe.getMaterial();
-    fontRenderer.drawStringWithShadow(matrixStack, I18n.format(material.getTranslationKey()), 3, 2, material.getColor().color);
-    String coolingString = I18n.format(KEY_COST, recipe.getCost());
-    fontRenderer.drawString(matrixStack, coolingString, 3, 35, Color.GRAY.getRGB());
+    fontRenderer.drawShadow(matrixStack, I18n.get(material.getTranslationKey()), 3, 2, material.getColor().value);
+    String coolingString = I18n.get(KEY_COST, recipe.getCost());
+    fontRenderer.draw(matrixStack, coolingString, 3, 35, Color.GRAY.getRGB());
   }
 
   @Override

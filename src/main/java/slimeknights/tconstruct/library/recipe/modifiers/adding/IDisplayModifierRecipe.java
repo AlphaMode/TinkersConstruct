@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.library.recipe.modifiers.adding;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import slimeknights.tconstruct.common.TinkerTags;

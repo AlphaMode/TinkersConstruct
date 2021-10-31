@@ -1,17 +1,19 @@
 package slimeknights.tconstruct.shared.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class ConsecratedSoilBlock extends Block {
 
@@ -20,17 +22,17 @@ public class ConsecratedSoilBlock extends Block {
   }
 
   @Override
-  public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
+  public void stepOn(Level worldIn, BlockPos pos, Entity entityIn) {
     this.processConsecratedSoil(entityIn);
   }
 
   // damage and set undead entities on fire
   private void processConsecratedSoil(Entity entity) {
-    if (entity instanceof MobEntity) {
+    if (entity instanceof Mob) {
       LivingEntity entityLiving = (LivingEntity) entity;
-      if (entityLiving.getCreatureAttribute() == CreatureAttribute.UNDEAD) {
-        entityLiving.attackEntityFrom(DamageSource.MAGIC, 1);
-        entityLiving.setFire(1);
+      if (entityLiving.getMobType() == MobType.UNDEAD) {
+        entityLiving.hurt(DamageSource.MAGIC, 1);
+        entityLiving.setSecondsOnFire(1);
       }
     }
   }

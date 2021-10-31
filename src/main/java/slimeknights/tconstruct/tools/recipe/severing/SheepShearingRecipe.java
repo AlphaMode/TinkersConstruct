@@ -1,15 +1,15 @@
 package slimeknights.tconstruct.tools.recipe.severing;
 
 import com.google.common.collect.Maps;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.passive.SheepEntity;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.Util;
 import slimeknights.mantle.recipe.EntityIngredient;
 import slimeknights.mantle.recipe.ItemOutput;
 import slimeknights.tconstruct.library.recipe.modifiers.severing.SeveringRecipe;
@@ -17,7 +17,7 @@ import slimeknights.tconstruct.library.recipe.modifiers.severing.SeveringRecipe;
 import java.util.Map;
 
 public class SheepShearingRecipe extends SeveringRecipe {
-  private static final Map<DyeColor,IItemProvider> WOOL_BY_COLOR = Util.make(Maps.newEnumMap(DyeColor.class), map -> {
+  private static final Map<DyeColor,ItemLike> WOOL_BY_COLOR = Util.make(Maps.newEnumMap(DyeColor.class), map -> {
     map.put(DyeColor.WHITE, Blocks.WHITE_WOOL);
     map.put(DyeColor.ORANGE, Blocks.ORANGE_WOOL);
     map.put(DyeColor.MAGENTA, Blocks.MAGENTA_WOOL);
@@ -42,10 +42,10 @@ public class SheepShearingRecipe extends SeveringRecipe {
 
   @Override
   public ItemStack getOutput(Entity entity) {
-    if (entity instanceof SheepEntity) {
-      SheepEntity sheep = (SheepEntity)entity;
-      if (!sheep.getSheared() && !sheep.isChild()) {
-        return new ItemStack(WOOL_BY_COLOR.get(sheep.getFleeceColor()), 2);
+    if (entity instanceof Sheep) {
+      Sheep sheep = (Sheep)entity;
+      if (!sheep.isSheared() && !sheep.isBaby()) {
+        return new ItemStack(WOOL_BY_COLOR.get(sheep.getColor()), 2);
       }
     }
     return ItemStack.EMPTY;

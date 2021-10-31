@@ -1,10 +1,12 @@
 package slimeknights.tconstruct.tables.block.table;
 
 import lombok.Getter;
-import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.BlockGetter;
 import slimeknights.tconstruct.tables.tileentity.table.TinkerStationTileEntity;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class TinkerStationBlock extends RetexturedTableBlock {
   @Getter
@@ -16,7 +18,7 @@ public class TinkerStationBlock extends RetexturedTableBlock {
   }
 
   @Override
-  public TileEntity createTileEntity(BlockState blockState, IBlockReader iBlockReader) {
+  public BlockEntity createTileEntity(BlockState blockState, BlockGetter iBlockReader) {
     return new TinkerStationTileEntity(getSlotCount());
   }
 }

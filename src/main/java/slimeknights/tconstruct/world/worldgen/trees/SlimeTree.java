@@ -1,20 +1,20 @@
 package slimeknights.tconstruct.world.worldgen.trees;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.trees.Tree;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.grower.AbstractTreeGrower;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.server.level.ServerLevel;
 import slimeknights.tconstruct.shared.block.SlimeType;
 import slimeknights.tconstruct.world.TinkerStructures;
 
 import javax.annotation.Nullable;
 import java.util.Random;
 
-public class SlimeTree extends Tree {
+public class SlimeTree extends AbstractTreeGrower {
 
   private final SlimeType foliageType;
 
@@ -25,7 +25,7 @@ public class SlimeTree extends Tree {
   @Deprecated
   @Nullable
   @Override
-  protected ConfiguredFeature<BaseTreeFeatureConfig, ?> getTreeFeature(Random randomIn, boolean largeHive) {
+  protected ConfiguredFeature<TreeConfiguration, ?> getConfiguredFeature(Random randomIn, boolean largeHive) {
     return null;
   }
 
@@ -51,17 +51,17 @@ public class SlimeTree extends Tree {
   }
 
   @Override
-  public boolean attemptGrowTree(ServerWorld world, ChunkGenerator chunkGenerator, BlockPos pos, BlockState state, Random rand) {
+  public boolean growTree(ServerLevel world, ChunkGenerator chunkGenerator, BlockPos pos, BlockState state, Random rand) {
     ConfiguredFeature<?, ?> configuredFeature = this.getSlimeTreeFeature();
     if (configuredFeature == null) {
       return false;
     }
-    world.setBlockState(pos, Blocks.AIR.getDefaultState(), 4);
-    if (configuredFeature.generate(world, chunkGenerator, rand, pos)) {
+    world.setBlock(pos, Blocks.AIR.defaultBlockState(), 4);
+    if (configuredFeature.place(world, chunkGenerator, rand, pos)) {
       return true;
     }
     else {
-      world.setBlockState(pos, state, 4);
+      world.setBlock(pos, state, 4);
       return false;
     }
   }

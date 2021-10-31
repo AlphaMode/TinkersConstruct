@@ -1,14 +1,14 @@
 package slimeknights.tconstruct.library.materials.definition;
 
 import lombok.Getter;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.Color;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.Util;
+import net.minecraft.network.chat.TextColor;
 
 @Getter
 public class Material implements IMaterial {
   /** Default white color */
-  protected static final Color WHITE = Color.fromInt(0xFFFFFF);
+  protected static final TextColor WHITE = TextColor.fromRgb(0xFFFFFF);
 
   /** This resource location uniquely identifies a material. */
   private final MaterialId identifier;
@@ -22,7 +22,7 @@ public class Material implements IMaterial {
   /** Key used for localizing the material */
   private final String translationKey;
   /** the text color for this material */
-  private final Color color;
+  private final TextColor color;
   /** if true, this material is hidden */
   private final boolean hidden;
 
@@ -30,12 +30,12 @@ public class Material implements IMaterial {
    * Materials should only be created by the MaterialManager, except when used for data gen
    * They're synced over the network and other classes might lead to unexpected behaviour.
    */
-  public Material(ResourceLocation identifier, int tier, int order, boolean craftable, Color color, boolean hidden) {
+  public Material(ResourceLocation identifier, int tier, int order, boolean craftable, TextColor color, boolean hidden) {
     this.identifier = new MaterialId(identifier);
     this.tier = tier;
     this.sortOrder = order;
     this.craftable = craftable;
-    this.translationKey = Util.makeTranslationKey("material", identifier);
+    this.translationKey = Util.makeDescriptionId("material", identifier);
     this.color = color;
     this.hidden = hidden;
   }

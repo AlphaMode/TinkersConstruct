@@ -2,7 +2,7 @@ package slimeknights.tconstruct.tables.inventory.table.tinkerstation;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.item.ItemStack;
 import slimeknights.tconstruct.library.recipe.partbuilder.Pattern;
 import slimeknights.tconstruct.tables.tileentity.table.TinkerStationTileEntity;

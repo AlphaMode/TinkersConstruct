@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.library.tools.helper.aoe;
 
 import lombok.RequiredArgsConstructor;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.library.tools.helper.ToolHarvestLogic;
 import slimeknights.tconstruct.library.tools.helper.aoe.RectangleAOEHarvestLogic.RectangleIterator;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
@@ -15,6 +15,8 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 
 import java.util.Collections;
 import java.util.function.Predicate;
+
+import slimeknights.tconstruct.library.tools.helper.ToolHarvestLogic.AOEMatchType;
 
 /** AOE harvest logic that mines blocks in a circle */
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class CircleAOEHarvestLogic extends ToolHarvestLogic {
   protected final boolean is3D;
 
   @Override
-  public Iterable<BlockPos> getAOEBlocks(IModifierToolStack tool, ItemStack stack, PlayerEntity player, BlockState state, World world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
+  public Iterable<BlockPos> getAOEBlocks(IModifierToolStack tool, ItemStack stack, Player player, BlockState state, Level world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
     // expanded gives an extra width every odd level, and an extra height every even level
     int expanded = tool.getModifierLevel(TinkerModifiers.expanded.get());
     return calculate(this, tool, stack, world, player, origin, sideHit, diameter + expanded, is3D, matchType);
@@ -44,7 +46,7 @@ public class CircleAOEHarvestLogic extends ToolHarvestLogic {
    * @param matchType  Type of harvest being performed
    * @return  List of block positions
    */
-  public static Iterable<BlockPos> calculate(ToolHarvestLogic self, IModifierToolStack tool, ItemStack stack, World world, PlayerEntity player, BlockPos origin, Direction sideHit, int diameter, boolean is3D, AOEMatchType matchType) {
+  public static Iterable<BlockPos> calculate(ToolHarvestLogic self, IModifierToolStack tool, ItemStack stack, Level world, Player player, BlockPos origin, Direction sideHit, int diameter, boolean is3D, AOEMatchType matchType) {
     // skip if no work
     if (diameter == 1) {
       return Collections.emptyList();
@@ -54,11 +56,11 @@ public class CircleAOEHarvestLogic extends ToolHarvestLogic {
     // for Y, direction is based on facing
     Direction widthDir, heightDir;
     if (sideHit.getAxis() == Axis.Y) {
-      heightDir = player.getHorizontalFacing();
-      widthDir = heightDir.rotateY();
+      heightDir = player.getDirection();
+      widthDir = heightDir.getClockWise();
     } else {
       // for X and Z, just rotate from side hit
-      widthDir = sideHit.rotateYCCW();
+      widthDir = sideHit.getCounterClockWise();
       heightDir = Direction.UP;
     }
 
@@ -92,7 +94,7 @@ public class CircleAOEHarvestLogic extends ToolHarvestLogic {
     @Override
     protected BlockPos computeNext() {
       // ensure the position did not get changed by the consumer last time
-      mutablePos.setPos(lastX, lastY, lastZ);
+      mutablePos.set(lastX, lastY, lastZ);
       // as long as we have another position, try using it
       while (incrementPosition()) {
         // skip over the origin

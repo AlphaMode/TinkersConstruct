@@ -1,19 +1,21 @@
 package slimeknights.tconstruct.smeltery.block.controller;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.util.TileEntityHelper;
 import slimeknights.tconstruct.smeltery.tileentity.controller.SmelteryTileEntity;
 
 import javax.annotation.Nullable;
 import java.util.Random;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class SmelteryControllerBlock extends HeatingControllerBlock {
   public SmelteryControllerBlock(Properties properties) {
@@ -21,28 +23,28 @@ public class SmelteryControllerBlock extends HeatingControllerBlock {
   }
 
   @Override
-  public TileEntity createTileEntity(BlockState blockState, IBlockReader iBlockReader) {
+  public BlockEntity createTileEntity(BlockState blockState, BlockGetter iBlockReader) {
     return new SmelteryTileEntity();
   }
 
   @Override
-  public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+  public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
     // check structure
     TileEntityHelper.getTile(SmelteryTileEntity.class, worldIn, pos).ifPresent(SmelteryTileEntity::updateStructure);
   }
 
   @Override
   @Deprecated
-  public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-    if (!newState.matchesBlock(this)) {
+  public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+    if (!newState.is(this)) {
       TileEntityHelper.getTile(SmelteryTileEntity.class, worldIn, pos).ifPresent(SmelteryTileEntity::invalidateStructure);
     }
-    super.onReplaced(state, worldIn, pos, newState, isMoving);
+    super.onRemove(state, worldIn, pos, newState, isMoving);
   }
 
   @Override
-  public void animateTick(BlockState state, World world, BlockPos pos, Random rand) {
-    if (state.get(ACTIVE)) {
+  public void animateTick(BlockState state, Level world, BlockPos pos, Random rand) {
+    if (state.getValue(ACTIVE)) {
       double x = pos.getX() + 0.5D;
       double y = (double) pos.getY() + (rand.nextFloat() * 6F + 2F) / 16F;
       double z = pos.getZ() + 0.5D;
@@ -58,7 +60,7 @@ public class SmelteryControllerBlock extends HeatingControllerBlock {
   @Deprecated
   @Override
   public BlockState rotate(BlockState state, Rotation rotation) {
-    if (state.get(IN_STRUCTURE)) {
+    if (state.getValue(IN_STRUCTURE)) {
       return state;
     }
     return super.rotate(state, rotation);
@@ -67,7 +69,7 @@ public class SmelteryControllerBlock extends HeatingControllerBlock {
   @Deprecated
   @Override
   public BlockState mirror(BlockState state, Mirror mirror) {
-    if (state.get(IN_STRUCTURE)) {
+    if (state.getValue(IN_STRUCTURE)) {
       return state;
     }
     return super.mirror(state, mirror);

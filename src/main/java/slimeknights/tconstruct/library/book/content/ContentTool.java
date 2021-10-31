@@ -6,16 +6,16 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.crafting.IShapedRecipe;
@@ -132,20 +132,20 @@ public class ContentTool extends TinkerPage {
       // if no required components, do a crafting recipe lookup
       if (required.isEmpty()) {
         // get the stacks for the first crafting table recipe
-        IRecipe<CraftingInventory> recipe = Optional.ofNullable(Minecraft.getInstance().world)
-                                                    .flatMap(world -> world.getRecipeManager().getRecipes(IRecipeType.CRAFTING).values().stream()
-                                                                           .filter(r -> r.getRecipeOutput().getItem() == tool.asItem())
+        Recipe<CraftingContainer> recipe = Optional.ofNullable(Minecraft.getInstance().level)
+                                                    .flatMap(world -> world.getRecipeManager().byType(RecipeType.CRAFTING).values().stream()
+                                                                           .filter(r -> r.getResultItem().getItem() == tool.asItem())
                                                                            .findFirst())
                                                     .orElse(null);
         if (recipe != null) {
           // parts is just the items in the recipe
-          this.parts = recipe.getIngredients().stream().map(ingredient -> ItemStackList.of(ingredient.getMatchingStacks())).collect(Collectors.toList());
+          this.parts = recipe.getIngredients().stream().map(ingredient -> ItemStackList.of(ingredient.getItems())).collect(Collectors.toList());
 
           // if we have a shaped recipe, display slots in order
           if (recipe instanceof IShapedRecipe) {
             IShapedRecipe<?> shaped = (IShapedRecipe<?>) recipe;
-            int width = MathHelper.clamp(shaped.getRecipeWidth() - 1, 0, 2);
-            this.imgSlots = IMG_SLOTS_SHAPED[MathHelper.clamp(shaped.getRecipeHeight() - 1, 0, 2)][width];
+            int width = Mth.clamp(shaped.getRecipeWidth() - 1, 0, 2);
+            this.imgSlots = IMG_SLOTS_SHAPED[Mth.clamp(shaped.getRecipeHeight() - 1, 0, 2)][width];
             this.slotPos = SLOTS_WIDTH[width];
           }
         } else {
@@ -206,7 +206,7 @@ public class ContentTool extends TinkerPage {
     imgY = imgY + 20 - imgHeight / 2;
 
     if (properties.length > 0) {
-      TextData head = new TextData(I18n.format(KEY_PROPERTIES));
+      TextData head = new TextData(I18n.get(KEY_PROPERTIES));
       head.underlined = true;
       list.add(new TextElement(padding, 30 + h, 86 - padding, BookScreen.PAGE_HEIGHT - h - 20, head));
 

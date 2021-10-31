@@ -1,15 +1,14 @@
 package slimeknights.tconstruct.gadgets;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.SpriteRenderer;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.ClientEventBase;
 import slimeknights.tconstruct.gadgets.client.FancyItemFrameRenderer;
@@ -25,13 +24,13 @@ public class GadgetClientEvents extends ClientEventBase {
   }
 
   @SubscribeEvent
-  static void clientSetup(FMLClientSetupEvent event) {
+  static void clientSetup(EntityRenderersEvent.RegisterRenderers event) {
     Minecraft mc = Minecraft.getInstance();
-
-    RenderingRegistry.registerEntityRenderingHandler(TinkerGadgets.itemFrameEntity.get(), (manager) -> new FancyItemFrameRenderer(manager, mc.getItemRenderer()));
-    RenderingRegistry.registerEntityRenderingHandler(TinkerGadgets.glowBallEntity.get(), (manager) -> new SpriteRenderer<>(manager, mc.getItemRenderer()));
-    RenderingRegistry.registerEntityRenderingHandler(TinkerGadgets.eflnEntity.get(), (manager) -> new SpriteRenderer<>(manager, mc.getItemRenderer()));
-    RenderingRegistry.registerEntityRenderingHandler(TinkerGadgets.quartzShurikenEntity.get(), (manager) -> new RenderShuriken(manager, mc.getItemRenderer()));
-    RenderingRegistry.registerEntityRenderingHandler(TinkerGadgets.flintShurikenEntity.get(), (manager) -> new RenderShuriken(manager, mc.getItemRenderer()));
+    
+    event.registerEntityRenderer(TinkerGadgets.itemFrameEntity.get(), FancyItemFrameRenderer::new);
+    event.registerEntityRenderer(TinkerGadgets.glowBallEntity.get(), ThrownItemRenderer::new);
+    event.registerEntityRenderer(TinkerGadgets.eflnEntity.get(), ThrownItemRenderer::new);
+    event.registerEntityRenderer(TinkerGadgets.quartzShurikenEntity.get(), RenderShuriken::new);
+    event.registerEntityRenderer(TinkerGadgets.flintShurikenEntity.get(), RenderShuriken::new);
   }
 }

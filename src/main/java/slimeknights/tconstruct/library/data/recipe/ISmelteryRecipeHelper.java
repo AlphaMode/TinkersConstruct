@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.library.data.recipe;
 
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.fluid.Fluid;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.item.Item;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.ConditionalRecipe;
 import net.minecraftforge.common.crafting.conditions.TrueCondition;
 import net.minecraftforge.fluids.FluidStack;
@@ -39,9 +39,9 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param recipePath  Recipe output name
    * @param isOptional  If true, recipe is optional
    */
-  default void metalMeltingBase(Consumer<IFinishedRecipe> consumer, Fluid fluid, int amount, String tagName, float factor, String recipePath, boolean isOptional) {
-    Consumer<IFinishedRecipe> wrapped = isOptional ? withCondition(consumer, tagCondition(tagName)) : consumer;
-    MeltingRecipeBuilder.melting(Ingredient.fromTag(getTag("forge", tagName)), fluid, amount, factor)
+  default void metalMeltingBase(Consumer<FinishedRecipe> consumer, Fluid fluid, int amount, String tagName, float factor, String recipePath, boolean isOptional) {
+    Consumer<FinishedRecipe> wrapped = isOptional ? withCondition(consumer, tagCondition(tagName)) : consumer;
+    MeltingRecipeBuilder.melting(Ingredient.of(getTag("forge", tagName)), fluid, amount, factor)
                         .build(wrapped, modResource(recipePath));
   }
 
@@ -56,9 +56,9 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param isOptional  If true, recipe is optional
    * @param byproducts  List of byproduct options for this metal, first one that is present will be used
    */
-  default void oreMelting(Consumer<IFinishedRecipe> consumer, Fluid fluid, int amount, String tagName, float factor, String recipePath, boolean isOptional, IByproduct... byproducts) {
-    Consumer<IFinishedRecipe> wrapped = isOptional ? withCondition(consumer, tagCondition(tagName)) : consumer;
-    Supplier<MeltingRecipeBuilder> supplier = () -> MeltingRecipeBuilder.melting(Ingredient.fromTag(getTag("forge", tagName)), fluid, amount, factor).setOre();
+  default void oreMelting(Consumer<FinishedRecipe> consumer, Fluid fluid, int amount, String tagName, float factor, String recipePath, boolean isOptional, IByproduct... byproducts) {
+    Consumer<FinishedRecipe> wrapped = isOptional ? withCondition(consumer, tagCondition(tagName)) : consumer;
+    Supplier<MeltingRecipeBuilder> supplier = () -> MeltingRecipeBuilder.melting(Ingredient.of(getTag("forge", tagName)), fluid, amount, factor).setOre();
     ResourceLocation location = modResource(recipePath);
 
     // if no byproducts, just build directly
@@ -102,7 +102,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param isOptional  If true, this recipe is entirely optional
    * @param byproducts  List of byproduct options for this metal, first one that is present will be used
    */
-  default void metalMelting(Consumer<IFinishedRecipe> consumer, Fluid fluid, String name, boolean hasOre, boolean hasDust, String folder, boolean isOptional, IByproduct... byproducts) {
+  default void metalMelting(Consumer<FinishedRecipe> consumer, Fluid fluid, String name, boolean hasOre, boolean hasDust, String folder, boolean isOptional, IByproduct... byproducts) {
     String prefix = folder + "/" + name + "/";
     metalMeltingBase(consumer, fluid, FluidValues.METAL_BLOCK, "storage_blocks/" + name, 3.0f, prefix + "block", isOptional);
     metalMeltingBase(consumer, fluid, FluidValues.INGOT, "ingots/" + name, 1.0f, prefix + "ingot", isOptional);
@@ -133,7 +133,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param isOptional  If true, this recipe is entirely optional
    * @param byproducts  List of byproduct options for this metal, first one that is present will be used
    */
-  default void metalMelting(Consumer<IFinishedRecipe> consumer, Fluid fluid, String name, boolean hasOre, String folder, boolean isOptional, IByproduct... byproducts) {
+  default void metalMelting(Consumer<FinishedRecipe> consumer, Fluid fluid, String name, boolean hasOre, String folder, boolean isOptional, IByproduct... byproducts) {
     metalMelting(consumer, fluid, name, hasOre, true, folder, isOptional, byproducts);
   }
 
@@ -150,7 +150,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param output    Recipe output
    * @param location  Recipe base
    */
-  default void castingWithCast(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, int amount, CastItemObject cast, ItemOutput output, String location) {
+  default void castingWithCast(Consumer<FinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, int amount, CastItemObject cast, ItemOutput output, String location) {
     ItemCastingRecipeBuilder.tableRecipe(output)
                             .setFluidAndTime(fluid, forgeTag, amount)
                             .setCast(cast.getMultiUseTag(), false)

@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.library.materials.definition;
 
-import net.minecraft.util.Util;
-import net.minecraft.util.text.Color;
+import net.minecraft.Util;
+import net.minecraft.network.chat.TextColor;
 import slimeknights.tconstruct.TConstruct;
 
 public interface IMaterial extends Comparable<IMaterial> {
@@ -35,14 +35,14 @@ public interface IMaterial extends Comparable<IMaterial> {
    * @return the translation key
    */
   default String getTranslationKey() {
-    return Util.makeTranslationKey("material", getIdentifier());
+    return Util.makeDescriptionId("material", getIdentifier());
   }
 
   /**
    * Gets the text color for this material
    * @return the text color
    */
-  Color getColor();
+  TextColor getColor();
 
   /** If true, this material is hidden from display, such as in JEI and the books */
   boolean isHidden();

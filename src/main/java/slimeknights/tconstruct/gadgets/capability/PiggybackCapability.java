@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.gadgets.capability;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -33,17 +33,17 @@ public class PiggybackCapability implements Capability.IStorage<PiggybackHandler
 
   @Nullable
   @Override
-  public INBT writeNBT(Capability<PiggybackHandler> capability, PiggybackHandler instance, Direction side) {
+  public Tag writeNBT(Capability<PiggybackHandler> capability, PiggybackHandler instance, Direction side) {
     return null;
   }
 
   @Override
-  public void readNBT(Capability<PiggybackHandler> capability, PiggybackHandler instance, Direction side, INBT nbt) {}
+  public void readNBT(Capability<PiggybackHandler> capability, PiggybackHandler instance, Direction side, Tag nbt) {}
 
   /** Event listener to attach the capability */
   private static void attachCapability(AttachCapabilitiesEvent<Entity> event) {
-    if (event.getObject() instanceof PlayerEntity) {
-      event.addCapability(ID, new PiggybackHandler((PlayerEntity) event.getObject()));
+    if (event.getObject() instanceof Player) {
+      event.addCapability(ID, new PiggybackHandler((Player) event.getObject()));
     }
   }
 }

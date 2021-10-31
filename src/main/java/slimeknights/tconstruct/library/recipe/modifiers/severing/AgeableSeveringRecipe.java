@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.library.recipe.modifiers.severing;
 
 import com.google.gson.JsonObject;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.recipe.EntityIngredient;
 import slimeknights.mantle.recipe.ItemOutput;
 import slimeknights.mantle.util.JsonHelper;
@@ -23,7 +23,7 @@ public class AgeableSeveringRecipe extends SeveringRecipe {
 
   @Override
   public ItemStack getOutput(Entity entity) {
-    if (entity instanceof LivingEntity && ((LivingEntity) entity).isChild()) {
+    if (entity instanceof LivingEntity && ((LivingEntity) entity).isBaby()) {
       return childOutput == null ? ItemStack.EMPTY : childOutput.get().copy();
     }
     return getOutput().copy();
@@ -32,7 +32,7 @@ public class AgeableSeveringRecipe extends SeveringRecipe {
   /** Serializer for this recipe */
   public static class Serializer extends LoggingRecipeSerializer<AgeableSeveringRecipe> {
     @Override
-    public AgeableSeveringRecipe read(ResourceLocation id, JsonObject json) {
+    public AgeableSeveringRecipe fromJson(ResourceLocation id, JsonObject json) {
       EntityIngredient ingredient = EntityIngredient.deserialize(JsonHelper.getElement(json, "entity"));
       ItemOutput adult = ItemOutput.fromJson(JsonHelper.getElement(json, "adult_result"));
       ItemOutput child = null;
@@ -44,7 +44,7 @@ public class AgeableSeveringRecipe extends SeveringRecipe {
 
     @Nullable
     @Override
-    protected AgeableSeveringRecipe readSafe(ResourceLocation id, PacketBuffer buffer) {
+    protected AgeableSeveringRecipe readSafe(ResourceLocation id, FriendlyByteBuf buffer) {
       EntityIngredient ingredient = EntityIngredient.read(buffer);
       ItemOutput adult = ItemOutput.read(buffer);
       ItemOutput child = null;
@@ -55,7 +55,7 @@ public class AgeableSeveringRecipe extends SeveringRecipe {
     }
 
     @Override
-    protected void writeSafe(PacketBuffer buffer, AgeableSeveringRecipe recipe) {
+    protected void writeSafe(FriendlyByteBuf buffer, AgeableSeveringRecipe recipe) {
       recipe.ingredient.write(buffer);
       recipe.output.write(buffer);
       if (recipe.childOutput == null) {

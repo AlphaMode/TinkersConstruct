@@ -3,15 +3,15 @@ package slimeknights.tconstruct.library.recipe.molding;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.recipe.ICommonRecipe;
 import slimeknights.mantle.recipe.ItemOutput;
 import slimeknights.mantle.util.JsonHelper;
@@ -34,17 +34,17 @@ public abstract class MoldingRecipe implements ICommonRecipe<IMoldingInventory> 
   private final ItemOutput recipeOutput;
 
 	@Override
-  public boolean matches(IMoldingInventory inv, World worldIn) {
+  public boolean matches(IMoldingInventory inv, Level worldIn) {
     return material.test(inv.getMaterial()) && pattern.test(inv.getPattern());
   }
 
   @Override
   public NonNullList<Ingredient> getIngredients() {
-    return NonNullList.from(Ingredient.EMPTY, material, pattern);
+    return NonNullList.of(Ingredient.EMPTY, material, pattern);
   }
 
   @Override
-  public ItemStack getRecipeOutput() {
+  public ItemStack getResultItem() {
     return recipeOutput.get();
   }
 
@@ -55,12 +55,12 @@ public abstract class MoldingRecipe implements ICommonRecipe<IMoldingInventory> 
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
       return TinkerSmeltery.moldingTableSerializer.get();
     }
 
     @Override
-    public IRecipeType<?> getType() {
+    public RecipeType<?> getType() {
       return RecipeTypes.MOLDING_TABLE;
     }
   }
@@ -72,12 +72,12 @@ public abstract class MoldingRecipe implements ICommonRecipe<IMoldingInventory> 
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
       return TinkerSmeltery.moldingBasinSerializer.get();
     }
 
     @Override
-    public IRecipeType<?> getType() {
+    public RecipeType<?> getType() {
       return RecipeTypes.MOLDING_BASIN;
     }
   }
@@ -94,13 +94,13 @@ public abstract class MoldingRecipe implements ICommonRecipe<IMoldingInventory> 
     private final IFactory<T> factory;
 
     @Override
-    public T read(ResourceLocation id, JsonObject json) {
-      Ingredient material = Ingredient.deserialize(JsonHelper.getElement(json, "material"));
+    public T fromJson(ResourceLocation id, JsonObject json) {
+      Ingredient material = Ingredient.fromJson(JsonHelper.getElement(json, "material"));
       Ingredient pattern = Ingredient.EMPTY;
       boolean patternConsumed = false;
       if (json.has("pattern")) {
-        pattern = Ingredient.deserialize(json.get("pattern"));
-        patternConsumed = JSONUtils.getBoolean(json, "pattern_consumed", false);
+        pattern = Ingredient.fromJson(json.get("pattern"));
+        patternConsumed = GsonHelper.getAsBoolean(json, "pattern_consumed", false);
       }
       ItemOutput output = ItemOutput.fromJson(json.get("result"));
       return factory.create(id, material, pattern, patternConsumed, output);
@@ -108,18 +108,18 @@ public abstract class MoldingRecipe implements ICommonRecipe<IMoldingInventory> 
 
     @Nullable
     @Override
-    protected T readSafe(ResourceLocation id, PacketBuffer buffer) {
-      Ingredient material = Ingredient.read(buffer);
-      Ingredient mold = Ingredient.read(buffer);
+    protected T readSafe(ResourceLocation id, FriendlyByteBuf buffer) {
+      Ingredient material = Ingredient.fromNetwork(buffer);
+      Ingredient mold = Ingredient.fromNetwork(buffer);
       boolean moldConsumed = buffer.readBoolean();
       ItemOutput output = ItemOutput.read(buffer);
       return factory.create(id, material, mold, moldConsumed, output);
     }
 
     @Override
-    protected void writeSafe(PacketBuffer buffer, MoldingRecipe recipe) {
-      recipe.material.write(buffer);
-      recipe.pattern.write(buffer);
+    protected void writeSafe(FriendlyByteBuf buffer, MoldingRecipe recipe) {
+      recipe.material.toNetwork(buffer);
+      recipe.pattern.toNetwork(buffer);
       buffer.writeBoolean(recipe.patternConsumed);
       recipe.recipeOutput.write(buffer);
     }

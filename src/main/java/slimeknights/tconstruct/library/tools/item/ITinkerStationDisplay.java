@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.library.tools.item;
 
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.tools.helper.TooltipUtil;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
@@ -17,12 +17,12 @@ import java.util.List;
 /**
  * Interface to implement for tools that also display in the tinker station
  */
-public interface ITinkerStationDisplay extends IItemProvider {
+public interface ITinkerStationDisplay extends ItemLike {
   /**
    * The "title" displayed in the GUI
    */
-  default ITextComponent getLocalizedName() {
-    return new TranslationTextComponent(asItem().getTranslationKey());
+  default Component getLocalizedName() {
+    return new TranslatableComponent(asItem().getDescriptionId());
   }
 
   /**
@@ -31,7 +31,7 @@ public interface ITinkerStationDisplay extends IItemProvider {
    * @param tooltips     List of tooltips for display
    * @param tooltipFlag  Determines the type of tooltip to display
    */
-  default List<ITextComponent> getStatInformation(IModifierToolStack tool, List<ITextComponent> tooltips, TooltipFlag tooltipFlag) {
+  default List<Component> getStatInformation(IModifierToolStack tool, List<Component> tooltips, TooltipFlag tooltipFlag) {
     return TooltipUtil.getDefaultStats(tool, tooltips, tooltipFlag);
   }
 
@@ -42,7 +42,7 @@ public interface ITinkerStationDisplay extends IItemProvider {
    * @param materials the list of materials
    * @return the combined item name
    */
-  static ITextComponent getCombinedItemName(ITextComponent itemName, Collection<IMaterial> materials) {
+  static Component getCombinedItemName(Component itemName, Collection<IMaterial> materials) {
     if (materials.isEmpty() || materials.stream().allMatch(IMaterial.UNKNOWN::equals)) {
       return itemName;
     }
@@ -51,26 +51,26 @@ public interface ITinkerStationDisplay extends IItemProvider {
       IMaterial material = materials.iterator().next();
 
       if (Util.canTranslate(material.getTranslationKey() + ".format")) {
-        return new TranslationTextComponent(material.getTranslationKey() + ".format", itemName);
+        return new TranslatableComponent(material.getTranslationKey() + ".format", itemName);
       }
 
-      return new TranslationTextComponent(materials.iterator().next().getTranslationKey()).appendSibling(new StringTextComponent(" ")).appendSibling(itemName);
+      return new TranslatableComponent(materials.iterator().next().getTranslationKey()).append(new TextComponent(" ")).append(itemName);
     }
 
     // multiple materials. we'll have to combine
-    StringTextComponent name = new StringTextComponent("");
+    TextComponent name = new TextComponent("");
 
     Iterator<IMaterial> iter = materials.iterator();
 
     IMaterial material = iter.next();
-    name.appendSibling(new TranslationTextComponent(material.getTranslationKey()));
+    name.append(new TranslatableComponent(material.getTranslationKey()));
 
     while (iter.hasNext()) {
       material = iter.next();
-      name.appendString("-").appendSibling(new TranslationTextComponent(material.getTranslationKey()));
+      name.append("-").append(new TranslatableComponent(material.getTranslationKey()));
     }
 
-    name.appendString(" ").appendSibling(itemName);
+    name.append(" ").append(itemName);
 
     return name;
   }

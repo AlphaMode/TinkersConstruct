@@ -4,13 +4,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.World;
 import slimeknights.mantle.recipe.ICustomOutputRecipe;
 import slimeknights.mantle.util.JsonHelper;
@@ -31,7 +31,7 @@ import java.util.function.Consumer;
  * Shared logic for main types of salvage recipes
  */
 @RequiredArgsConstructor
-public abstract class AbstractModifierSalvage implements ICustomOutputRecipe<IInventory> {
+public abstract class AbstractModifierSalvage implements ICustomOutputRecipe<Container> {
   @Getter
   protected final ResourceLocation id;
   /** Ingredient determining tools matched by this */

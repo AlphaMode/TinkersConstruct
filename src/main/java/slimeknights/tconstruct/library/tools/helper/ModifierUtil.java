@@ -7,8 +7,8 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.ItemStack.TooltipDisplayFlags;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
@@ -42,7 +42,7 @@ public final class ModifierUtil {
    */
   public static boolean applyHarvestEnchants(ToolStack tool, ItemStack stack, ToolHarvestContext context) {
     boolean addedEnchants = false;
-    PlayerEntity player = context.getPlayer();
+    Player player = context.getPlayer();
     if (player == null || !player.isCreative()) {
       Map<Enchantment, Integer> enchantments = new HashMap<>();
       BiConsumer<Enchantment,Integer> enchantmentConsumer = (ench, add) -> {
@@ -60,7 +60,7 @@ public final class ModifierUtil {
       if (!enchantments.isEmpty()) {
         addedEnchants = true;
         EnchantmentHelper.setEnchantments(enchantments, stack);
-        stack.getOrCreateTag().putInt(TAG_HIDE_FLAGS, TooltipDisplayFlags.ENCHANTMENTS.func_242397_a());
+        stack.getOrCreateTag().putInt(TAG_HIDE_FLAGS, TooltipDisplayFlags.ENCHANTMENTS.getMask());
       }
     }
     return addedEnchants;

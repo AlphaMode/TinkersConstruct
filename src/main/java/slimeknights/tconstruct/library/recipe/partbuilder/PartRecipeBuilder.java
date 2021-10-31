@@ -4,9 +4,9 @@ import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.recipe.data.AbstractRecipeBuilder;
 import slimeknights.tconstruct.library.tools.part.IMaterialItem;
 import slimeknights.tconstruct.tables.TinkerTables;
@@ -14,6 +14,8 @@ import slimeknights.tconstruct.tables.TinkerTables;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Consumer;
+
+import slimeknights.mantle.recipe.data.AbstractRecipeBuilder.AbstractFinishedRecipe;
 
 /**
  * Builder for a material item part crafting recipe
@@ -37,12 +39,12 @@ public class PartRecipeBuilder extends AbstractRecipeBuilder<PartRecipeBuilder> 
   }
 
   @Override
-  public void build(Consumer<IFinishedRecipe> consumerIn) {
+  public void build(Consumer<FinishedRecipe> consumerIn) {
     this.build(consumerIn, Objects.requireNonNull(this.output.asItem().getRegistryName()));
   }
 
   @Override
-  public void build(Consumer<IFinishedRecipe> consumerIn, ResourceLocation id) {
+  public void build(Consumer<FinishedRecipe> consumerIn, ResourceLocation id) {
     if (this.outputAmount <= 0) {
       throw new IllegalStateException("recipe " + id + " must output at least 1");
     }
@@ -62,7 +64,7 @@ public class PartRecipeBuilder extends AbstractRecipeBuilder<PartRecipeBuilder> 
     }
 
     @Override
-    public void serialize(JsonObject json) {
+    public void serializeRecipeData(JsonObject json) {
       if (!group.isEmpty()) {
         json.addProperty("group", group);
       }
@@ -78,7 +80,7 @@ public class PartRecipeBuilder extends AbstractRecipeBuilder<PartRecipeBuilder> 
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getType() {
       return TinkerTables.partRecipeSerializer.get();
     }
   }

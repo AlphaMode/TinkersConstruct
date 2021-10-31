@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.plugin.crt.managers;
 
 import com.blamejared.crafttweaker.api.annotations.ZenRegister;
-import net.minecraft.item.Item;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.resources.ResourceLocation;
 import org.openzen.zencode.java.ZenCodeType;
 import slimeknights.mantle.recipe.FluidIngredient;
 import slimeknights.mantle.recipe.ItemOutput;
@@ -42,7 +42,7 @@ public class CastingTableManager implements ICastingManager {
   }
 
   @Override
-  public IRecipeType<ICastingRecipe> getRecipeType() {
+  public RecipeType<ICastingRecipe> getRecipeType() {
     return RecipeTypes.CASTING_TABLE;
   }
 }

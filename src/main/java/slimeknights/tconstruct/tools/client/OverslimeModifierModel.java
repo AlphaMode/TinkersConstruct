@@ -2,7 +2,7 @@ package slimeknights.tconstruct.tools.client;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.math.vector.TransformationMatrix;
 import slimeknights.mantle.util.ItemLayerPixels;
@@ -22,15 +22,15 @@ import java.util.function.Function;
 public class OverslimeModifierModel extends NormalModifierModel {
   /** Constant unbaked model instance, as they are all the same */
   public static final IUnbakedModifierModel UNBAKED_INSTANCE = (smallGetter, largeGetter) -> {
-    RenderMaterial smallTexture = smallGetter.apply("");
-    RenderMaterial largeTexture = largeGetter.apply("");
+    Material smallTexture = smallGetter.apply("");
+    Material largeTexture = largeGetter.apply("");
     if (smallTexture != null || largeTexture != null) {
       return new OverslimeModifierModel(smallTexture, largeTexture);
     }
     return null;
   };
 
-  public OverslimeModifierModel(@Nullable RenderMaterial smallTexture, @Nullable RenderMaterial largeTexture) {
+  public OverslimeModifierModel(@Nullable Material smallTexture, @Nullable Material largeTexture) {
     super(smallTexture, largeTexture);
   }
 

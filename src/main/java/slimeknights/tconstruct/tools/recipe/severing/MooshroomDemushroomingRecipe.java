@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.tools.recipe.severing;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.passive.MooshroomEntity;
-import net.minecraft.entity.passive.MooshroomEntity.Type;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.MushroomCow;
+import net.minecraft.world.entity.animal.MushroomCow.MushroomType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.recipe.EntityIngredient;
 import slimeknights.mantle.recipe.ItemOutput;
 import slimeknights.tconstruct.library.recipe.modifiers.severing.SeveringRecipe;
@@ -21,10 +21,10 @@ public class MooshroomDemushroomingRecipe extends SeveringRecipe {
 
   @Override
   public ItemStack getOutput(Entity entity) {
-    if (entity instanceof MooshroomEntity) {
-      MooshroomEntity mooshroom = ((MooshroomEntity) entity);
-      if (!mooshroom.isChild()) {
-        return new ItemStack(mooshroom.getMooshroomType() == Type.BROWN ? Items.BROWN_MUSHROOM : Items.RED_MUSHROOM, 5);
+    if (entity instanceof MushroomCow) {
+      MushroomCow mooshroom = ((MushroomCow) entity);
+      if (!mooshroom.isBaby()) {
+        return new ItemStack(mooshroom.getMushroomType() == MushroomType.BROWN ? Items.BROWN_MUSHROOM : Items.RED_MUSHROOM, 5);
       }
     }
     return ItemStack.EMPTY;

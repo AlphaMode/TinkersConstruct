@@ -3,7 +3,7 @@ package slimeknights.tconstruct.library.client.modifiers;
 import com.google.common.collect.ImmutableList;
 import lombok.Data;
 import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.util.Direction;
@@ -27,10 +27,10 @@ import java.util.function.Function;
 public class FluidModifierModel extends NormalModifierModel {
   /** Constant unbaked model instance, as they are all the same */
   public static final IUnbakedModifierModel UNBAKED_INSTANCE = (smallGetter, largeGetter) -> {
-    RenderMaterial smallTexture = smallGetter.apply("");
-    RenderMaterial largeTexture = largeGetter.apply("");
-    RenderMaterial smallFull = smallGetter.apply("_full");
-    RenderMaterial largeFull = largeGetter.apply("_full");
+    Material smallTexture = smallGetter.apply("");
+    Material largeTexture = largeGetter.apply("");
+    Material smallFull = smallGetter.apply("_full");
+    Material largeFull = largeGetter.apply("_full");
     if (smallTexture != null || largeTexture != null) {
       return new FluidModifierModel(smallTexture, largeTexture, smallFull, largeFull);
     }
@@ -38,16 +38,16 @@ public class FluidModifierModel extends NormalModifierModel {
   };
 
   /** Textures to show */
-  protected final RenderMaterial[] fluidTextures;
+  protected final Material[] fluidTextures;
 
-  protected FluidModifierModel(@Nullable RenderMaterial smallTexture, @Nullable RenderMaterial largeTexture, RenderMaterial[] fluidTextures) {
+  protected FluidModifierModel(@Nullable Material smallTexture, @Nullable Material largeTexture, Material[] fluidTextures) {
     super(smallTexture, largeTexture);
     this.fluidTextures = fluidTextures;
   }
 
-  public FluidModifierModel(@Nullable RenderMaterial smallTexture, @Nullable RenderMaterial largeTexture,
-														@Nullable RenderMaterial smallFull, @Nullable RenderMaterial largeFull) {
-    this(smallTexture, largeTexture, new RenderMaterial[] { smallFull, largeFull });
+  public FluidModifierModel(@Nullable Material smallTexture, @Nullable Material largeTexture,
+														@Nullable Material smallFull, @Nullable Material largeFull) {
+    this(smallTexture, largeTexture, new Material[] { smallFull, largeFull });
   }
 
   @Nullable

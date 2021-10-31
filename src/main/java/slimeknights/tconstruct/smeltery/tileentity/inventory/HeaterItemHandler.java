@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.smeltery.tileentity.inventory;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeHooks;
 import slimeknights.mantle.inventory.SingleItemHandler;
 import slimeknights.mantle.tileentity.MantleTileEntity;

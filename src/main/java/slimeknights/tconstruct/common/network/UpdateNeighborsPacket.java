@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.common.network;
 
 import lombok.RequiredArgsConstructor;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.BlockFlags;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.registries.GameData;
@@ -20,14 +20,14 @@ public class UpdateNeighborsPacket implements IThreadsafePacket {
   private final BlockState state;
   private final BlockPos pos;
 
-  public UpdateNeighborsPacket(PacketBuffer buffer) {
-    this.state = GameData.getBlockStateIDMap().getByValue(buffer.readVarInt());
+  public UpdateNeighborsPacket(FriendlyByteBuf buffer) {
+    this.state = GameData.getBlockStateIDMap().byId(buffer.readVarInt());
     this.pos = buffer.readBlockPos();
   }
 
   @Override
-  public void encode(PacketBuffer buffer) {
-    buffer.writeVarInt(Block.getStateId(state));
+  public void encode(FriendlyByteBuf buffer) {
+    buffer.writeVarInt(Block.getId(state));
     buffer.writeBlockPos(pos);
   }
 
@@ -38,10 +38,10 @@ public class UpdateNeighborsPacket implements IThreadsafePacket {
 
   private static class HandleClient {
     private static void handle(UpdateNeighborsPacket packet) {
-      World world = Minecraft.getInstance().world;
+      Level world = Minecraft.getInstance().level;
       if (world != null) {
-        packet.state.updateNeighbours(world, packet.pos, BlockFlags.BLOCK_UPDATE, 511);
-        packet.state.updateDiagonalNeighbors(world, packet.pos, BlockFlags.BLOCK_UPDATE, 511);
+        packet.state.updateNeighbourShapes(world, packet.pos, BlockFlags.BLOCK_UPDATE, 511);
+        packet.state.updateIndirectNeighbourShapes(world, packet.pos, BlockFlags.BLOCK_UPDATE, 511);
       }
     }
   }

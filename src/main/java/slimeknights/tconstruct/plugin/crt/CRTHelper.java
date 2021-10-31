@@ -6,8 +6,8 @@ import com.blamejared.crafttweaker.api.fluid.CTFluidIngredient;
 import com.blamejared.crafttweaker.impl.commands.CTCommandCollectionEvent;
 import com.blamejared.crafttweaker.impl_native.item.ExpandItem;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.recipe.EntityIngredient;
@@ -88,14 +88,14 @@ public class CRTHelper {
         builder.append("Material: `").append(iMaterial.getIdentifier()).append("` {");
         builder.append("\n\tCraftable: ").append(iMaterial.isCraftable());
         builder.append("\n\tTranslation Key: `").append(iMaterial.getTranslationKey()).append("`");
-        builder.append("\n\tColor: ").append(String.format("#%06X", iMaterial.getColor().getColor()));
+        builder.append("\n\tColor: ").append(String.format("#%06X", iMaterial.getColor().getValue()));
         builder.append("\n\tTier: ").append(iMaterial.getTier());
         builder.append("\n\tSort Order: ").append(iMaterial.getSortOrder());
         builder.append("\n}");
         CraftTweakerAPI.logDump(builder.toString());
       });
-      final StringTextComponent message = new StringTextComponent(TextFormatting.GREEN + "Material list written to the log" + TextFormatting.RESET);
-      commandContext.getSource().sendFeedback(message, true);
+      final TextComponent message = new TextComponent(ChatFormatting.GREEN + "Material list written to the log" + ChatFormatting.RESET);
+      commandContext.getSource().sendSuccess(message, true);
       return 0;
     });
 
@@ -105,8 +105,8 @@ public class CRTHelper {
       ForgeRegistries.ITEMS.getValues().stream().filter(item -> item instanceof IMaterialItem).forEach(item -> {
         CraftTweakerAPI.logDump(ExpandItem.getDefaultInstance(item).getCommandString());
       });
-      final StringTextComponent message = new StringTextComponent(TextFormatting.GREEN + "Material Items written to the log" + TextFormatting.RESET);
-      commandContext.getSource().sendFeedback(message, true);
+      final TextComponent message = new TextComponent(ChatFormatting.GREEN + "Material Items written to the log" + ChatFormatting.RESET);
+      commandContext.getSource().sendSuccess(message, true);
       return 0;
     });
 

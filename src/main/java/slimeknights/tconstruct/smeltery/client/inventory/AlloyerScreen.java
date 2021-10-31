@@ -2,10 +2,10 @@ package slimeknights.tconstruct.smeltery.client.inventory;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import slimeknights.mantle.client.screen.ElementScreen;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.GuiUtil;
@@ -18,7 +18,7 @@ import slimeknights.tconstruct.smeltery.tileentity.module.alloying.MixerAlloyTan
 
 import javax.annotation.Nullable;
 
-public class AlloyerScreen extends ContainerScreen<AlloyerContainer> implements IScreenWithFluidTank {
+public class AlloyerScreen extends AbstractContainerScreen<AlloyerContainer> implements IScreenWithFluidTank {
   private static final int[] INPUT_TANK_START_X = {54, 22, 38, 70, 6};
   private static final ResourceLocation BACKGROUND = TConstruct.getResource("textures/gui/alloyer.png");
   private static final ElementScreen SCALA = new ElementScreen(176, 0, 34, 52, 256, 256);
@@ -29,7 +29,7 @@ public class AlloyerScreen extends ContainerScreen<AlloyerContainer> implements 
   private final GuiFuelModule fuel;
   private final GuiTankModule outputTank;
   private GuiTankModule[] inputTanks = new GuiTankModule[0];
-  public AlloyerScreen(AlloyerContainer container, PlayerInventory inv, ITextComponent name) {
+  public AlloyerScreen(AlloyerContainer container, Inventory inv, Component name) {
     super(container, inv, name);
     AlloyerTileEntity te = container.getTile();
     if (te != null) {

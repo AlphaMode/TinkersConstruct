@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.smeltery.tileentity.inventory;
 
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import slimeknights.mantle.inventory.SingleItemHandler;
@@ -28,12 +28,12 @@ public class DuctItemHandler extends SingleItemHandler<DuctTileEntity> {
    */
   @Override
   public void setStack(ItemStack newStack) {
-    World world = parent.getWorld();
-    boolean hasChange = world != null && !ItemStack.areItemStacksEqual(getStack(), newStack);
+    Level world = parent.getLevel();
+    boolean hasChange = world != null && !ItemStack.matches(getStack(), newStack);
     super.setStack(newStack);
     if (hasChange) {
-      if (!world.isRemote) {
-        BlockPos pos = parent.getPos();
+      if (!world.isClientSide) {
+        BlockPos pos = parent.getBlockPos();
         TinkerNetwork.getInstance().sendToClientsAround(new InventorySlotSyncPacket(newStack, 0, pos), world, pos);
       } else {
         parent.updateFluid();
@@ -44,9 +44,9 @@ public class DuctItemHandler extends SingleItemHandler<DuctTileEntity> {
   @Override
   protected boolean isItemValid(ItemStack stack) {
     // the item or its container must be in the tag
-    if (!stack.getItem().isIn(TinkerTags.Items.DUCT_CONTAINERS)) {
+    if (!stack.getItem().is(TinkerTags.Items.DUCT_CONTAINERS)) {
       ItemStack container = stack.getContainerItem();
-      if (container.isEmpty() || !container.getItem().isIn(TinkerTags.Items.DUCT_CONTAINERS)) {
+      if (container.isEmpty() || !container.getItem().is(TinkerTags.Items.DUCT_CONTAINERS)) {
         return false;
       }
     }

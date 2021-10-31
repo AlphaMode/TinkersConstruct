@@ -5,12 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.FluidIngredient;
 import slimeknights.mantle.recipe.ItemOutput;
@@ -32,7 +32,7 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
   protected final ItemOutput result;
   @Getter
   protected final int coolingTime;
-  public ItemCastingRecipe(IRecipeType<?> type, ResourceLocation id, String group, Ingredient cast, FluidIngredient fluid, ItemOutput result, int coolingTime, boolean consumed, boolean switchSlots) {
+  public ItemCastingRecipe(RecipeType<?> type, ResourceLocation id, String group, Ingredient cast, FluidIngredient fluid, ItemOutput result, int coolingTime, boolean consumed, boolean switchSlots) {
     super(type, id, group, cast, consumed, switchSlots);
     this.fluid = fluid;
     this.result = result;
@@ -45,7 +45,7 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
   }
 
   @Override
-  public boolean matches(ICastingInventory inv, World worldIn) {
+  public boolean matches(ICastingInventory inv, Level worldIn) {
     return getCast().test(inv.getStack()) && fluid.test(inv.getFluid());
   }
 

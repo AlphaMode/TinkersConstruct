@@ -3,13 +3,13 @@ package slimeknights.tconstruct.common.json;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootFunction;
-import net.minecraft.loot.LootFunctionType;
-import net.minecraft.loot.conditions.ILootCondition;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
@@ -20,18 +20,18 @@ import slimeknights.tconstruct.shared.TinkerCommons;
 /**
  * Loot function to set the fluid on a dropped item
  */
-public class SetFluidLootFunction extends LootFunction {
+public class SetFluidLootFunction extends LootItemConditionalFunction {
   public static final ResourceLocation ID = TConstruct.getResource("set_fluid");
 
   /** Fluid to add to the item */
   private final FluidStack fluid;
-  protected SetFluidLootFunction(ILootCondition[] conditionsIn, FluidStack fluid) {
+  protected SetFluidLootFunction(LootItemCondition[] conditionsIn, FluidStack fluid) {
     super(conditionsIn);
     this.fluid = fluid;
   }
 
   @Override
-  protected ItemStack doApply(ItemStack stack, LootContext context) {
+  protected ItemStack run(ItemStack stack, LootContext context) {
     return stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
                 .map(handler -> {
                   handler.fill(fluid.copy(), FluidAction.EXECUTE);
@@ -40,7 +40,7 @@ public class SetFluidLootFunction extends LootFunction {
   }
 
   @Override
-  public LootFunctionType getFunctionType() {
+  public LootItemFunctionType getType() {
     return TinkerCommons.lootSetFluid;
   }
 
@@ -49,12 +49,12 @@ public class SetFluidLootFunction extends LootFunction {
    * @param fluid  Fluid to set
    * @return  Builder instance
    */
-  public static LootFunction.Builder<?> builder(FluidStack fluid) {
-    return builder(conditions -> new SetFluidLootFunction(conditions, fluid));
+  public static LootItemConditionalFunction.Builder<?> builder(FluidStack fluid) {
+    return simpleBuilder(conditions -> new SetFluidLootFunction(conditions, fluid));
   }
 
   /** Serializer logic for the function */
-  public static class Serializer extends LootFunction.Serializer<SetFluidLootFunction> {
+  public static class Serializer extends LootItemConditionalFunction.Serializer<SetFluidLootFunction> {
     @Override
     public void serialize(JsonObject json, SetFluidLootFunction loot, JsonSerializationContext context) {
       super.serialize(json, loot, context);
@@ -62,8 +62,8 @@ public class SetFluidLootFunction extends LootFunction {
     }
 
     @Override
-    public SetFluidLootFunction deserialize(JsonObject object, JsonDeserializationContext context, ILootCondition[] conditions) {
-      FluidStack fluid = RecipeHelper.deserializeFluidStack(JSONUtils.getJsonObject(object, "fluid"));
+    public SetFluidLootFunction deserialize(JsonObject object, JsonDeserializationContext context, LootItemCondition[] conditions) {
+      FluidStack fluid = RecipeHelper.deserializeFluidStack(GsonHelper.getAsJsonObject(object, "fluid"));
       return new SetFluidLootFunction(conditions, fluid);
     }
   }

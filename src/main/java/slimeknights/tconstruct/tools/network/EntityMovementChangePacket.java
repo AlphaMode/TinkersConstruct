@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.tools.network;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import slimeknights.mantle.network.packet.IThreadsafePacket;
 
@@ -16,15 +16,15 @@ public class EntityMovementChangePacket implements IThreadsafePacket {
   private float pitch;
 
   public EntityMovementChangePacket(Entity entity) {
-    this.entityID = entity.getEntityId();
-    this.x = entity.getMotion().x;
-    this.y = entity.getMotion().y;
-    this.z = entity.getMotion().z;
-    this.yaw = entity.rotationYaw;
-    this.pitch = entity.rotationPitch;
+    this.entityID = entity.getId();
+    this.x = entity.getDeltaMovement().x;
+    this.y = entity.getDeltaMovement().y;
+    this.z = entity.getDeltaMovement().z;
+    this.yaw = entity.yRot;
+    this.pitch = entity.xRot;
   }
 
-  public EntityMovementChangePacket(PacketBuffer buffer) {
+  public EntityMovementChangePacket(FriendlyByteBuf buffer) {
     this.entityID = buffer.readInt();
     this.x = buffer.readDouble();
     this.y = buffer.readDouble();
@@ -34,7 +34,7 @@ public class EntityMovementChangePacket implements IThreadsafePacket {
   }
 
   @Override
-  public void encode(PacketBuffer packetBuffer) {
+  public void encode(FriendlyByteBuf packetBuffer) {
     packetBuffer.writeInt(this.entityID);
     packetBuffer.writeDouble(this.x);
     packetBuffer.writeDouble(this.y);
@@ -53,12 +53,12 @@ public class EntityMovementChangePacket implements IThreadsafePacket {
   /** Safely runs client side only code in a method only called on client */
   private static class HandleClient {
     private static void handle(EntityMovementChangePacket packet) {
-      assert Minecraft.getInstance().world != null;
-      Entity entity = Minecraft.getInstance().world.getEntityByID(packet.entityID);
+      assert Minecraft.getInstance().level != null;
+      Entity entity = Minecraft.getInstance().level.getEntity(packet.entityID);
       if (entity != null) {
-        entity.setMotion(packet.x, packet.y, packet.z);
-        entity.rotationYaw = packet.yaw;
-        entity.rotationPitch = packet.pitch;
+        entity.setDeltaMovement(packet.x, packet.y, packet.z);
+        entity.yRot = packet.yaw;
+        entity.xRot = packet.pitch;
       }
     }
   }

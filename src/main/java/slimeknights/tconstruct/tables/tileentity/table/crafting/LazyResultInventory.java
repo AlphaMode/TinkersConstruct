@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.tables.tileentity.table.crafting;
 
 import lombok.RequiredArgsConstructor;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -13,7 +13,7 @@ import java.util.Objects;
  * It will calculate the result when requested based on the methods in {@link ILazyCrafter}, and update other slots on recipe take
  */
 @RequiredArgsConstructor
-public class LazyResultInventory implements IInventory {
+public class LazyResultInventory implements Container {
   private final ILazyCrafter crafter;
 
   /** Cache of the last result */
@@ -32,7 +32,7 @@ public class LazyResultInventory implements IInventory {
    * Gets the result of this inventory, lazy loading it if not yet calculated
    * @return  Item stack result
    */
-  public ItemStack getResult(@Nullable PlayerEntity player) {
+  public ItemStack getResult(@Nullable Player player) {
     if (result == null) {
       result = Objects.requireNonNull(crafter.calcResult(player), "Result cannot be null");
     }
@@ -42,12 +42,12 @@ public class LazyResultInventory implements IInventory {
   /* Inventory logic */
 
   @Override
-  public ItemStack getStackInSlot(int index) {
+  public ItemStack getItem(int index) {
     return getResult();
   }
 
   @Override
-  public int getSizeInventory() {
+  public int getContainerSize() {
     return 1;
   }
 
@@ -61,12 +61,12 @@ public class LazyResultInventory implements IInventory {
    * @param amount  Number to craft
    * @return  Crafting result
    */
-  public ItemStack craftResult(PlayerEntity player, int amount) {
+  public ItemStack craftResult(Player player, int amount) {
     // get result and consume items
     // TODO: are all these copies needed?
     ItemStack output = crafter.onCraft(player, getResult().copy(), amount);
     // clear result cache, items changed
-    clear();
+    clearContent();
     // return result
     return output;
   }
@@ -79,7 +79,7 @@ public class LazyResultInventory implements IInventory {
    */
   @Deprecated
   @Override
-  public ItemStack removeStackFromSlot(int index) {
+  public ItemStack removeItemNoUpdate(int index) {
     return getResult().copy();
   }
 
@@ -92,7 +92,7 @@ public class LazyResultInventory implements IInventory {
    */
   @Deprecated
   @Override
-  public ItemStack decrStackSize(int index, int count) {
+  public ItemStack removeItem(int index, int count) {
     return getResult().copy();
   }
 
@@ -100,7 +100,7 @@ public class LazyResultInventory implements IInventory {
    * Clears the result cache, causing the result to be recalculated
    */
   @Override
-  public void clear() {
+  public void clearContent() {
     this.result = null;
   }
 
@@ -109,15 +109,15 @@ public class LazyResultInventory implements IInventory {
   /** @deprecated Unsupported method */
   @Deprecated
   @Override
-  public void setInventorySlotContents(int index, ItemStack stack) {}
+  public void setItem(int index, ItemStack stack) {}
 
   /** @deprecated Unused method */
   @Deprecated
   @Override
-  public void markDirty() {}
+  public void setChanged() {}
 
   @Override
-  public boolean isUsableByPlayer(PlayerEntity player) {
+  public boolean stillValid(Player player) {
     return true;
   }
 
@@ -131,7 +131,7 @@ public class LazyResultInventory implements IInventory {
      *                 May not match the player used in {@link #onCraft(PlayerEntity, ItemStack, int)} as this result is cached
      * @return  Item stack result
      */
-    ItemStack calcResult(@Nullable PlayerEntity player);
+    ItemStack calcResult(@Nullable Player player);
 
     /**
      * Called when an item is crafted to consume requirements
@@ -139,6 +139,6 @@ public class LazyResultInventory implements IInventory {
      * @param result  Crafting result
      * @param amount  Amount to craft
      */
-    ItemStack onCraft(PlayerEntity player, ItemStack result, int amount);
+    ItemStack onCraft(Player player, ItemStack result, int amount);
   }
 }

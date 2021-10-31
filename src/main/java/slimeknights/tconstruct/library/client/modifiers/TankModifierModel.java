@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.library.client.modifiers;
 
 import lombok.Data;
-import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.fluid.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.tconstruct.library.modifiers.Modifier;
@@ -17,22 +17,22 @@ import javax.annotation.Nullable;
 public class TankModifierModel extends FluidModifierModel {
   /** Constant unbaked model instance, as they are all the same */
   public static final IUnbakedModifierModel UNBAKED_INSTANCE = (smallGetter, largeGetter) -> {
-    RenderMaterial smallTexture = smallGetter.apply("");
-    RenderMaterial largeTexture = largeGetter.apply("");
-    RenderMaterial smallPartial = smallGetter.apply("_partial");
-    RenderMaterial largePartial = largeGetter.apply("_partial");
-    RenderMaterial smallFull = smallGetter.apply("_full");
-    RenderMaterial largeFull = largeGetter.apply("_full");
+    Material smallTexture = smallGetter.apply("");
+    Material largeTexture = largeGetter.apply("");
+    Material smallPartial = smallGetter.apply("_partial");
+    Material largePartial = largeGetter.apply("_partial");
+    Material smallFull = smallGetter.apply("_full");
+    Material largeFull = largeGetter.apply("_full");
     if (smallTexture != null || largeTexture != null) {
       return new TankModifierModel(smallTexture, largeTexture, smallPartial, largePartial, smallFull, largeFull);
     }
     return null;
   };
 
-  public TankModifierModel(@Nullable RenderMaterial smallTexture, @Nullable RenderMaterial largeTexture,
-                           @Nullable RenderMaterial smallPartial, @Nullable RenderMaterial largePartial,
-                           @Nullable RenderMaterial smallFull, @Nullable RenderMaterial largeFull) {
-    super(smallTexture, largeTexture, new RenderMaterial[] { smallPartial, largePartial, smallFull, largeFull });
+  public TankModifierModel(@Nullable Material smallTexture, @Nullable Material largeTexture,
+                           @Nullable Material smallPartial, @Nullable Material largePartial,
+                           @Nullable Material smallFull, @Nullable Material largeFull) {
+    super(smallTexture, largeTexture, new Material[] { smallPartial, largePartial, smallFull, largeFull });
   }
 
   @Nullable

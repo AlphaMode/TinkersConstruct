@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.common.data.tags;
 
-import net.minecraft.data.BlockTagsProvider;
+import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.ItemTagsProvider;
+import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.data.TagsProvider;
 import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag.INamedTag;
@@ -45,6 +45,8 @@ import static slimeknights.tconstruct.common.TinkerTags.Items.STONE_HARVEST;
 import static slimeknights.tconstruct.common.TinkerTags.Items.SWORD;
 import static slimeknights.tconstruct.common.TinkerTags.Items.TWO_HANDED;
 
+import net.minecraft.data.tags.TagsProvider.TagAppender;
+
 public class ItemTagProvider extends ItemTagsProvider {
 
   public ItemTagProvider(DataGenerator generatorIn, BlockTagsProvider blockTagProvider, ExistingFileHelper existingFileHelper) {
@@ -52,7 +54,7 @@ public class ItemTagProvider extends ItemTagsProvider {
   }
 
   @Override
-  protected void registerTags() {
+  protected void addTags() {
     this.addCommon();
     this.addWorld();
     this.addSmeltery();
@@ -60,16 +62,16 @@ public class ItemTagProvider extends ItemTagsProvider {
   }
 
   private void addCommon() {
-    this.getOrCreateBuilder(TinkerTags.Items.TINKERS_GUIDES)
+    this.tag(TinkerTags.Items.TINKERS_GUIDES)
         .add(TinkerCommons.materialsAndYou.get(), TinkerCommons.tinkersGadgetry.get(),
              TinkerCommons.punySmelting.get(), TinkerCommons.mightySmelting.get(),
              TinkerCommons.fantasticFoundry.get(), TinkerCommons.encyclopedia.get());
-    this.getOrCreateBuilder(ItemTags.LECTERN_BOOKS).addTag(TinkerTags.Items.TINKERS_GUIDES);
-    this.getOrCreateBuilder(TinkerTags.Items.GUIDEBOOKS).addTag(TinkerTags.Items.TINKERS_GUIDES);
-    this.getOrCreateBuilder(TinkerTags.Items.BOOKS).addTag(TinkerTags.Items.GUIDEBOOKS);
-    this.getOrCreateBuilder(TinkerTags.Items.STRUCTURE_DEBUG).addTag(TinkerTags.Items.TINKERS_GUIDES);
+    this.tag(ItemTags.LECTERN_BOOKS).addTag(TinkerTags.Items.TINKERS_GUIDES);
+    this.tag(TinkerTags.Items.GUIDEBOOKS).addTag(TinkerTags.Items.TINKERS_GUIDES);
+    this.tag(TinkerTags.Items.BOOKS).addTag(TinkerTags.Items.GUIDEBOOKS);
+    this.tag(TinkerTags.Items.STRUCTURE_DEBUG).addTag(TinkerTags.Items.TINKERS_GUIDES);
 
-    Builder<Item> slimeballs = this.getOrCreateBuilder(Tags.Items.SLIMEBALLS);
+    TagAppender<Item> slimeballs = this.tag(Tags.Items.SLIMEBALLS);
     for (SlimeType type : SlimeType.values()) {
       slimeballs.addTag(type.getSlimeballTag());
     }

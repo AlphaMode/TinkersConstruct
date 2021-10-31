@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.plugin.jei.modifiers;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.RequiredArgsConstructor;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 
 import javax.annotation.Nullable;
@@ -17,9 +17,9 @@ public class ModifierIngredientRenderer implements IIngredientRenderer<ModifierE
   private final int width;
 
   @Override
-  public void render(MatrixStack matrices, int x, int y, @Nullable ModifierEntry entry) {
+  public void render(PoseStack matrices, int x, int y, @Nullable ModifierEntry entry) {
     if (entry != null) {
-      ITextComponent name = entry.getModifier().getDisplayName(entry.getLevel());
+      Component name = entry.getModifier().getDisplayName(entry.getLevel());
       FontRenderer fontRenderer = getFontRenderer(Minecraft.getInstance(), entry);
       x += (width - fontRenderer.getStringPropertyWidth(name)) / 2;
       fontRenderer.drawTextWithShadow(matrices, name, x, y + 1, -1);

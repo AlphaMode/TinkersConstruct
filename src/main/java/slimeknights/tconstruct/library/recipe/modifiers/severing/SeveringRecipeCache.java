@@ -2,8 +2,8 @@ package slimeknights.tconstruct.library.recipe.modifiers.severing;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.crafting.RecipeManager;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.crafting.RecipeManager;
 import slimeknights.mantle.recipe.RecipeHelper;
 import slimeknights.tconstruct.common.recipe.RecipeCacheInvalidator;
 import slimeknights.tconstruct.library.recipe.RecipeTypes;

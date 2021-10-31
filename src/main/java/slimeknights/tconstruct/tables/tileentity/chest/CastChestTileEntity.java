@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tables.tileentity.chest;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.tables.TinkerTables;
@@ -23,7 +23,7 @@ public class CastChestTileEntity extends ChestTileEntity {
     @Override
     public boolean isItemValid(int slot, ItemStack stack) {
       for (int i = 0; i < this.getSlots(); i++) {
-        if (ItemStack.areItemsEqual(stack, this.getStackInSlot(i))) {
+        if (ItemStack.isSame(stack, this.getStackInSlot(i))) {
           return i == slot;
         }
       }

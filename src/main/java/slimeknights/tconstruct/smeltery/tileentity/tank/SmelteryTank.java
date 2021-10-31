@@ -2,13 +2,13 @@ package slimeknights.tconstruct.smeltery.tileentity.tank;
 
 import com.google.common.collect.Lists;
 import lombok.Getter;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -18,6 +18,8 @@ import slimeknights.tconstruct.smeltery.tileentity.tank.ISmelteryTankHandler.Flu
 
 import java.util.List;
 import java.util.ListIterator;
+
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
 /**
  * Fluid handler implementation for the smeltery
@@ -44,10 +46,10 @@ public class SmelteryTank implements IFluidHandler {
    * Called when the fluids change to sync to client
    */
   public void syncFluids() {
-    TileEntity te = parent.getTileEntity();
-    World world = te.getWorld();
-    if (world != null && !world.isRemote) {
-      BlockPos pos = te.getPos();
+    BlockEntity te = parent.getTileEntity();
+    Level world = te.getLevel();
+    if (world != null && !world.isClientSide) {
+      BlockPos pos = te.getBlockPos();
       TinkerNetwork.getInstance().sendToClientsAround(new SmelteryTankUpdatePacket(pos, fluids), world, pos);
     }
   }
@@ -263,10 +265,10 @@ public class SmelteryTank implements IFluidHandler {
   }
 
   /** Writes the tank to NBT */
-  public CompoundNBT write(CompoundNBT nbt) {
-    ListNBT list = new ListNBT();
+  public CompoundTag write(CompoundTag nbt) {
+    ListTag list = new ListTag();
     for (FluidStack liquid : fluids) {
-      CompoundNBT fluidTag = new CompoundNBT();
+      CompoundTag fluidTag = new CompoundTag();
       liquid.writeToNBT(fluidTag);
       list.add(fluidTag);
     }
@@ -276,12 +278,12 @@ public class SmelteryTank implements IFluidHandler {
   }
 
   /** Reads the tank from NBT */
-  public void read(CompoundNBT tag) {
-    ListNBT list = tag.getList(TAG_FLUIDS, NBT.TAG_COMPOUND);
+  public void read(CompoundTag tag) {
+    ListTag list = tag.getList(TAG_FLUIDS, NBT.TAG_COMPOUND);
     fluids.clear();
     contained = 0;
     for (int i = 0; i < list.size(); i++) {
-      CompoundNBT fluidTag = list.getCompound(i);
+      CompoundTag fluidTag = list.getCompound(i);
       FluidStack fluid = FluidStack.loadFluidStackFromNBT(fluidTag);
       if (!fluid.isEmpty()) {
         fluids.add(fluid);

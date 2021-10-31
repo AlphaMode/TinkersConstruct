@@ -4,14 +4,14 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIntArray;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.LazyOptional;
@@ -43,7 +43,7 @@ import java.util.function.Supplier;
  * Module handling fuel consumption for the melter and smeltery
  */
 @RequiredArgsConstructor
-public class FuelModule implements IIntArray {
+public class FuelModule implements ContainerData {
   /** Block position that will never be valid in world, used for sync */
   private static final BlockPos NULL_POS = new BlockPos(0, -1, 0);
   /** Temperature used for solid fuels, hot enough to melt iron */
@@ -103,8 +103,8 @@ public class FuelModule implements IIntArray {
   }
 
   /** Gets a nonnull world instance from the parent */
-  private World getWorld() {
-    return Objects.requireNonNull(parent.getWorld(), "Parent tile entity has null world");
+  private Level getWorld() {
+    return Objects.requireNonNull(parent.getLevel(), "Parent tile entity has null world");
   }
 
   /**
@@ -161,7 +161,7 @@ public class FuelModule implements IIntArray {
       if (time > 0) {
         if (consume) {
           ItemStack extracted = handler.extractItem(i, 1, false);
-          if (extracted.isItemEqual(stack)) {
+          if (extracted.sameItem(stack)) {
             fuel += time;
             fuelQuality = time;
             temperature = SOLID_TEMPERATURE;
@@ -172,14 +172,14 @@ public class FuelModule implements IIntArray {
               // if we cannot insert the container back, spit it on the ground
               ItemStack notInserted = ItemHandlerHelper.insertItem(handler, container, false);
               if (!notInserted.isEmpty()) {
-                World world = getWorld();
-                double x = (world.rand.nextFloat() * 0.5F) + 0.25D;
-                double y = (world.rand.nextFloat() * 0.5F) + 0.25D;
-                double z = (world.rand.nextFloat() * 0.5F) + 0.25D;
-                BlockPos pos = lastPos == null ? parent.getPos() : lastPos;
+                Level world = getWorld();
+                double x = (world.random.nextFloat() * 0.5F) + 0.25D;
+                double y = (world.random.nextFloat() * 0.5F) + 0.25D;
+                double z = (world.random.nextFloat() * 0.5F) + 0.25D;
+                BlockPos pos = lastPos == null ? parent.getBlockPos() : lastPos;
                 ItemEntity itementity = new ItemEntity(world, pos.getX() + x, pos.getY() + y, pos.getZ() + z, container);
-                itementity.setDefaultPickupDelay();
-                world.addEntity(itementity);
+                itementity.setDefaultPickUpDelay();
+                world.addFreshEntity(itementity);
               }
             }
           } else {

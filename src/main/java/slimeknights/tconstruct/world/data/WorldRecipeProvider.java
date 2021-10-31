@@ -2,8 +2,8 @@ package slimeknights.tconstruct.world.data;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
@@ -27,11 +27,11 @@ public class WorldRecipeProvider extends BaseRecipeProvider implements ICommonRe
   }
 
   @Override
-  protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
+  protected void buildShapelessRecipes(Consumer<FinishedRecipe> consumer) {
     // Add recipe for all slimeball <-> congealed and slimeblock <-> slimeball
     // only earth slime recipe we need here slime
-    ShapedRecipeBuilder.shapedRecipe(TinkerWorld.congealedSlime.get(SlimeType.EARTH))
-                       .key('#', SlimeType.EARTH.getSlimeballTag())
+    ShapedRecipeBuilder.shaped(TinkerWorld.congealedSlime.get(SlimeType.EARTH))
+                       .define('#', SlimeType.EARTH.getSlimeballTag())
                        .patternLine("##")
                        .patternLine("##")
                        .addCriterion("has_item", hasItem(SlimeType.EARTH.getSlimeballTag()))

@@ -8,8 +8,8 @@ import com.blamejared.crafttweaker.api.managers.IRecipeManager;
 import com.blamejared.crafttweaker.impl.actions.recipes.ActionAddRecipe;
 import com.blamejared.crafttweaker.impl.actions.recipes.ActionRemoveRecipe;
 import com.blamejared.crafttweaker.impl.item.MCItemStackMutable;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.resources.ResourceLocation;
 import org.openzen.zencode.java.ZenCodeType;
 import slimeknights.mantle.recipe.EntityIngredient;
 import slimeknights.mantle.recipe.ItemOutput;
@@ -51,7 +51,7 @@ public class SeveringManager implements IRecipeManager {
   }
 
   @Override
-  public IRecipeType<SeveringRecipe> getRecipeType() {
+  public RecipeType<SeveringRecipe> getRecipeType() {
     return RecipeTypes.SEVERING;
   }
 }

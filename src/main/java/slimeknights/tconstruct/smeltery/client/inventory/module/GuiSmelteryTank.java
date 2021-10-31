@@ -3,7 +3,7 @@ package slimeknights.tconstruct.smeltery.client.inventory.module;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fluids.FluidStack;
@@ -29,7 +29,7 @@ public class GuiSmelteryTank {
   public static final String TOOLTIP_AVAILABLE = TConstruct.makeTranslationKey("gui", "melting.available");
   public static final String TOOLTIP_USED = TConstruct.makeTranslationKey("gui", "melting.used");
 
-  private final ContainerScreen<?> parent;
+  private final AbstractContainerScreen<?> parent;
   private final SmelteryTank tank;
   private final int x, y, width, height;
 
@@ -168,7 +168,7 @@ public class GuiSmelteryTank {
       else {
         tooltip = FluidTooltipHandler.getFluidTooltip(tank.getFluidInTank(hovered));
       }
-      parent.func_243308_b(matrices, tooltip, mouseX, mouseY);
+      parent.renderComponentTooltip(matrices, tooltip, mouseX, mouseY);
     }
   }
 

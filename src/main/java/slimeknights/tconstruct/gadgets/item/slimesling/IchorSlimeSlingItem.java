@@ -1,17 +1,19 @@
 package slimeknights.tconstruct.gadgets.item.slimesling;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.shared.block.SlimeType;
+
+import net.minecraft.world.item.Item.Properties;
 
 public class IchorSlimeSlingItem extends BaseSlimeSlingItem {
 
@@ -21,35 +23,35 @@ public class IchorSlimeSlingItem extends BaseSlimeSlingItem {
 
   /** Called when the player stops using an Item (stops holding the right mouse button). */
   @Override
-  public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
-    if (!(entityLiving instanceof PlayerEntity)) {
+  public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
+    if (!(entityLiving instanceof Player)) {
       return;
     }
 
-    PlayerEntity player = (PlayerEntity) entityLiving;
+    Player player = (Player) entityLiving;
     float f = getForce(stack, timeLeft) / 2;
 
     float range = 5F;
-    Vector3d start = player.getEyePosition(1F);
-    Vector3d look = player.getLookVec();
-    Vector3d direction = start.add(look.x * range, look.y * range, look.z * range);
-    AxisAlignedBB bb = player.getBoundingBox().expand(look.x * range, look.y * range, look.z * range).expand(1, 1, 1);
+    Vec3 start = player.getEyePosition(1F);
+    Vec3 look = player.getLookAngle();
+    Vec3 direction = start.add(look.x * range, look.y * range, look.z * range);
+    AABB bb = player.getBoundingBox().expandTowards(look.x * range, look.y * range, look.z * range).expandTowards(1, 1, 1);
 
-    EntityRayTraceResult emop = ProjectileHelper.rayTraceEntities(worldIn, player, start, direction, bb, (e) -> e instanceof LivingEntity);
+    EntityHitResult emop = ProjectileUtil.getEntityHitResult(worldIn, player, start, direction, bb, (e) -> e instanceof LivingEntity);
     if (emop != null) {
       LivingEntity target = (LivingEntity) emop.getEntity();
-      double targetDist = start.squareDistanceTo(target.getEyePosition(1F));
+      double targetDist = start.distanceToSqr(target.getEyePosition(1F));
 
       // cancel if there's a block in the way
-      BlockRayTraceResult mop = rayTrace(worldIn, player, RayTraceContext.FluidMode.NONE);
-      double blockDist = mop.getPos().distanceSq(start.x, start.y, start.z, true);
-      if (mop.getType() == RayTraceResult.Type.BLOCK && targetDist > blockDist) {
+      BlockHitResult mop = getPlayerPOVHitResult(worldIn, player, ClipContext.Fluid.NONE);
+      double blockDist = mop.getBlockPos().distSqr(start.x, start.y, start.z, true);
+      if (mop.getType() == HitResult.Type.BLOCK && targetDist > blockDist) {
         playMissSound(player);
         return;
       }
 
-      player.getCooldownTracker().setCooldown(stack.getItem(), 3);
-      target.applyKnockback(f , -look.x, -look.z);
+      player.getCooldowns().addCooldown(stack.getItem(), 3);
+      target.knockback(f , -look.x, -look.z);
       playerServerMovement(target);
       onSuccess(player, stack);
     } else {

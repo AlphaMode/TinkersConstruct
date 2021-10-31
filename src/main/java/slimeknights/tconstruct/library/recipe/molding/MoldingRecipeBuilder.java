@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.tags.ITag;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.util.ResourceLocation;
 import slimeknights.mantle.recipe.ItemOutput;
 import slimeknights.mantle.recipe.data.AbstractRecipeBuilder;
@@ -30,7 +30,7 @@ public class MoldingRecipeBuilder extends AbstractRecipeBuilder<MoldingRecipeBui
    * @param item  Item output
    * @return  Recipe
    */
-  public static MoldingRecipeBuilder moldingTable(IItemProvider item) {
+  public static MoldingRecipeBuilder moldingTable(ItemLike item) {
     return molding(ItemOutput.fromItem(item), TinkerSmeltery.moldingTableSerializer.get());
   }
 

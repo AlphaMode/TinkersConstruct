@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.melee;
 
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.util.text.ITextComponent;
 import slimeknights.tconstruct.library.modifiers.IncrementalModifier;
 import slimeknights.tconstruct.library.tools.context.ToolAttackContext;
@@ -12,8 +12,8 @@ import java.util.List;
 
 /** Shared logic for all modifiers that boost damage against a creature type */
 public class ScaledTypeDamageModifier extends IncrementalModifier {
-  private final CreatureAttribute type;
-  public ScaledTypeDamageModifier(int color, CreatureAttribute type) {
+  private final MobType type;
+  public ScaledTypeDamageModifier(int color, MobType type) {
     super(color);
     this.type = type;
   }
@@ -24,7 +24,7 @@ public class ScaledTypeDamageModifier extends IncrementalModifier {
    * @return  True if effective
    */
   protected boolean isEffective(LivingEntity target) {
-    return target.getCreatureAttribute() == type;
+    return target.getMobType() == type;
   }
 
   @Override

@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.smeltery.inventory;
 
 import lombok.Getter;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IntReferenceHolder;
@@ -26,7 +26,7 @@ public class MelterContainer extends BaseContainer<MelterTileEntity> {
   private final Slot[] inputs;
   @Getter
   private boolean hasFuelSlot = false;
-  public MelterContainer(int id, @Nullable PlayerInventory inv, @Nullable MelterTileEntity melter) {
+  public MelterContainer(int id, @Nullable Inventory inv, @Nullable MelterTileEntity melter) {
     super(TinkerSmeltery.melterContainer.get(), id, inv, melter);
 
     // create slots

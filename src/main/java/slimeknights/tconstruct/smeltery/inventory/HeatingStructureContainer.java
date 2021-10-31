@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.smeltery.inventory;
 
 import lombok.Getter;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.IntReferenceHolder;
 import slimeknights.mantle.util.sync.ValidZeroIntReference;
@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 public class HeatingStructureContainer extends TriggeringMultiModuleContainer<HeatingStructureTileEntity> {
   @Getter
   private final SideInventoryContainer<HeatingStructureTileEntity> sideInventory;
-  public HeatingStructureContainer(int id, @Nullable PlayerInventory inv, @Nullable HeatingStructureTileEntity structure) {
+  public HeatingStructureContainer(int id, @Nullable Inventory inv, @Nullable HeatingStructureTileEntity structure) {
     super(TinkerSmeltery.smelteryContainer.get(), id, inv, structure);
     if (inv != null && structure != null) {
       // can hold 7 in a column, so try to fill the first column first

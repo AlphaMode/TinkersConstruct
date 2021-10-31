@@ -6,10 +6,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.util.TablePrinter;
 import slimeknights.mantle.command.MantleCommand;
 import slimeknights.tconstruct.TConstruct;
@@ -39,14 +39,14 @@ import java.util.stream.Stream;
 /** Command that prints a list of all modifiers and how they are used in current datapacks */
 public class ModifierUsageCommand {
   /** Tag has no values */
-  private static final ITextComponent SUCCESS = new TranslationTextComponent("command.tconstruct.modifier_usage");
+  private static final Component SUCCESS = new TranslatableComponent("command.tconstruct.modifier_usage");
 
   /**
    * Registers this sub command with the root command
    * @param subCommand  Command builder
    */
-  public static void register(LiteralArgumentBuilder<CommandSource> subCommand) {
-    subCommand.requires(sender -> sender.hasPermissionLevel(MantleCommand.PERMISSION_EDIT_SPAWN))
+  public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
+    subCommand.requires(sender -> sender.hasPermission(MantleCommand.PERMISSION_EDIT_SPAWN))
               .executes(context -> runForType(context, ModifierUsages.ALL, null))
               .then(Commands.literal("all").executes(context -> runForType(context, ModifierUsages.ALL, null)))
               .then(Commands.literal("recipe")

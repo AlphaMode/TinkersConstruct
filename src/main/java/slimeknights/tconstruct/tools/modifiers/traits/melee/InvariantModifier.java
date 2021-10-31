@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.tools.modifiers.traits.melee;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import slimeknights.tconstruct.library.modifiers.Modifier;

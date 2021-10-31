@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.tools.modifiers.traits.melee;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.StringTextComponent;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerTags;
@@ -15,7 +15,7 @@ import java.util.List;
 
 /** Deals a percentage boost in damage when on fire */
 public class ConductingModifier extends Modifier {
-  private static final ITextComponent ATTACK_DAMAGE = TConstruct.makeTranslation("modifier", "conducting.attack_damage");
+  private static final Component ATTACK_DAMAGE = TConstruct.makeTranslation("modifier", "conducting.attack_damage");
   private static final int MAX_BONUS_TICKS = 15 * 20; // time from lava
   private static final float PERCENT_PER_LEVEL = 0.15f; // 15% bonus when in lava essentially
   public ConductingModifier() {

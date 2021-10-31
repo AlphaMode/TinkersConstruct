@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.smeltery.recipe;
 
 import lombok.RequiredArgsConstructor;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.item.ItemStack;
 import slimeknights.tconstruct.smeltery.tileentity.CastingTileEntity;
 
 /**
@@ -16,7 +16,7 @@ public class TileCastingWrapper implements ICastingInventory {
 
   @Override
   public ItemStack getStack() {
-    return tile.getStackInSlot(switchSlots ? CastingTileEntity.OUTPUT : CastingTileEntity.INPUT);
+    return tile.getItem(switchSlots ? CastingTileEntity.OUTPUT : CastingTileEntity.INPUT);
   }
 
   @Override

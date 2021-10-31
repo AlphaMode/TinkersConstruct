@@ -1,19 +1,19 @@
 package slimeknights.tconstruct.common;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectCategory;
 
 /** Effect extension with a few helpers */
-public class TinkerEffect extends Effect {
+public class TinkerEffect extends MobEffect {
   /** If true, effect is visible, false for hidden */
   private final boolean show;
-  public TinkerEffect(EffectType typeIn, boolean show) {
+  public TinkerEffect(MobEffectCategory typeIn, boolean show) {
     this(typeIn, 0xffffff, show);
   }
 
-  public TinkerEffect(EffectType typeIn, int color, boolean show) {
+  public TinkerEffect(MobEffectCategory typeIn, int color, boolean show) {
     super(typeIn, color);
     this.show = show;
   }
@@ -21,17 +21,17 @@ public class TinkerEffect extends Effect {
   /* Visibility */
 
   @Override
-  public boolean shouldRender(EffectInstance effect) {
+  public boolean shouldRender(MobEffectInstance effect) {
     return this.show;
   }
 
   @Override
-  public boolean shouldRenderInvText(EffectInstance effect) {
+  public boolean shouldRenderInvText(MobEffectInstance effect) {
     return this.show;
   }
 
   @Override
-  public boolean shouldRenderHUD(EffectInstance effect) {
+  public boolean shouldRenderHUD(MobEffectInstance effect) {
     return this.show;
   }
 
@@ -44,7 +44,7 @@ public class TinkerEffect extends Effect {
    * @param duration  Duration
    * @return  Applied instance
    */
-  public EffectInstance apply(LivingEntity entity, int duration) {
+  public MobEffectInstance apply(LivingEntity entity, int duration) {
     return this.apply(entity, duration, 0);
   }
 
@@ -55,9 +55,9 @@ public class TinkerEffect extends Effect {
    * @param level     Effect level
    * @return  Applied instance
    */
-  public EffectInstance apply(LivingEntity entity, int duration, int level) {
-    EffectInstance effect = new EffectInstance(this, duration, level, false, false);
-    entity.addPotionEffect(effect);
+  public MobEffectInstance apply(LivingEntity entity, int duration, int level) {
+    MobEffectInstance effect = new MobEffectInstance(this, duration, level, false, false);
+    entity.addEffect(effect);
     return effect;
   }
 
@@ -67,7 +67,7 @@ public class TinkerEffect extends Effect {
    * @return  Level, or -1 if inactive
    */
   public int getLevel(LivingEntity entity) {
-    EffectInstance effect = entity.getActivePotionEffect(this);
+    MobEffectInstance effect = entity.getEffect(this);
     if (effect != null) {
       return effect.getAmplifier();
     }

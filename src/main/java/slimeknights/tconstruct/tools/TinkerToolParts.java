@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.tools;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.registration.object.ItemObject;
 import slimeknights.mantle.util.SupplierItemGroup;
 import slimeknights.tconstruct.TConstruct;
@@ -20,14 +20,14 @@ import java.util.List;
 
 public final class TinkerToolParts extends TinkerModule {
   /** Tab for all tool parts */
-  public static final ItemGroup TAB_TOOL_PARTS = new SupplierItemGroup(TConstruct.MOD_ID, "tool_parts", () -> {
+  public static final CreativeModeTab TAB_TOOL_PARTS = new SupplierItemGroup(TConstruct.MOD_ID, "tool_parts", () -> {
     List<IMaterial> materials = new ArrayList<>(MaterialRegistry.getInstance().getVisibleMaterials());
     if (materials.isEmpty()) {
       return new ItemStack(TinkerToolParts.pickaxeHead);
     }
     return TinkerToolParts.pickaxeHead.get().withMaterial(materials.get(TConstruct.RANDOM.nextInt(materials.size())));
   });
-  private static final Item.Properties PARTS_PROPS = new Item.Properties().group(TAB_TOOL_PARTS);
+  private static final Item.Properties PARTS_PROPS = new Item.Properties().tab(TAB_TOOL_PARTS);
 
   // repair kit, technically a head so it filters to things useful for repair
   public static final ItemObject<RepairKitItem> repairKit = ITEMS.register("repair_kit", () -> new RepairKitItem(PARTS_PROPS));

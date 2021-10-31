@@ -4,11 +4,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import lombok.Getter;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.recipe.LoggingRecipeSerializer;
@@ -98,7 +98,7 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
 
   /** @deprecated */
   @Override
-  public ItemStack getRecipeOutput() {
+  public ItemStack getResultItem() {
     return ItemStack.EMPTY;
   }
 
@@ -111,7 +111,7 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
   /** Gets or builds the list of tool inputs */
   private List<ItemStack> getToolInputs() {
     if (toolInputs == null) {
-      toolInputs = Arrays.stream(this.toolRequirement.getMatchingStacks()).map(stack -> {
+      toolInputs = Arrays.stream(this.toolRequirement.getItems()).map(stack -> {
         if (stack.getItem() instanceof IModifiableDisplay) {
           return ((IModifiableDisplay)stack.getItem()).getRenderTool();
         }

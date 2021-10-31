@@ -1,42 +1,42 @@
 package slimeknights.tconstruct.world.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.SlimeEntity;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Slime;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.library.events.teleport.EnderSlimeTeleportEvent;
 import slimeknights.tconstruct.library.utils.TeleportHelper;
 import slimeknights.tconstruct.library.utils.TeleportHelper.ITeleportEventFactory;
 import slimeknights.tconstruct.world.TinkerWorld;
 
-public class EnderSlimeEntity extends SlimeEntity {
+public class EnderSlimeEntity extends Slime {
   /** Predicate for this ender slime to allow teleporting */
   private final ITeleportEventFactory teleportPredicate = (entity, x, y, z) -> new EnderSlimeTeleportEvent(entity, x, y, z, this);
 
-  public EnderSlimeEntity(EntityType<? extends EnderSlimeEntity> type, World worldIn) {
+  public EnderSlimeEntity(EntityType<? extends EnderSlimeEntity> type, Level worldIn) {
     super(type, worldIn);
   }
 
   @Override
-  protected IParticleData getSquishParticle() {
+  protected ParticleOptions getParticleType() {
     return TinkerWorld.enderSlimeParticle.get();
   }
 
   @Override
-  public void applyEnchantments(LivingEntity slime, Entity target) {
-    super.applyEnchantments(slime, target);
+  public void doEnchantDamageEffects(LivingEntity slime, Entity target) {
+    super.doEnchantDamageEffects(slime, target);
     if (target instanceof LivingEntity) {
       TeleportHelper.randomNearbyTeleport((LivingEntity) target, teleportPredicate);
     }
   }
 
   @Override
-  protected void damageEntity(DamageSource damageSrc, float damageAmount) {
+  protected void actuallyHurt(DamageSource damageSrc, float damageAmount) {
     float oldHealth = getHealth();
-    super.damageEntity(damageSrc, damageAmount);
+    super.actuallyHurt(damageSrc, damageAmount);
     if (isAlive() && getHealth() < oldHealth) {
       TeleportHelper.randomNearbyTeleport(this, teleportPredicate);
     }

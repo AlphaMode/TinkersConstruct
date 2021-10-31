@@ -1,23 +1,23 @@
 package slimeknights.tconstruct.library.tools.helper;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.block.CampfireBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.network.play.server.SChangeBlockPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.GameType;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ToolType;
@@ -50,12 +50,12 @@ public class ToolHarvestLogic {
    * @param state  State to check
    * @return  Damage to deal
    */
-  public int getDamage(ToolStack tool, ItemStack stack, World world, BlockPos pos, BlockState state) {
-    if (state.getBlockHardness(world, pos) == 0) {
+  public int getDamage(ToolStack tool, ItemStack stack, Level world, BlockPos pos, BlockState state) {
+    if (state.getDestroySpeed(world, pos) == 0) {
       return 0;
     }
     // if it lacks the harvest tag, it takes double damage (swords for instance)
-    return tool.getItem().isIn(TinkerTags.Items.HARVEST_PRIMARY) ? 1 : 2;
+    return tool.getItem().is(TinkerTags.Items.HARVEST_PRIMARY) ? 1 : 2;
   }
 
   /**
@@ -82,7 +82,7 @@ public class ToolHarvestLogic {
     }
 
     // harvest level too low -> not effective
-    if (state.getRequiresTool() && tool.getStats().getInt(ToolStats.HARVEST_LEVEL) < state.getHarvestLevel()) {
+    if (state.requiresCorrectToolForDrops() && tool.getStats().getInt(ToolStats.HARVEST_LEVEL) < state.getHarvestLevel()) {
       return false;
     }
 
@@ -128,7 +128,7 @@ public class ToolHarvestLogic {
    * @param matchType   Type of match
    * @return A list of BlockPos's that the AOE tool can affect. Note these positions will likely be mutable
    */
-  public Iterable<BlockPos> getAOEBlocks(IModifierToolStack tool, ItemStack stack, PlayerEntity player, BlockState state, World world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
+  public Iterable<BlockPos> getAOEBlocks(IModifierToolStack tool, ItemStack stack, Player player, BlockState state, Level world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
     return Collections.emptyList();
   }
 

@@ -1,17 +1,17 @@
 package slimeknights.tconstruct.plugin.jei.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.RequiredArgsConstructor;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.inventory.InventoryScreen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.TConstruct;
 
 import javax.annotation.Nullable;
@@ -37,9 +37,9 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityType>
   private final Map<EntityType<?>,Entity> ENTITY_MAP = new HashMap<>();
 
   @Override
-  public void render(MatrixStack matrixStack, int x, int y, @Nullable EntityType type) {
+  public void render(PoseStack matrixStack, int x, int y, @Nullable EntityType type) {
     if (type != null) {
-      World world = Minecraft.getInstance().world;
+      Level world = Minecraft.getInstance().level;
       if (world != null && !IGNORED_ENTITIES.contains(type)) {
         Entity entity;
         // players cannot be created using the type, but we can use the client player
@@ -55,14 +55,14 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityType>
           // scale down large mobs, but don't scale up small ones
           LivingEntity livingEntity = (LivingEntity) entity;
           int scale = size / 2;
-          float height = entity.getHeight();
-          float width = entity.getWidth();
+          float height = entity.getBbHeight();
+          float width = entity.getBbWidth();
           if (height > 2 || width > 2) {
             scale = (int)(size / Math.max(height, width));
           }
           // catch exceptions drawing the entity to be safe, any caught exceptions blacklist the entity
           try {
-            InventoryScreen.drawEntityOnScreen(x + size / 2, y + size, scale, 0, 10, livingEntity);
+            InventoryScreen.renderEntityInInventory(x + size / 2, y + size, scale, 0, 10, livingEntity);
             return;
           } catch (Exception e) {
             TConstruct.LOG.error("Error drawing entity " + type.getRegistryName(), e);
@@ -78,16 +78,16 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityType>
 
       // fallback, draw a pink and black "spawn egg"
       Minecraft minecraft = Minecraft.getInstance();
-      minecraft.getTextureManager().bindTexture(EntityMeltingRecipeCategory.BACKGROUND_LOC);
+      minecraft.getTextureManager().bind(EntityMeltingRecipeCategory.BACKGROUND_LOC);
       int offset = (size - 16) / 2;
       Screen.blit(matrixStack, x + offset, y + offset, 149f, 58f, 16, 16, 256, 256);
     }
   }
 
   @Override
-  public List<ITextComponent> getTooltip(EntityType type, ITooltipFlag flag) {
-    List<ITextComponent> tooltip = new ArrayList<>();
-    tooltip.add(type.getName());
+  public List<Component> getTooltip(EntityType type, TooltipFlag flag) {
+    List<Component> tooltip = new ArrayList<>();
+    tooltip.add(type.getDescription());
     return tooltip;
   }
 }

@@ -2,12 +2,12 @@ package slimeknights.tconstruct.library.recipe.modifiers.adding;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.recipe.SizedIngredient;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.TConstruct;
@@ -98,7 +98,7 @@ public class ModifierRecipe extends AbstractModifierRecipe {
   }
 
   @Override
-  public boolean matches(ITinkerStationInventory inv, World world) {
+  public boolean matches(ITinkerStationInventory inv, Level world) {
     // ensure this modifier can be applied
     if (!this.toolRequirement.test(inv.getTinkerableStack())) {
       return false;

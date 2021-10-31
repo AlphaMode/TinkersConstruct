@@ -1,25 +1,25 @@
 package slimeknights.tconstruct.tools.modifiers.internal;
 
 import lombok.Getter;
-import net.minecraft.block.AbstractFireBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CampfireBlock;
-import net.minecraft.block.TNTBlock;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.TntBlock;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.library.modifiers.SingleUseModifier;
 import slimeknights.tconstruct.library.tools.helper.ToolDamageUtil;
 import slimeknights.tconstruct.library.tools.helper.ToolHarvestLogic;
@@ -48,62 +48,62 @@ public class FirestarterModifier extends SingleUseModifier {
   }
 
   @Override
-  public ActionResultType onEntityUse(IModifierToolStack tool, int level, PlayerEntity player, LivingEntity target, Hand hand) {
-    if (target instanceof CreeperEntity) {
-      CreeperEntity creeper = (CreeperEntity) target;
-      player.world.playSound(player, creeper.getPosX(), creeper.getPosY(), creeper.getPosZ(), SoundEvents.ITEM_FLINTANDSTEEL_USE, creeper.getSoundCategory(), 1.0F, RANDOM.nextFloat() * 0.4F + 0.8F);
-      if (!player.world.isRemote) {
+  public InteractionResult onEntityUse(IModifierToolStack tool, int level, Player player, LivingEntity target, InteractionHand hand) {
+    if (target instanceof Creeper) {
+      Creeper creeper = (Creeper) target;
+      player.level.playSound(player, creeper.getX(), creeper.getY(), creeper.getZ(), SoundEvents.FLINTANDSTEEL_USE, creeper.getSoundSource(), 1.0F, RANDOM.nextFloat() * 0.4F + 0.8F);
+      if (!player.level.isClientSide) {
         creeper.ignite();
         ToolDamageUtil.damageAnimated(tool, 1, player, hand);
       }
-      return ActionResultType.func_233537_a_(player.world.isRemote);
+      return InteractionResult.sidedSuccess(player.level.isClientSide);
     }
-    return ActionResultType.PASS;
+    return InteractionResult.PASS;
   }
 
   /** Ignites the given block */
-  private static boolean ignite(IModifierToolStack tool, World world, BlockPos pos, BlockState state, Direction sideHit, Direction horizontalFacing, @Nullable PlayerEntity player) {
+  private static boolean ignite(IModifierToolStack tool, Level world, BlockPos pos, BlockState state, Direction sideHit, Direction horizontalFacing, @Nullable Player player) {
     // campfires first
-    if (CampfireBlock.canBeLit(state)) {
-      world.playSound(player, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0F, RANDOM.nextFloat() * 0.4F + 0.8F);
-      world.setBlockState(pos, state.with(BlockStateProperties.LIT, true), 11);
+    if (CampfireBlock.canLight(state)) {
+      world.playSound(player, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, RANDOM.nextFloat() * 0.4F + 0.8F);
+      world.setBlock(pos, state.setValue(BlockStateProperties.LIT, true), 11);
       return true;
     }
 
     // ignite the TNT
-    if (state.getBlock() instanceof TNTBlock) {
-      TNTBlock tnt = (TNTBlock) state.getBlock();
+    if (state.getBlock() instanceof TntBlock) {
+      TntBlock tnt = (TntBlock) state.getBlock();
       tnt.catchFire(state, world, pos, sideHit, player);
-      world.setBlockState(pos, Blocks.AIR.getDefaultState(), 11);
+      world.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
       return true;
     }
 
     // fire starting
-    BlockPos offset = pos.offset(sideHit);
-    if (AbstractFireBlock.canLightBlock(world, offset, horizontalFacing)) {
-      world.playSound(player, offset, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0F, RANDOM.nextFloat() * 0.4F + 0.8F);
-      world.setBlockState(offset, AbstractFireBlock.getFireForPlacement(world, offset), 11);
+    BlockPos offset = pos.relative(sideHit);
+    if (BaseFireBlock.canBePlacedAt(world, offset, horizontalFacing)) {
+      world.playSound(player, offset, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, RANDOM.nextFloat() * 0.4F + 0.8F);
+      world.setBlock(offset, BaseFireBlock.getState(world, offset), 11);
       return true;
     }
     return false;
   }
 
   @Override
-  public ActionResultType afterBlockUse(IModifierToolStack tool, int level, ItemUseContext context) {
+  public InteractionResult afterBlockUse(IModifierToolStack tool, int level, UseOnContext context) {
     if (tool.isBroken()) {
-      return ActionResultType.PASS;
+      return InteractionResult.PASS;
     }
-    PlayerEntity player = context.getPlayer();
-    World world = context.getWorld();
-    BlockPos pos = context.getPos();
-    Direction sideHit = context.getFace();
+    Player player = context.getPlayer();
+    Level world = context.getLevel();
+    BlockPos pos = context.getClickedPos();
+    Direction sideHit = context.getClickedFace();
     BlockState state = world.getBlockState(pos);
-    ItemStack stack = context.getItem();
+    ItemStack stack = context.getItemInHand();
 
     // if targeting fire, offset to behind the fire
     boolean targetingFire = false;
-    if (state.isIn(BlockTags.FIRE)) {
-      pos = pos.offset(sideHit.getOpposite());
+    if (state.is(BlockTags.FIRE)) {
+      pos = pos.relative(sideHit.getOpposite());
       targetingFire = true;
     }
 
@@ -115,17 +115,17 @@ public class FirestarterModifier extends SingleUseModifier {
     }
 
     // burn it all in AOE
-    Hand hand = context.getHand();
-    Direction horizontalFacing = context.getPlacementHorizontalFacing();
+    InteractionHand hand = context.getHand();
+    Direction horizontalFacing = context.getHorizontalDirection();
     // first burn the center, unless we already know its fire
     boolean didIgnite = false;
     if (!targetingFire) {
       didIgnite = ignite(tool, world, pos, state, sideHit, horizontalFacing, player);
       if (didIgnite && ToolDamageUtil.damage(tool, 1, player, stack)) {
         if (player != null) {
-          player.sendBreakAnimation(hand);
+          player.broadcastBreakEvent(hand);
         }
-        return ActionResultType.func_233537_a_(world.isRemote);
+        return InteractionResult.sidedSuccess(world.isClientSide);
       }
     }
     // ignite the edges, if any worked return success
@@ -134,12 +134,12 @@ public class FirestarterModifier extends SingleUseModifier {
         didIgnite = true;
         if (ToolDamageUtil.damage(tool, 1, player, stack)) {
           if (player != null) {
-            player.sendBreakAnimation(hand);
+            player.broadcastBreakEvent(hand);
           }
           break;
         }
       }
     }
-    return didIgnite ? ActionResultType.func_233537_a_(world.isRemote) : ActionResultType.PASS;
+    return didIgnite ? InteractionResult.sidedSuccess(world.isClientSide) : InteractionResult.PASS;
   }
 }

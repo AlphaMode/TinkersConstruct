@@ -1,26 +1,26 @@
 package slimeknights.tconstruct.smeltery.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.RenderState;
-import net.minecraft.client.renderer.RenderState.LineState;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderStateShard.LineStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.smeltery.block.controller.ControllerBlock;
 import slimeknights.tconstruct.smeltery.block.controller.HeatingControllerBlock;
 import slimeknights.tconstruct.smeltery.tileentity.controller.HeatingStructureTileEntity;
@@ -29,26 +29,26 @@ import slimeknights.tconstruct.smeltery.tileentity.multiblock.HeatingStructureMu
 
 import java.util.OptionalDouble;
 
-public class HeatingStructureTileEntityRenderer extends TileEntityRenderer<HeatingStructureTileEntity> {
-  private static final RenderType ERROR_BLOCK = RenderType.makeType(
-    "lines", DefaultVertexFormats.POSITION_COLOR, 1, 256,
-    RenderType.State.getBuilder()
-                    .line(new LineState(OptionalDouble.empty()))
-                    .layer(RenderState.VIEW_OFFSET_Z_LAYERING)
-                    .transparency(RenderState.TRANSLUCENT_TRANSPARENCY)
-                    .target(RenderState.ITEM_ENTITY_TARGET)
-                    .writeMask(RenderState.COLOR_DEPTH_WRITE)
-                    .depthTest(RenderState.DEPTH_ALWAYS)
-                    .build(false));
+public class HeatingStructureTileEntityRenderer extends BlockEntityRenderer<HeatingStructureTileEntity> {
+  private static final RenderType ERROR_BLOCK = RenderType.create(
+    "lines", DefaultVertexFormat.POSITION_COLOR, 1, 256,
+    RenderType.CompositeState.builder()
+                    .setLineState(new LineStateShard(OptionalDouble.empty()))
+                    .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
+                    .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                    .setOutputState(RenderStateShard.ITEM_ENTITY_TARGET)
+                    .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+                    .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
+                    .createCompositeState(false));
 
   private static final float ITEM_SCALE = 15f/16f;
-  public HeatingStructureTileEntityRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+  public HeatingStructureTileEntityRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
     super(rendererDispatcherIn);
   }
 
   @Override
-  public void render(HeatingStructureTileEntity smeltery, float partialTicks, MatrixStack matrices, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay) {
-    World world = smeltery.getWorld();
+  public void render(HeatingStructureTileEntity smeltery, float partialTicks, PoseStack matrices, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
+    Level world = smeltery.getLevel();
     if (world == null) return;
     BlockState state = smeltery.getBlockState();
     StructureData structure = smeltery.getStructure();

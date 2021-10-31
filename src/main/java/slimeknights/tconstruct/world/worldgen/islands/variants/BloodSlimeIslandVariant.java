@@ -1,16 +1,16 @@
 package slimeknights.tconstruct.world.worldgen.islands.variants;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Plane;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.template.BlockIgnoreStructureProcessor;
-import net.minecraft.world.gen.feature.template.StructureProcessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Plane;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.structure.templatesystem.BlockIgnoreProcessor;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.fluids.TinkerFluids;
 import slimeknights.tconstruct.shared.block.SlimeType;
@@ -40,7 +40,7 @@ public class BloodSlimeIslandVariant extends AbstractSlimeIslandVariant {
 
   @Override
   public BlockState getLakeFluid() {
-    return Objects.requireNonNull(TinkerFluids.magma.getBlock()).getDefaultState();
+    return Objects.requireNonNull(TinkerFluids.magma.getBlock()).defaultBlockState();
   }
 
   @Nullable
@@ -51,19 +51,19 @@ public class BloodSlimeIslandVariant extends AbstractSlimeIslandVariant {
 
   @Override
   public StructureProcessor getStructureProcessor() {
-    return BlockIgnoreStructureProcessor.AIR_AND_STRUCTURE_BLOCK;
+    return BlockIgnoreProcessor.STRUCTURE_AND_AIR;
   }
 
-  private static boolean isLava(ISeedReader world, BlockPos pos) {
-    return world.isAirBlock(pos) || world.getBlockState(pos).getBlock() == Blocks.LAVA;
+  private static boolean isLava(WorldGenLevel world, BlockPos pos) {
+    return world.isEmptyBlock(pos) || world.getBlockState(pos).getBlock() == Blocks.LAVA;
   }
 
   @Override
-  public boolean isPositionValid(ISeedReader world, BlockPos pos, ChunkGenerator generator) {
-    BlockPos up = pos.up();
+  public boolean isPositionValid(WorldGenLevel world, BlockPos pos, ChunkGenerator generator) {
+    BlockPos up = pos.above();
     if (isLava(world, up)) {
       for (Direction direction : Plane.HORIZONTAL) {
-        if (!isLava(world, up.offset(direction))) {
+        if (!isLava(world, up.relative(direction))) {
           return false;
         }
       }

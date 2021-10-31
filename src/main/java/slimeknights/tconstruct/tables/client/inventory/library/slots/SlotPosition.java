@@ -7,7 +7,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.util.GsonHelper;
 import slimeknights.mantle.util.JsonHelper;
 
 import java.util.Collections;
@@ -53,7 +53,7 @@ public class SlotPosition {
    * @return a slot position
    */
   public static SlotPosition fromJson(JsonObject json, String name) {
-    JsonArray array = JSONUtils.getJsonArray(json, name);
+    JsonArray array = GsonHelper.getAsJsonArray(json, name);
 
     if (array.size() != 2) {
       throw new JsonParseException("Expected 2 " + name + " values, found: " + array.size());
@@ -61,7 +61,7 @@ public class SlotPosition {
 
     int[] vec = new int[2];
     for (int i = 0; i < vec.length; ++i) {
-      vec[i] = JSONUtils.getInt(array.get(i), name + "[" + i + "]");
+      vec[i] = GsonHelper.convertToInt(array.get(i), name + "[" + i + "]");
     }
 
     return new SlotPosition(vec[0], vec[1]);

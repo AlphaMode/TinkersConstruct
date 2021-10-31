@@ -6,13 +6,13 @@ import com.google.gson.JsonSyntaxException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
@@ -48,7 +48,7 @@ public class MeltingRecipe implements IMeltingRecipe {
   private List<List<FluidStack>> outputWithByproducts;
 
   @Override
-  public boolean matches(IMeltingInventory inv, World world) {
+  public boolean matches(IMeltingInventory inv, Level world) {
     return input.test(inv.getStack());
   }
 
@@ -69,11 +69,11 @@ public class MeltingRecipe implements IMeltingRecipe {
 
   @Override
   public NonNullList<Ingredient> getIngredients() {
-    return NonNullList.from(Ingredient.EMPTY, input);
+    return NonNullList.of(Ingredient.EMPTY, input);
   }
 
   @Override
-  public IRecipeSerializer<?> getSerializer() {
+  public RecipeSerializer<?> getSerializer() {
     return TinkerSmeltery.meltingSerializer.get();
   }
 
@@ -120,14 +120,14 @@ public class MeltingRecipe implements IMeltingRecipe {
     private final IFactory<T> factory;
 
     @Override
-    public T read(ResourceLocation id, JsonObject json) {
-      String group = JSONUtils.getString(json, "group", "");
-      Ingredient input = Ingredient.deserialize(json.get("ingredient"));
-      FluidStack output = RecipeHelper.deserializeFluidStack(JSONUtils.getJsonObject(json, "result"));
+    public T fromJson(ResourceLocation id, JsonObject json) {
+      String group = GsonHelper.getAsString(json, "group", "");
+      Ingredient input = Ingredient.fromJson(json.get("ingredient"));
+      FluidStack output = RecipeHelper.deserializeFluidStack(GsonHelper.getAsJsonObject(json, "result"));
 
       // temperature calculates
-      int temperature = JSONUtils.getInt(json, "temperature");
-      int time = JSONUtils.getInt(json, "time");
+      int temperature = GsonHelper.getAsInt(json, "temperature");
+      int time = GsonHelper.getAsInt(json, "time");
       // validate values
       if (temperature < 0) throw new JsonSyntaxException("Melting temperature must be greater than zero");
       if (time <= 0) throw new JsonSyntaxException("Melting time must be greater than zero");
@@ -141,9 +141,9 @@ public class MeltingRecipe implements IMeltingRecipe {
 
     @Nullable
     @Override
-    protected T readSafe(ResourceLocation id, PacketBuffer buffer) {
-      String group = buffer.readString(Short.MAX_VALUE);
-      Ingredient input = Ingredient.read(buffer);
+    protected T readSafe(ResourceLocation id, FriendlyByteBuf buffer) {
+      String group = buffer.readUtf(Short.MAX_VALUE);
+      Ingredient input = Ingredient.fromNetwork(buffer);
       FluidStack output = FluidStack.readFromPacket(buffer);
       int temperature = buffer.readInt();
       int time = buffer.readVarInt();
@@ -156,9 +156,9 @@ public class MeltingRecipe implements IMeltingRecipe {
     }
 
     @Override
-    protected void writeSafe(PacketBuffer buffer, MeltingRecipe recipe) {
-      buffer.writeString(recipe.group);
-      recipe.input.write(buffer);
+    protected void writeSafe(FriendlyByteBuf buffer, MeltingRecipe recipe) {
+      buffer.writeUtf(recipe.group);
+      recipe.input.toNetwork(buffer);
       recipe.output.writeToPacket(buffer);
       buffer.writeInt(recipe.temperature);
       buffer.writeVarInt(recipe.time);

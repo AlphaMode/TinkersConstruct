@@ -1,30 +1,32 @@
 package slimeknights.tconstruct.smeltery.block.component;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.util.TileEntityHelper;
 import slimeknights.tconstruct.smeltery.tileentity.component.SmelteryComponentTileEntity;
 
 import javax.annotation.Nullable;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class SearedBlock extends Block {
   public static final BooleanProperty IN_STRUCTURE = BooleanProperty.create("in_structure");
 
   public SearedBlock(Properties properties) {
     super(properties);
-    this.setDefaultState(this.getDefaultState().with(IN_STRUCTURE, false));
+    this.registerDefaultState(this.defaultBlockState().setValue(IN_STRUCTURE, false));
   }
 
   @Override
-  protected void fillStateContainer(Builder<Block,BlockState> builder) {
+  protected void createBlockStateDefinition(Builder<Block,BlockState> builder) {
     builder.add(IN_STRUCTURE);
   }
 
@@ -34,29 +36,29 @@ public class SearedBlock extends Block {
   }
 
   @Override
-  public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+  public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
     return new SmelteryComponentTileEntity();
   }
 
   @Override
   @Deprecated
-  public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-    if (!newState.matchesBlock(this)) {
+  public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+    if (!newState.is(this)) {
       TileEntityHelper.getTile(SmelteryComponentTileEntity.class, worldIn, pos).ifPresent(te -> te.notifyMasterOfChange(pos, newState));
     }
-    super.onReplaced(state, worldIn, pos, newState, isMoving);
+    super.onRemove(state, worldIn, pos, newState, isMoving);
   }
 
   @Override
-  public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+  public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
     SmelteryComponentTileEntity.updateNeighbors(world, pos, state);
   }
 
   @Override
   @Deprecated
-  public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-    super.eventReceived(state, worldIn, pos, id, param);
-    TileEntity tileentity = worldIn.getTileEntity(pos);
-    return tileentity != null && tileentity.receiveClientEvent(id, param);
+  public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
+    super.triggerEvent(state, worldIn, pos, id, param);
+    BlockEntity tileentity = worldIn.getBlockEntity(pos);
+    return tileentity != null && tileentity.triggerEvent(id, param);
   }
 }

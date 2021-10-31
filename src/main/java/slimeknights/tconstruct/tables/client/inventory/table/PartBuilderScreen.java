@@ -5,15 +5,15 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.function.Function;
 
 public class PartBuilderScreen extends BaseStationScreen<PartBuilderTileEntity, PartBuilderContainer> {
-  private static final ITextComponent INFO_TEXT = TConstruct.makeTranslation("gui", "part_builder.info");
-  private static final ITextComponent TRAIT_TITLE = TConstruct.makeTranslation("gui", "part_builder.trait").mergeStyle(TextFormatting.UNDERLINE);
-  private static final IFormattableTextComponent UNCRAFTABLE_MATERIAL = TConstruct.makeTranslation("gui", "part_builder.uncraftable").mergeStyle(TextFormatting.RED);
-  private static final IFormattableTextComponent UNCRAFTABLE_MATERIAL_TOOLTIP = TConstruct.makeTranslation("gui", "part_builder.uncraftable.tooltip");
+  private static final Component INFO_TEXT = TConstruct.makeTranslation("gui", "part_builder.info");
+  private static final Component TRAIT_TITLE = TConstruct.makeTranslation("gui", "part_builder.trait").withStyle(ChatFormatting.UNDERLINE);
+  private static final MutableComponent UNCRAFTABLE_MATERIAL = TConstruct.makeTranslation("gui", "part_builder.uncraftable").withStyle(ChatFormatting.RED);
+  private static final MutableComponent UNCRAFTABLE_MATERIAL_TOOLTIP = TConstruct.makeTranslation("gui", "part_builder.uncraftable.tooltip");
 
   private static final ResourceLocation BACKGROUND = TConstruct.getResource("textures/gui/partbuilder.png");
 
@@ -55,7 +55,7 @@ public class PartBuilderScreen extends BaseStationScreen<PartBuilderTileEntity, 
    */
   private int recipeIndexOffset = 0;
 
-  public PartBuilderScreen(PartBuilderContainer container, PlayerInventory playerInventory, ITextComponent title) {
+  public PartBuilderScreen(PartBuilderContainer container, Inventory playerInventory, Component title) {
     super(container, playerInventory, title);
 
     this.infoPanelScreen = new PartInfoPanelScreen(this, container, playerInventory, title);

@@ -4,11 +4,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.CookingRecipeBuilder;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.ShapedRecipeBuilder;
-import net.minecraft.data.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import slimeknights.mantle.recipe.data.ConsumerWrapperBuilder;
 import slimeknights.tconstruct.common.data.BaseRecipeProvider;
@@ -38,12 +38,12 @@ public class CommonRecipeProvider extends BaseRecipeProvider implements ICommonR
   }
 
   @Override
-  protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
+  protected void buildShapelessRecipes(Consumer<FinishedRecipe> consumer) {
     this.addCommonRecipes(consumer);
     this.addMaterialRecipes(consumer);
   }
 
-  private void addCommonRecipes(Consumer<IFinishedRecipe> consumer) {
+  private void addCommonRecipes(Consumer<FinishedRecipe> consumer) {
     // firewood and lavawood
     String folder = "common/firewood/";
     slabStairsCrafting(consumer, TinkerCommons.blazewood, folder, false);
@@ -51,24 +51,24 @@ public class CommonRecipeProvider extends BaseRecipeProvider implements ICommonR
 
     // nahuatl
     slabStairsCrafting(consumer, TinkerMaterials.nahuatl, folder, false);
-    ShapedRecipeBuilder.shapedRecipe(TinkerMaterials.nahuatl.getFence(), 6)
-                       .patternLine("WWW").patternLine("WWW")
-                       .key('W', TinkerMaterials.nahuatl)
-                       .addCriterion("has_planks", hasItem(TinkerMaterials.nahuatl))
-                       .build(consumer, modResource(folder + "nahuatl_fence"));
+    ShapedRecipeBuilder.shaped(TinkerMaterials.nahuatl.getFence(), 6)
+                       .pattern("WWW").pattern("WWW")
+                       .define('W', TinkerMaterials.nahuatl)
+                       .unlockedBy("has_planks", has(TinkerMaterials.nahuatl))
+                       .save(consumer, modResource(folder + "nahuatl_fence"));
 
     // mud bricks
     slabStairsCrafting(consumer, TinkerCommons.mudBricks, "common/", false);
 
     // book
-    ShapelessRecipeBuilder.shapelessRecipe(TinkerCommons.materialsAndYou)
-                          .addIngredient(Items.BOOK)
-                          .addIngredient(TinkerTables.pattern)
-                          .addCriterion("has_item", hasItem(TinkerTables.pattern))
-                          .build(consumer, prefix(TinkerCommons.materialsAndYou, "common/"));
-    ShapelessRecipeBuilder.shapelessRecipe(TinkerCommons.tinkersGadgetry)
-                          .addIngredient(Items.BOOK)
-                          .addIngredient(SlimeType.SKY.getSlimeballTag())
+    ShapelessRecipeBuilder.shapeless(TinkerCommons.materialsAndYou)
+                          .requires(Items.BOOK)
+                          .requires(TinkerTables.pattern)
+                          .unlockedBy("has_item", has(TinkerTables.pattern))
+                          .save(consumer, prefix(TinkerCommons.materialsAndYou, "common/"));
+    ShapelessRecipeBuilder.shapeless(TinkerCommons.tinkersGadgetry)
+                          .requires(Items.BOOK)
+                          .requires(SlimeType.SKY.getSlimeballTag())
                           .addCriterion("has_item", hasItem(SlimeType.SKY.getSlimeballTag()))
                           .build(consumer, prefix(TinkerCommons.tinkersGadgetry, "common/"));
     ShapelessRecipeBuilder.shapelessRecipe(TinkerCommons.punySmelting)

@@ -14,13 +14,13 @@ import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.EquipmentSlotType.Group;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.Rarity;
 import net.minecraft.item.UseAction;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -56,6 +56,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import net.minecraft.world.item.Item.Properties;
 
 /**
  * A standard modifiable item which implements melee hooks
@@ -99,12 +101,12 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
 
   @Nullable
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
+  public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
     return new ToolCapabilityProvider(stack);
   }
 
   @Override
-  public boolean updateItemStackNBT(CompoundNBT nbt) {
+  public boolean verifyTagAfterLoad(CompoundTag nbt) {
     // when the itemstack is loaded from NBT we recalculate all the data
     // stops things from being wrong if modifiers or materials change
     ToolStack.from(this, getToolDefinition(), nbt.getCompound("tag")).rebuildStats();

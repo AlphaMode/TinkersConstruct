@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.melee;
 
-import net.minecraft.util.text.Color;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import slimeknights.tconstruct.library.modifiers.IncrementalModifier;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
 import slimeknights.tconstruct.library.tools.nbt.IModDataReadOnly;
@@ -16,11 +16,11 @@ public class SharpnessModifier extends IncrementalModifier {
   }
 
   @Override
-  public ITextComponent getDisplayName(int level) {
+  public Component getDisplayName(int level) {
     // displays special names for levels of sharpness
     if (level <= 5) {
-      return new TranslationTextComponent(getTranslationKey() + "." + level)
-        .modifyStyle(style -> style.setColor(Color.fromInt(getColor())));
+      return new TranslatableComponent(getTranslationKey() + "." + level)
+        .withStyle(style -> style.withColor(TextColor.fromRgb(getColor())));
     }
     return super.getDisplayName(level);
   }

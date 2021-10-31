@@ -7,16 +7,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ITag;
-import net.minecraft.tags.TagCollectionManager;
-import net.minecraft.world.gen.feature.HugeFungusConfig;
+import net.minecraft.tags.Tag;
+import net.minecraft.tags.SerializationTags;
+import net.minecraft.world.level.levelgen.feature.HugeFungusConfiguration;
 
 /**
  * Extension of huge fungus config that replaces the ground state with a ground tag
  */
-public class SlimeFungusConfig extends HugeFungusConfig {
-  public static final Codec<HugeFungusConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-    ITag.getTagCodec(() -> TagCollectionManager.getManager().getBlockTags()).fieldOf("valid_base").forGetter(
+public class SlimeFungusConfig extends HugeFungusConfiguration {
+  public static final Codec<HugeFungusConfiguration> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    Tag.codec(() -> SerializationTags.getInstance().getBlocks()).fieldOf("valid_base").forGetter(
       config -> config instanceof SlimeFungusConfig ? ((SlimeFungusConfig)config).getGroundTag() : BlockTags.NYLIUM),
     BlockState.CODEC.fieldOf("stem_state").forGetter(config -> config.stemState),
     BlockState.CODEC.fieldOf("hat_state").forGetter(config -> config.hatState),

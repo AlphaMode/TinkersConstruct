@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.tables.tileentity.table.crafting;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.recipe.inventory.ISingleItemInventory;
 import slimeknights.tconstruct.library.recipe.RecipeTypes;
 import slimeknights.tconstruct.library.recipe.material.MaterialRecipe;
@@ -24,7 +24,7 @@ public class TinkerStationInventoryWrapper implements IMutableTinkerStationInven
 
   private MaterialRecipe lastMaterialRecipe;
   @Nullable
-  private PlayerEntity player;
+  private Player player;
 
   /**
    * Creates a new wrapper instance for the station
@@ -45,7 +45,7 @@ public class TinkerStationInventoryWrapper implements IMutableTinkerStationInven
   @Nullable
   private MaterialRecipe findMaterialRecipe(ItemStack stack) {
     // must have world
-    World world = station.getWorld();
+    Level world = station.getLevel();
     if (world == null) {
       return null;
     }
@@ -55,7 +55,7 @@ public class TinkerStationInventoryWrapper implements IMutableTinkerStationInven
       return lastMaterialRecipe;
     }
     // try to find a new recipe
-    Optional<MaterialRecipe> newRecipe = world.getRecipeManager().getRecipe(RecipeTypes.MATERIAL, inv, world);
+    Optional<MaterialRecipe> newRecipe = world.getRecipeManager().getRecipeFor(RecipeTypes.MATERIAL, inv, world);
     if (newRecipe.isPresent()) {
       lastMaterialRecipe = newRecipe.get();
       return lastMaterialRecipe;
@@ -83,7 +83,7 @@ public class TinkerStationInventoryWrapper implements IMutableTinkerStationInven
 
   @Override
   public ItemStack getTinkerableStack() {
-    return this.station.getStackInSlot(TINKER_SLOT);
+    return this.station.getItem(TINKER_SLOT);
   }
 
   @Override
@@ -91,7 +91,7 @@ public class TinkerStationInventoryWrapper implements IMutableTinkerStationInven
     if (index < 0 || index >= station.getInputCount()) {
       return ItemStack.EMPTY;
     }
-    return this.station.getStackInSlot(index + TinkerStationTileEntity.INPUT_SLOT);
+    return this.station.getItem(index + TinkerStationTileEntity.INPUT_SLOT);
   }
 
   @Override
@@ -115,14 +115,14 @@ public class TinkerStationInventoryWrapper implements IMutableTinkerStationInven
   @Override
   public void setInput(int index, ItemStack stack) {
     if (index >= 0 && index < station.getInputCount()) {
-      this.station.setInventorySlotContents(index + TinkerStationTileEntity.INPUT_SLOT, stack);
+      this.station.setItem(index + TinkerStationTileEntity.INPUT_SLOT, stack);
     }
   }
 
   @Override
   public void giveItem(ItemStack stack) {
     if (player != null) {
-      player.inventory.placeItemBackInInventory(player.getEntityWorld(), stack);
+      player.inventory.placeItemBackInInventory(player.getCommandSenderWorld(), stack);
     }
   }
 
@@ -130,7 +130,7 @@ public class TinkerStationInventoryWrapper implements IMutableTinkerStationInven
    * Updates the current player of this inventory
    * @param player  Player
    */
-  public void setPlayer(@Nullable PlayerEntity player) {
+  public void setPlayer(@Nullable Player player) {
     this.player = player;
   }
 }

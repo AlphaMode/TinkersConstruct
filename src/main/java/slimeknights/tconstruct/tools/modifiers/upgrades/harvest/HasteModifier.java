@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.harvest;
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import slimeknights.tconstruct.library.modifiers.IncrementalModifier;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
 import slimeknights.tconstruct.library.tools.nbt.IModDataReadOnly;
@@ -15,10 +15,10 @@ public class HasteModifier extends IncrementalModifier {
   }
 
   @Override
-  public ITextComponent getDisplayName(int level) {
+  public Component getDisplayName(int level) {
     // displays special names for levels of haste
     if (level <= 5) {
-      return applyStyle(new TranslationTextComponent(getTranslationKey() + "." + level));
+      return applyStyle(new TranslatableComponent(getTranslationKey() + "." + level));
     }
     return super.getDisplayName(level);
   }

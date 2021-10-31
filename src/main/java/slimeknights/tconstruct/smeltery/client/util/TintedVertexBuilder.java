@@ -1,45 +1,45 @@
 package slimeknights.tconstruct.smeltery.client.util;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import lombok.RequiredArgsConstructor;
 
 /**
  * Vertex builder wrapper that tints all quads passed in
  */
 @RequiredArgsConstructor
-public class TintedVertexBuilder implements IVertexBuilder {
+public class TintedVertexBuilder implements VertexConsumer {
   /** Base vertex builder */
-  private final IVertexBuilder inner;
+  private final VertexConsumer inner;
   /** Tint color from 0-255 */
   private final int tintRed, tintGreen, tintBlue, tintAlpha;
 
   @Override
-  public IVertexBuilder pos(double x, double y, double z) {
-    return inner.pos(x, y, z);
+  public VertexConsumer vertex(double x, double y, double z) {
+    return inner.vertex(x, y, z);
   }
 
   @Override
-  public IVertexBuilder color(int red, int green, int blue, int alpha) {
+  public VertexConsumer color(int red, int green, int blue, int alpha) {
     return inner.color((red * tintRed) / 0xFF, (green * tintGreen) / 0xFF, (blue * tintBlue) / 0xFF, (alpha * tintAlpha) / 0xFF);
   }
 
   @Override
-  public IVertexBuilder tex(float u, float v) {
-    return inner.tex(u, v);
+  public VertexConsumer uv(float u, float v) {
+    return inner.uv(u, v);
   }
 
   @Override
-  public IVertexBuilder overlay(int u, int v) {
-    return inner.overlay(u, v);
+  public VertexConsumer overlayCoords(int u, int v) {
+    return inner.overlayCoords(u, v);
   }
 
   @Override
-  public IVertexBuilder lightmap(int u, int v) {
-    return inner.lightmap(u, v);
+  public VertexConsumer uv2(int u, int v) {
+    return inner.uv2(u, v);
   }
 
   @Override
-  public IVertexBuilder normal(float x, float y, float z) {
+  public VertexConsumer normal(float x, float y, float z) {
     return inner.normal(x, y, z);
   }
 

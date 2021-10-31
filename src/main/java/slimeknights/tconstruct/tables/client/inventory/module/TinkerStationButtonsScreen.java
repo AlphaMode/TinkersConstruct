@@ -2,11 +2,11 @@ package slimeknights.tconstruct.tables.client.inventory.module;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.TranslationTextComponent;
 import slimeknights.tconstruct.library.client.Icons;
 import slimeknights.tconstruct.tables.client.SlotInformationLoader;
@@ -25,7 +25,7 @@ public class TinkerStationButtonsScreen extends SideButtonsScreen {
   public static final int WOOD_STYLE = 2;
   public static final int METAL_STYLE = 1;
 
-  public TinkerStationButtonsScreen(TinkerStationScreen parent, Container container, PlayerInventory playerInventory, ITextComponent title) {
+  public TinkerStationButtonsScreen(TinkerStationScreen parent, AbstractContainerMenu container, Inventory playerInventory, Component title) {
     super(parent, container, playerInventory, title, TinkerStationScreen.COLUMN_COUNT, false);
 
     this.parent = parent;
@@ -38,8 +38,8 @@ public class TinkerStationButtonsScreen extends SideButtonsScreen {
     int index = 0;
     this.buttonCount = 0;
 
-    Button.IPressable onPressed = button -> {
-      for (Widget widget : TinkerStationButtonsScreen.this.buttons) {
+    Button.OnPress onPressed = button -> {
+      for (AbstractWidget widget : TinkerStationButtonsScreen.this.buttons) {
         if (widget instanceof SlotButtonItem) {
           ((SlotButtonItem) widget).pressed = false;
         }

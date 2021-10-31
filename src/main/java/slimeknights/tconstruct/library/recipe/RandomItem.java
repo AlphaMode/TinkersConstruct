@@ -5,9 +5,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import io.netty.handler.codec.DecoderException;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
 import net.minecraftforge.items.ItemHandlerHelper;
 import slimeknights.mantle.recipe.ItemOutput;
 
@@ -66,7 +66,7 @@ public abstract class RandomItem {
   public abstract JsonElement serialize();
 
   /** Writes this object to the packet buffer */
-  public abstract void write(PacketBuffer buffer);
+  public abstract void write(FriendlyByteBuf buffer);
 
   /**
    * Reads a random item from JSON
@@ -78,7 +78,7 @@ public abstract class RandomItem {
     if (element.isJsonObject()) {
       JsonObject object = element.getAsJsonObject();
       if (object.has("max")) {
-        object.addProperty("count", JSONUtils.getInt(object, "max"));
+        object.addProperty("count", GsonHelper.getAsInt(object, "max"));
         object.remove("max");
       }
     }
@@ -95,20 +95,20 @@ public abstract class RandomItem {
     JsonObject object = element.getAsJsonObject();
     // min and max count
     if (object.has("min")) {
-      return range(result, JSONUtils.getInt(object, "min"));
+      return range(result, GsonHelper.getAsInt(object, "min"));
     }
     // percent chance
     if (object.has("chance")) {
-      return chance(result, JSONUtils.getFloat(object, "chance"));
+      return chance(result, GsonHelper.getAsFloat(object, "chance"));
     }
     // constant tag most likely
     return constant(result);
   }
 
   /** Reads the object from the packet buffer */
-  public static RandomItem read(PacketBuffer buffer) {
+  public static RandomItem read(FriendlyByteBuf buffer) {
     ItemOutput result = ItemOutput.read(buffer);
-    RandomType type = buffer.readEnumValue(RandomType.class);
+    RandomType type = buffer.readEnum(RandomType.class);
     switch (type) {
       case RANGE: {
         int min = buffer.readVarInt();
@@ -156,15 +156,15 @@ public abstract class RandomItem {
         object = resultElement.getAsJsonObject();
       }
       object.addProperty("min", minCount);
-      object.addProperty("max", JSONUtils.getInt(object, "count", 1));
+      object.addProperty("max", GsonHelper.getAsInt(object, "count", 1));
       object.remove("count");
       return object;
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
       result.write(buffer);
-      buffer.writeEnumValue(RandomType.RANGE);
+      buffer.writeEnum(RandomType.RANGE);
       buffer.writeVarInt(minCount);
     }
   }
@@ -205,9 +205,9 @@ public abstract class RandomItem {
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
       result.write(buffer);
-      buffer.writeEnumValue(RandomType.CHANCE);
+      buffer.writeEnum(RandomType.CHANCE);
       buffer.writeFloat(chance);
     }
   }

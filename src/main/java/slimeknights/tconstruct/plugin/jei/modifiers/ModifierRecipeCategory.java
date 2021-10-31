@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.plugin.jei.modifiers;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -14,16 +14,16 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelManager;
-import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.ForgeI18n;
 import slimeknights.mantle.client.model.NBTKeyModel;
@@ -51,8 +51,8 @@ public class ModifierRecipeCategory implements IRecipeCategory<IDisplayModifierR
   private static final String KEY_TITLE = TConstruct.makeTranslationKey("jei", "modifiers.title");
 
   // translation
-  private static final List<ITextComponent> TEXT_FREE = Collections.singletonList(TConstruct.makeTranslation("jei", "modifiers.free"));
-  private static final List<ITextComponent> TEXT_INCREMENTAL = Collections.singletonList(TConstruct.makeTranslation("jei", "modifiers.incremental"));
+  private static final List<Component> TEXT_FREE = Collections.singletonList(TConstruct.makeTranslation("jei", "modifiers.free"));
+  private static final List<Component> TEXT_INCREMENTAL = Collections.singletonList(TConstruct.makeTranslation("jei", "modifiers.incremental"));
   private static final String KEY_SLOT = TConstruct.makeTranslationKey("jei", "modifiers.slot");
   private static final String KEY_SLOTS = TConstruct.makeTranslationKey("jei", "modifiers.slots");
   private static final String KEY_MAX = TConstruct.makeTranslationKey("jei", "modifiers.max");
@@ -99,7 +99,7 @@ public class ModifierRecipeCategory implements IRecipeCategory<IDisplayModifierR
   }
 
   /** Draws a single slot icon */
-  private void drawSlot(MatrixStack matrices, List<List<ItemStack>> inputs, int slot, int x, int y) {
+  private void drawSlot(PoseStack matrices, List<List<ItemStack>> inputs, int slot, int x, int y) {
     if (slot >= inputs.size() || inputs.get(slot).isEmpty()) {
       // -1 as the item list includes the output slot, we skip that
       slotIcons[slot - 1].draw(matrices, x + 1, y + 1);
@@ -107,7 +107,7 @@ public class ModifierRecipeCategory implements IRecipeCategory<IDisplayModifierR
   }
 
   /** Draws the icon for the given slot type */
-  private void drawSlotType(MatrixStack matrices, @Nullable SlotType slotType, int x, int y) {
+  private void drawSlotType(PoseStack matrices, @Nullable SlotType slotType, int x, int y) {
     Minecraft minecraft = Minecraft.getInstance();
     TextureAtlasSprite sprite;
     if (slotTypeSprites.containsKey(slotType)) {
@@ -115,9 +115,9 @@ public class ModifierRecipeCategory implements IRecipeCategory<IDisplayModifierR
     } else {
       ModelManager modelManager = minecraft.getModelManager();
       // gets the model for the item, its a sepcial one that gives us texture info
-      IBakedModel model = minecraft.getItemRenderer().getItemModelMesher().getItemModel(TinkerModifiers.creativeSlotItem.get());
+      BakedModel model = minecraft.getItemRenderer().getItemModelShaper().getItemModel(TinkerModifiers.creativeSlotItem.get());
       if (model != null && model.getOverrides() instanceof NBTKeyModel.Overrides) {
-        RenderMaterial material = ((NBTKeyModel.Overrides)model.getOverrides()).getTexture(slotType == null ? "slotless" : slotType.getName());
+        Material material = ((NBTKeyModel.Overrides)model.getOverrides()).getTexture(slotType == null ? "slotless" : slotType.getName());
         sprite = modelManager.getAtlasTexture(material.getAtlasLocation()).getSprite(material.getTextureLocation());
       } else {
         // failed to use the model, use missing texture

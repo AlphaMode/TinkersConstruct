@@ -4,15 +4,15 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.item.Item;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.client.event.RecipesUpdatedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidStack;
@@ -37,7 +37,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FluidTooltipHandler {
   private static final Map<Fluid,List<FluidGuiEntry>> CACHE = new HashMap<>();
-  public static final ITextComponent HOLD_SHIFT = new TranslationTextComponent(TConstruct.makeTranslationKey("gui", "fluid.hold_shift")).mergeStyle(TextFormatting.GRAY);
+  public static final Component HOLD_SHIFT = new TranslatableComponent(TConstruct.makeTranslationKey("gui", "fluid.hold_shift")).withStyle(ChatFormatting.GRAY);
 
   /*
    * Base units
@@ -75,7 +75,7 @@ public class FluidTooltipHandler {
    * @param fluid  Fluid stack instance
    * @return  Fluid tooltip
    */
-  public static List<ITextComponent> getFluidTooltip(FluidStack fluid) {
+  public static List<Component> getFluidTooltip(FluidStack fluid) {
     return getFluidTooltip(fluid, fluid.getAmount());
   }
 
@@ -85,16 +85,16 @@ public class FluidTooltipHandler {
    * @param amount Amount override
    * @return  Fluid tooltip
    */
-  public static List<ITextComponent> getFluidTooltip(FluidStack fluid, int amount) {
-    List<ITextComponent> tooltip = new ArrayList<>();
+  public static List<Component> getFluidTooltip(FluidStack fluid, int amount) {
+    List<Component> tooltip = new ArrayList<>();
     // fluid name, not sure if there is a cleaner way to do this
-    tooltip.add(fluid.getDisplayName().copyRaw().mergeStyle(TextFormatting.WHITE));
+    tooltip.add(fluid.getDisplayName().plainCopy().withStyle(ChatFormatting.WHITE));
     // material
     appendMaterial(fluid.getFluid(), amount, tooltip);
     // add mod display name
     ModList.get().getModContainerById(Objects.requireNonNull(fluid.getFluid().getRegistryName()).getNamespace())
            .map(container -> container.getModInfo().getDisplayName())
-           .ifPresent(name -> tooltip.add(new StringTextComponent(name).mergeStyle(TextFormatting.BLUE, TextFormatting.ITALIC)));
+           .ifPresent(name -> tooltip.add(new TextComponent(name).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC)));
     return tooltip;
   }
 
@@ -103,7 +103,7 @@ public class FluidTooltipHandler {
    * @param fluid    Input fluid stack
    * @param tooltip  Tooltip to append information
    */
-  public static void appendMaterial(FluidStack fluid, List<ITextComponent> tooltip) {
+  public static void appendMaterial(FluidStack fluid, List<Component> tooltip) {
     appendMaterial(fluid.getFluid(), fluid.getAmount(), tooltip);
   }
 
@@ -113,7 +113,7 @@ public class FluidTooltipHandler {
    * @param original   Input amount
    * @param tooltip    Tooltip to append information
    */
-  public static void appendMaterial(Fluid fluid, int original, List<ITextComponent> tooltip) {
+  public static void appendMaterial(Fluid fluid, int original, List<Component> tooltip) {
     if (appendMaterialNoShift(fluid, original, tooltip)) {
       appendShift(tooltip);
     }
@@ -126,7 +126,7 @@ public class FluidTooltipHandler {
    * @param tooltip    Tooltip to append information
    * @return  True if the amount is not in buckets
    */
-  public static boolean appendMaterialNoShift(Fluid fluid, int original, List<ITextComponent> tooltip) {
+  public static boolean appendMaterialNoShift(Fluid fluid, int original, List<Component> tooltip) {
     int amount = original;
 
     // if holding shift, skip specific units
@@ -148,9 +148,9 @@ public class FluidTooltipHandler {
    * Appends the hold shift message to the tooltip
    * @param tooltip  Tooltip to append information
    */
-  public static void appendShift(List<ITextComponent> tooltip) {
+  public static void appendShift(List<Component> tooltip) {
     if(!Screen.hasShiftDown()) {
-      tooltip.add(StringTextComponent.EMPTY);
+      tooltip.add(TextComponent.EMPTY);
       tooltip.add(HOLD_SHIFT);
     }
   }
@@ -160,7 +160,7 @@ public class FluidTooltipHandler {
    * @param amount   Fluid amount
    * @param tooltip  Tooltip to append information
    */
-  public static void appendIngots(int amount, List<ITextComponent> tooltip) {
+  public static void appendIngots(int amount, List<Component> tooltip) {
     amount = INGOT.getText(tooltip, amount);
     appendBuckets(amount, tooltip);
   }
@@ -170,7 +170,7 @@ public class FluidTooltipHandler {
    * @param amount     Fluid amount
    * @param tooltip  Tooltip to append information
    */
-  public static void appendBuckets(int amount, List<ITextComponent> tooltip) {
+  public static void appendBuckets(int amount, List<Component> tooltip) {
     amount = KILOBUCKET.getText(tooltip, amount);
     amount = BUCKET.getText(tooltip, amount);
     MILLIBUCKET.getText(tooltip, amount);
@@ -182,8 +182,8 @@ public class FluidTooltipHandler {
    * @return  List of entries for the fluid
    */
   private static List<FluidGuiEntry> calcFluidEntries(Fluid fluid) {
-    assert Minecraft.getInstance().world != null;
-    RecipeManager manager = Minecraft.getInstance().world.getRecipeManager();
+    assert Minecraft.getInstance().level != null;
+    RecipeManager manager = Minecraft.getInstance().level.getRecipeManager();
 
     // first, search casting recipes for cast items
     List<FluidGuiEntry> list = new ArrayList<>();

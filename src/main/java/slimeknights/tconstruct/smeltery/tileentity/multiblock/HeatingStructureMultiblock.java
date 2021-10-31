@@ -4,11 +4,11 @@ import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.tileentity.MantleTileEntity;
 import slimeknights.tconstruct.common.multiblock.IMasterLogic;
 import slimeknights.tconstruct.common.multiblock.IServantLogic;
@@ -62,7 +62,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
   }
 
   @Override
-  public StructureData detectMultiblock(World world, BlockPos master, Direction facing) {
+  public StructureData detectMultiblock(Level world, BlockPos master, Direction facing) {
     // clear tanks from last check before calling
     tanks.clear();
     return super.detectMultiblock(world, master, facing);
@@ -75,7 +75,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
    */
   @Override
   @Nullable
-  public StructureData readFromNBT(CompoundNBT nbt) {
+  public StructureData readFromNBT(CompoundTag nbt) {
     // add all tanks from NBT, will be picked up in the create call
     tanks.clear();
     tanks.addAll(readPosList(nbt, TAG_TANKS));
@@ -88,8 +88,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
    * @param pos    Position to check, note it may be mutable
    * @return   True if its a valid slave
    */
-  protected boolean isValidSlave(World world, BlockPos pos) {
-    TileEntity te = world.getTileEntity(pos);
+  protected boolean isValidSlave(Level world, BlockPos pos) {
+    BlockEntity te = world.getBlockEntity(pos);
 
     // slave-blocks are only allowed if they already belong to this smeltery
     if (te instanceof IServantLogic) {
@@ -103,7 +103,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
    * Checks if this structure can expand up by one block
    * @return  True if this structure can expand
    */
-  public boolean canExpand(StructureData data, World world) {
+  public boolean canExpand(StructureData data, Level world) {
     BlockPos min = data.getMinPos();
     BlockPos to = data.getMaxPos().up();
     // want two positions one layer above the structure

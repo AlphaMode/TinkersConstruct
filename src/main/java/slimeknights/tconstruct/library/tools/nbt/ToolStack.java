@@ -5,10 +5,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 import slimeknights.tconstruct.TConstruct;
@@ -67,7 +67,7 @@ public class ToolStack implements IModifierToolStack {
   private final ToolDefinition definition;
   /** Original tool NBT */
   @Getter(AccessLevel.PROTECTED)
-  private final CompoundNBT nbt;
+  private final CompoundTag nbt;
   /** Public view of the internal NBT, to give to modifier hooks */
   private RestrictedCompoundTag restrictedNBT;
 
@@ -116,9 +116,9 @@ public class ToolStack implements IModifierToolStack {
     ToolDefinition definition = item instanceof IModifiable
                                 ? ((IModifiable)item).getToolDefinition()
                                 : ToolDefinition.EMPTY;
-    CompoundNBT nbt = stack.getTag();
+    CompoundTag nbt = stack.getTag();
     if (nbt == null) {
-      nbt = new CompoundNBT();
+      nbt = new CompoundTag();
       if (!copyNbt) {
         stack.setTag(nbt);
       }
@@ -153,7 +153,7 @@ public class ToolStack implements IModifierToolStack {
    * @return  Tool stack
    */
   public static ToolStack createTool(Item item, ToolDefinition definition, List<IMaterial> materials) {
-    ToolStack tool = from(item, definition, new CompoundNBT());
+    ToolStack tool = from(item, definition, new CompoundTag());
     // set cached to empty, saves a NBT lookup or two
     tool.damage = 0;
     tool.broken = false;
@@ -502,7 +502,7 @@ public class ToolStack implements IModifierToolStack {
         persistentModData = ModDataNBT.readFromNBT(nbt.getCompound(TAG_PERSISTENT_MOD_DATA));
       } else {
         // if no tag exists, create it
-        CompoundNBT tag = new CompoundNBT();
+        CompoundTag tag = new CompoundTag();
         nbt.put(TAG_PERSISTENT_MOD_DATA, tag);
         persistentModData = ModDataNBT.readFromNBT(tag);
       }
@@ -529,7 +529,7 @@ public class ToolStack implements IModifierToolStack {
    * @param modData  New data
    */
   protected void setVolatileModData(ModDataNBT modData) {
-    CompoundNBT data = modData.getData();
+    CompoundTag data = modData.getData();
     if (data.isEmpty()) {
       volatileModData = IModDataReadOnly.EMPTY;
       nbt.remove(TAG_VOLATILE_MOD_DATA);

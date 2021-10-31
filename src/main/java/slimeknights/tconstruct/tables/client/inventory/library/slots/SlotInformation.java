@@ -3,10 +3,10 @@ package slimeknights.tconstruct.tables.client.inventory.library.slots;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.util.GsonHelper;
 import slimeknights.tconstruct.library.tools.item.IModifiable;
 import slimeknights.tconstruct.library.tools.item.IModifiableDisplay;
 
@@ -42,17 +42,17 @@ public class SlotInformation {
     List<SlotPosition> slots = SlotPosition.listFromJson(json, "slots");
     Item item = Items.AIR;
     if (json.has("item")) {
-      item = JSONUtils.getItem(json, "item");
+      item = GsonHelper.getAsItem(json, "item");
     }
 
     SlotPosition slotPosition = new SlotPosition(-1, -1);
     if (json.has("tool")) {
-      slotPosition = SlotPosition.fromJson(JSONUtils.getJsonObject(json, "tool"));
+      slotPosition = SlotPosition.fromJson(GsonHelper.getAsJsonObject(json, "tool"));
     }
 
-    int sortIndex = JSONUtils.getInt(json, "sortIndex");
+    int sortIndex = GsonHelper.getAsInt(json, "sortIndex");
     // strict defaults to true if its a tool core as it has a definition to be strict
-    boolean strictSlots = JSONUtils.getBoolean(json, "strictSlots", item instanceof IModifiable);
+    boolean strictSlots = GsonHelper.getAsBoolean(json, "strictSlots", item instanceof IModifiable);
 
     return new SlotInformation(slots, slotPosition, item, sortIndex, strictSlots);
   }

@@ -1,15 +1,15 @@
 package slimeknights.tconstruct.gadgets.item.slimesling;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.UseAction;
-import net.minecraft.network.play.server.SEntityVelocityPacket;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.item.TooltipItem;
 import slimeknights.tconstruct.common.Sounds;
 import slimeknights.tconstruct.common.network.TinkerNetwork;
@@ -17,6 +17,8 @@ import slimeknights.tconstruct.shared.TinkerCommons;
 import slimeknights.tconstruct.shared.block.SlimeType;
 
 import javax.annotation.Nonnull;
+
+import net.minecraft.world.item.Item.Properties;
 
 public abstract class BaseSlimeSlingItem extends TooltipItem {
 
@@ -32,16 +34,16 @@ public abstract class BaseSlimeSlingItem extends TooltipItem {
   }
 
   @Override
-  public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+  public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
     return repair.getItem() == TinkerCommons.slimeball.get(type);
   }
 
   @Nonnull
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-    ItemStack itemStackIn = playerIn.getHeldItem(hand);
-    playerIn.setActiveHand(hand);
-    return new ActionResult<>(ActionResultType.SUCCESS, itemStackIn);
+  public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
+    ItemStack itemStackIn = playerIn.getItemInHand(hand);
+    playerIn.startUsingItem(hand);
+    return new InteractionResultHolder<>(InteractionResult.SUCCESS, itemStackIn);
   }
 
   /** How long it takes to use or consume an item */
@@ -52,8 +54,8 @@ public abstract class BaseSlimeSlingItem extends TooltipItem {
 
   /** returns the action that specifies what animation to play when the items is being used */
   @Override
-  public UseAction getUseAction(ItemStack stack) {
-    return UseAction.BOW;
+  public UseAnim getUseAnimation(ItemStack stack) {
+    return UseAnim.BOW;
   }
 
   /** Determines how much force a charged right click item will release on player letting go
@@ -76,14 +78,14 @@ public abstract class BaseSlimeSlingItem extends TooltipItem {
   /** Send EntityMovementChangePacket if player is on a server
    * @param player player to potentially send a packet for */
   protected void playerServerMovement(LivingEntity player) {
-    if (player instanceof ServerPlayerEntity) {
-      ServerPlayerEntity playerMP = (ServerPlayerEntity) player;
-      TinkerNetwork.getInstance().sendVanillaPacket(new SEntityVelocityPacket(player), playerMP);
+    if (player instanceof ServerPlayer) {
+      ServerPlayer playerMP = (ServerPlayer) player;
+      TinkerNetwork.getInstance().sendVanillaPacket(new ClientboundSetEntityMotionPacket(player), playerMP);
     }
   }
 
   /** Plays the success sound and damages the sling */
-  protected void onSuccess(PlayerEntity player, ItemStack sling) {
+  protected void onSuccess(Player player, ItemStack sling) {
     player.playSound(Sounds.SLIME_SLING.getSound(), 1f, 1f);
     sling.damageItem(1, player, p -> p.sendBreakAnimation(p.getActiveHand()));
   }

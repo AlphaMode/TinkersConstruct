@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.general;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Hand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
@@ -34,7 +34,7 @@ public class ExperiencedModifier extends Modifier {
    */
   private void beforeBlockBreak(BreakEvent event) {
     // only support main hand block breaking currently
-    ToolStack tool = getHeldTool(event.getPlayer(), Hand.MAIN_HAND);
+    ToolStack tool = getHeldTool(event.getPlayer(), InteractionHand.MAIN_HAND);
     if (tool != null) {
       int level = tool.getModifierLevel(this);
       if (level > 0) {
@@ -48,7 +48,7 @@ public class ExperiencedModifier extends Modifier {
    * @param event  Event
    */
   private void onEntityKill(LivingExperienceDropEvent event) {
-    PlayerEntity player = event.getAttackingPlayer();
+    Player player = event.getAttackingPlayer();
     if (player != null) {
       ToolStack tool = getHeldTool(player, ModifierLootingHandler.getLootingHand(player));
       if (tool != null) {

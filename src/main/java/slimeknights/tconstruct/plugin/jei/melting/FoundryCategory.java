@@ -9,9 +9,9 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.gui.ingredient.ITooltipCallback;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ForgeI18n;
 import slimeknights.tconstruct.TConstruct;
@@ -81,7 +81,7 @@ public class FoundryCategory extends AbstractMeltingCategory {
     }
 
     @Override
-    protected boolean addOreTooltip(FluidStack stack, List<ITextComponent> list) {
+    protected boolean addOreTooltip(FluidStack stack, List<Component> list) {
       return FluidTooltipHandler.appendMaterialNoShift(stack.getFluid(), IMeltingInventory.applyOreBoost(stack.getAmount(), Config.COMMON.foundryNuggetsPerOre.get()), list);
     }
   }

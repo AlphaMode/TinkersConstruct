@@ -1,12 +1,12 @@
 package slimeknights.tconstruct.tools.modifiers.effect;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.EffectType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.server.level.ServerLevel;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerEffect;
 import slimeknights.tconstruct.library.tools.helper.ToolAttackUtil;
@@ -21,7 +21,7 @@ import java.util.List;
 public class BleedingEffect extends TinkerEffect {
   private static final String SOURCE_KEY = TConstruct.prefix("bleed");
   public BleedingEffect() {
-    super(EffectType.HARMFUL, 0xa80000, false);
+    super(MobEffectCategory.HARMFUL, 0xa80000, false);
   }
 
   @Override
@@ -30,15 +30,15 @@ public class BleedingEffect extends TinkerEffect {
   }
 
   @Override
-  public boolean isReady(int tick, int level) {
+  public boolean isDurationEffectTick(int tick, int level) {
     // every half second
     return tick > 0 && tick % 20 == 0;
   }
 
   @Override
-  public void performEffect(LivingEntity target, int level) {
+  public void applyEffectTick(LivingEntity target, int level) {
     // attribute to player kill
-    LivingEntity lastAttacker = target.getLastAttackedEntity();
+    LivingEntity lastAttacker = target.getLastHurtMob();
     DamageSource source;
     if(lastAttacker != null) {
       source = new EntityDamageSource(SOURCE_KEY, lastAttacker);
@@ -48,13 +48,13 @@ public class BleedingEffect extends TinkerEffect {
     }
 
     // perform damage
-    int hurtResistantTime = target.hurtResistantTime;
+    int hurtResistantTime = target.invulnerableTime;
     ToolAttackUtil.attackEntitySecondary(source, (level + 1f) / 2f, target, target, true);
-    target.hurtResistantTime = hurtResistantTime;
+    target.invulnerableTime = hurtResistantTime;
 
     // damage particles
-    if (target.world instanceof ServerWorld) {
-      ((ServerWorld)target.world).spawnParticle(ParticleTypes.DAMAGE_INDICATOR, target.getPosX(), target.getPosYHeight(0.5), target.getPosZ(), 1, 0.1, 0, 0.1, 0.2);
+    if (target.level instanceof ServerLevel) {
+      ((ServerLevel)target.level).sendParticles(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getY(0.5), target.getZ(), 1, 0.1, 0, 0.1, 0.2);
     }
   }
 }

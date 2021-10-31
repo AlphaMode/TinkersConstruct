@@ -2,14 +2,14 @@ package slimeknights.tconstruct.library.recipe.tinkerstation.repairing;
 
 import com.mojang.datafixers.util.Pair;
 import lombok.Getter;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.SpecialRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.modifiers.Modifier;
@@ -21,7 +21,7 @@ import slimeknights.tconstruct.tools.TinkerModifiers;
 
 import javax.annotation.Nullable;
 
-public class ModifierRepairCraftingRecipe extends SpecialRecipe implements IModifierRepairRecipe {
+public class ModifierRepairCraftingRecipe extends CustomRecipe implements IModifierRepairRecipe {
   @Getter
   private final Modifier modifier;
   @Getter
@@ -41,12 +41,12 @@ public class ModifierRepairCraftingRecipe extends SpecialRecipe implements IModi
    * @return  Relevant inputs, or null if invalid
    */
   @Nullable
-  protected Pair<ToolStack, Integer> getRelevantInputs(CraftingInventory inv) {
+  protected Pair<ToolStack, Integer> getRelevantInputs(CraftingContainer inv) {
     ToolStack tool = null;
     int itemsFound = 0;
     int modifierLevel = 0;
-    for (int i = 0; i < inv.getSizeInventory(); i++) {
-      ItemStack stack = inv.getStackInSlot(i);
+    for (int i = 0; i < inv.getContainerSize(); i++) {
+      ItemStack stack = inv.getItem(i);
       if (stack.isEmpty()) {
         continue;
       }
@@ -83,12 +83,12 @@ public class ModifierRepairCraftingRecipe extends SpecialRecipe implements IModi
   }
 
   @Override
-  public boolean matches(CraftingInventory inv, World world) {
+  public boolean matches(CraftingContainer inv, Level world) {
     return getRelevantInputs(inv) != null;
   }
 
   @Override
-  public ItemStack getCraftingResult(CraftingInventory inv) {
+  public ItemStack assemble(CraftingContainer inv) {
     Pair<ToolStack, Integer> inputs = getRelevantInputs(inv);
     if (inputs == null) {
       TConstruct.LOG.error("Recipe repair on {} failed to find items after matching", getId());

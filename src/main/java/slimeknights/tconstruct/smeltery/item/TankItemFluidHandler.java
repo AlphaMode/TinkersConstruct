@@ -2,8 +2,8 @@ package slimeknights.tconstruct.smeltery.item;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
@@ -15,6 +15,8 @@ import slimeknights.tconstruct.smeltery.tileentity.component.TankTileEntity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
 /**
  * Handler that works with a tank item to adjust its tank in NBT

@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.library.data.recipe;
 
-import net.minecraft.data.IFinishedRecipe;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.tags.ITag;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.ItemOutput;
@@ -30,7 +30,7 @@ public interface IMaterialRecipeHelper extends IRecipeHelper {
    * @param needed    Number of items needed
    * @param saveName  Material save name
    */
-  default void materialRecipe(Consumer<IFinishedRecipe> consumer, MaterialId material, Ingredient input, int value, int needed, String saveName) {
+  default void materialRecipe(Consumer<FinishedRecipe> consumer, MaterialId material, Ingredient input, int value, int needed, String saveName) {
     materialRecipe(consumer, material, input, value, needed, null, saveName);
   }
 
@@ -43,7 +43,7 @@ public interface IMaterialRecipeHelper extends IRecipeHelper {
    * @param needed    Number of items needed
    * @param saveName  Material save name
    */
-  default void materialRecipe(Consumer<IFinishedRecipe> consumer, MaterialId material, Ingredient input, int value, int needed, @Nullable ItemOutput leftover, String saveName) {
+  default void materialRecipe(Consumer<FinishedRecipe> consumer, MaterialId material, Ingredient input, int value, int needed, @Nullable ItemOutput leftover, String saveName) {
     MaterialRecipeBuilder builder = MaterialRecipeBuilder.materialRecipe(material)
                                                          .setIngredient(input)
                                                          .setValue(value)

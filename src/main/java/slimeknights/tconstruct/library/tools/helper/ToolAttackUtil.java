@@ -4,16 +4,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.entity.ai.attributes.AttributeModifierManager;
-import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SEntityVelocityPacket;
 import net.minecraft.particles.IParticleData;
@@ -21,7 +21,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.Effects;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
@@ -61,11 +61,11 @@ public class ToolAttackUtil {
    * @param hand    Attacking hand
    * @return  Cooldown function
    */
-  public static DoubleSupplier getCooldownFunction(PlayerEntity player, Hand hand) {
-    if (hand == Hand.OFF_HAND) {
+  public static DoubleSupplier getCooldownFunction(Player player, InteractionHand hand) {
+    if (hand == InteractionHand.OFF_HAND) {
       return () -> OffhandCooldownTracker.getCooldown(player);
     }
-    return () -> player.getCooledAttackStrength(0.5f);
+    return () -> player.getAttackStrengthScale(0.5f);
   }
 
   /**
@@ -77,10 +77,10 @@ public class ToolAttackUtil {
    * @param hand     Hand used
    * @return  Attack damage
    */
-  public static float getAttributeAttackDamage(IModifierToolStack tool, LivingEntity holder, Hand hand) {
-    if (hand == Hand.OFF_HAND && !holder.world.isRemote()) {
+  public static float getAttributeAttackDamage(IModifierToolStack tool, LivingEntity holder, InteractionHand hand) {
+    if (hand == InteractionHand.OFF_HAND && !holder.level.isClientSide()) {
       // first, get a map of existing damage modifiers to exclude
-      Multimap<Attribute,AttributeModifier> mainModifiers = new SingleKeyMultimap<>(Attributes.ATTACK_DAMAGE, holder.getHeldItemMainhand().getAttributeModifiers(EquipmentSlotType.MAINHAND).get(Attributes.ATTACK_DAMAGE));
+      Multimap<Attribute,AttributeModifier> mainModifiers = new SingleKeyMultimap<>(Attributes.ATTACK_DAMAGE, holder.getMainHandItem().getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE));
 
       // next, build a list of damage modifiers from the offhand stack, handled directly as it saves parsing the tool twice and lets us simplify by filtering
       ImmutableList.Builder<AttributeModifier> listBuilder = ImmutableList.builder();

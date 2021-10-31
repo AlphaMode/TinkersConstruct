@@ -1,10 +1,12 @@
 package slimeknights.tconstruct.world.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.NonNullList;
 import slimeknights.tconstruct.shared.block.SlimeType;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 /** Simple block to hide ichor */
 public class SlimeWartBlock extends Block {
@@ -15,9 +17,9 @@ public class SlimeWartBlock extends Block {
   }
 
   @Override
-  public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+  public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
     if (foliageType != SlimeType.ICHOR) {
-      super.fillItemGroup(group, items);
+      super.fillItemCategory(group, items);
     }
   }
 }

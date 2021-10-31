@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.smeltery.tileentity.multiblock;
 
 import lombok.Getter;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.util.TileEntityHelper;
 import slimeknights.tconstruct.common.multiblock.IMasterLogic;
 import slimeknights.tconstruct.common.multiblock.IServantLogic;
@@ -55,7 +55,7 @@ public class MultiblockStructureData {
 
   /** Bounding box representing the area inside the structure */
   @Getter
-  private final AxisAlignedBB bounds;
+  private final AABB bounds;
 
   public MultiblockStructureData(BlockPos minPos, BlockPos maxPos, Set<BlockPos> extraPositons, boolean hasFloor, boolean hasFrame, boolean hasCeiling) {
     this.minPos = minPos;
@@ -66,12 +66,12 @@ public class MultiblockStructureData {
     this.hasCeiling = hasCeiling;
 
     // inner positions
-    minInside = minPos.add(1, hasFloor ? 1 : 0, 1);
-    maxInside = maxPos.add(-1, hasCeiling ? -1 : 0, -1);
+    minInside = minPos.offset(1, hasFloor ? 1 : 0, 1);
+    maxInside = maxPos.offset(-1, hasCeiling ? -1 : 0, -1);
     innerX = maxInside.getX() - minInside.getX() + 1;
     innerY = maxInside.getY() - minInside.getY() + 1;
     innerZ = maxInside.getZ() - minInside.getZ() + 1;
-    bounds = new AxisAlignedBB(minInside, maxInside.add(1, 1, 1));
+    bounds = new AABB(minInside, maxInside.offset(1, 1, 1));
   }
 
   /**
@@ -158,12 +158,12 @@ public class MultiblockStructureData {
    * Iterates over each position contained in this structure
    * @param consumer  Position consumer, note the position is mutable, so call {@link BlockPos#toImmutable()} if you have to store it
    */
-  protected void forEachContained(Consumer<BlockPos.Mutable> consumer) {
-    BlockPos.Mutable mutable = new BlockPos.Mutable();
+  protected void forEachContained(Consumer<BlockPos.MutableBlockPos> consumer) {
+    BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
     for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
       for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
         for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
-          mutable.setPos(x, y, z);
+          mutable.set(x, y, z);
           if (containsBase(mutable)) {
             consumer.accept(mutable);
           }
@@ -185,13 +185,13 @@ public class MultiblockStructureData {
       shouldUpdate = pos -> !oldStructure.contains(pos);
     }
 
-    World world = master.getTileEntity().getWorld();
+    Level world = master.getTileEntity().getLevel();
     assert world != null;
 
 
     // assign master to each servant
     forEachContained(pos -> {
-      if (shouldUpdate.test(pos) && world.isBlockLoaded(pos)) {
+      if (shouldUpdate.test(pos) && world.hasChunkAt(pos)) {
         TileEntityHelper.getTile(IServantLogic.class, world, pos).ifPresent(te -> te.setPotentialMaster(master));
       }
     });
@@ -199,7 +199,7 @@ public class MultiblockStructureData {
     // remove master from anything only in the old structure
     if (oldStructure != null) {
       oldStructure.forEachContained(pos -> {
-        if (!contains(pos) && world.isBlockLoaded(pos)) {
+        if (!contains(pos) && world.hasChunkAt(pos)) {
           TileEntityHelper.getTile(IServantLogic.class, world, pos).ifPresent(te -> te.removeMaster(master));
         }
       });
@@ -211,10 +211,10 @@ public class MultiblockStructureData {
    * @param master  Master to remove
    */
   public void clearMaster(IMasterLogic master) {
-    World world = master.getTileEntity().getWorld();
+    Level world = master.getTileEntity().getLevel();
     assert world != null;
     forEachContained(pos -> {
-      if (world.isBlockLoaded(pos)) {
+      if (world.hasChunkAt(pos)) {
         TileEntityHelper.getTile(IServantLogic.class, world, pos).ifPresent(te -> te.removeMaster(master));
       }
     });
@@ -224,8 +224,8 @@ public class MultiblockStructureData {
    * Writes this structure to NBT for the client, client does not need a full list of positions, just render bounds
    * @return  structure as NBT
    */
-  public CompoundNBT writeClientNBT() {
-    CompoundNBT nbt = new CompoundNBT();
+  public CompoundTag writeClientNBT() {
+    CompoundTag nbt = new CompoundTag();
     nbt.put(TAG_MIN, TagUtil.writePos(minPos));
     nbt.put(TAG_MAX, TagUtil.writePos(maxPos));
     return nbt;
@@ -235,8 +235,8 @@ public class MultiblockStructureData {
    * Writes the full NBT data for writing to disk
    * @return  structure as NBT
    */
-  public CompoundNBT writeToNBT() {
-    CompoundNBT nbt = writeClientNBT();
+  public CompoundTag writeToNBT() {
+    CompoundTag nbt = writeClientNBT();
     if (!extra.isEmpty()) {
       nbt.put(TAG_EXTRA_POS, writePosList(extra));
     }
@@ -248,8 +248,8 @@ public class MultiblockStructureData {
    * @param collection  Position collection
    * @return  NBT list
    */
-  protected static ListNBT writePosList(Collection<BlockPos> collection) {
-    ListNBT list = new ListNBT();
+  protected static ListTag writePosList(Collection<BlockPos> collection) {
+    ListTag list = new ListTag();
     for (BlockPos pos : collection) {
       list.add(TagUtil.writePos(pos));
     }

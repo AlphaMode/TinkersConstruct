@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.tools.item;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -19,10 +19,12 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class CreativeSlotItem extends Item {
   private static final String NBT_KEY = "slot";
   private static final String TOOLTIP = TConstruct.makeTranslationKey("item", "creative_slot.tooltip");
-  private static final ITextComponent TOOLTIP_MISSING = TConstruct.makeTranslation("item", "creative_slot.missing").mergeStyle(TextFormatting.RED);
+  private static final Component TOOLTIP_MISSING = TConstruct.makeTranslation("item", "creative_slot.missing").withStyle(ChatFormatting.RED);
 
   public CreativeSlotItem(Properties properties) {
     super(properties);
@@ -31,7 +33,7 @@ public class CreativeSlotItem extends Item {
   /** Gets the value of the slot tag from the given stack */
   @Nullable
   public static SlotType getSlot(ItemStack stack) {
-    CompoundNBT nbt = stack.getTag();
+    CompoundTag nbt = stack.getTag();
     if (nbt != null && nbt.contains(NBT_KEY, NBT.TAG_STRING)) {
       return SlotType.getIfPresent(nbt.getString(NBT_KEY));
     }

@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.smeltery.recipe;
 
-import net.minecraft.fluid.Fluid;
+import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.recipe.inventory.ISingleItemInventory;
 
 /**

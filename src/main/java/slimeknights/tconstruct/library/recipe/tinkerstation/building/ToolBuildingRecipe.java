@@ -2,10 +2,10 @@ package slimeknights.tconstruct.library.recipe.tinkerstation.building;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.recipe.tinkerstation.ITinkerStationInventory;
 import slimeknights.tconstruct.library.recipe.tinkerstation.ITinkerStationRecipe;
@@ -31,12 +31,12 @@ public class ToolBuildingRecipe implements ITinkerStationRecipe {
   protected final IModifiable output;
 
   @Override
-  public IRecipeSerializer<?> getSerializer() {
+  public RecipeSerializer<?> getSerializer() {
     return TinkerTables.toolBuildingRecipeSerializer.get();
   }
 
   @Override
-  public boolean matches(ITinkerStationInventory inv, World worldIn) {
+  public boolean matches(ITinkerStationInventory inv, Level worldIn) {
     if (!inv.getTinkerableStack().isEmpty()) {
       return false;
     }
@@ -62,7 +62,7 @@ public class ToolBuildingRecipe implements ITinkerStationRecipe {
   }
 
   @Override
-  public ItemStack getCraftingResult(ITinkerStationInventory inv) {
+  public ItemStack assemble(ITinkerStationInventory inv) {
     // first n slots contain parts
     List<IMaterial> materials = IntStream.range(0, output.getToolDefinition().getRequiredComponents().size())
                                          .mapToObj(inv::getInput)
@@ -74,7 +74,7 @@ public class ToolBuildingRecipe implements ITinkerStationRecipe {
   /** @deprecated Use {@link #getCraftingResult(ITinkerStationInventory)} */
   @Deprecated
   @Override
-  public ItemStack getRecipeOutput() {
+  public ItemStack getResultItem() {
     return new ItemStack(this.output);
   }
 }

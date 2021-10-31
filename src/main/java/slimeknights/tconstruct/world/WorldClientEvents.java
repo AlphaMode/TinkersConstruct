@@ -2,16 +2,16 @@ package slimeknights.tconstruct.world;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.color.ItemColors;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.renderer.entity.SlimeRenderer;
-import net.minecraft.client.renderer.entity.model.GenericHeadModel;
-import net.minecraft.client.renderer.tileentity.SkullTileEntityRenderer;
-import net.minecraft.item.Items;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.model.SkullModel;
+import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
+import net.minecraft.world.item.Items;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
@@ -38,17 +38,17 @@ public class WorldClientEvents extends ClientEventBase {
   /**
    * Called by TinkerClient to add the resource listeners, runs during constructor
    */
-  public static void addResourceListener(IReloadableResourceManager manager) {
+  public static void addResourceListener(ReloadableResourceManager manager) {
     for (SlimeType type : SlimeType.values()) {
-      manager.addReloadListener(new SlimeColorReloadListener(type));
+      manager.registerReloadListener(new SlimeColorReloadListener(type));
     }
   }
 
   @SubscribeEvent
   static void registerParticleFactories(ParticleFactoryRegisterEvent event) {
-    Minecraft.getInstance().particles.registerFactory(TinkerWorld.skySlimeParticle.get(), new SlimeParticle.Factory(SlimeType.SKY));
-    Minecraft.getInstance().particles.registerFactory(TinkerWorld.enderSlimeParticle.get(), new SlimeParticle.Factory(SlimeType.ENDER));
-    Minecraft.getInstance().particles.registerFactory(TinkerWorld.terracubeParticle.get(), new SlimeParticle.Factory(Items.CLAY_BALL));
+    Minecraft.getInstance().particleEngine.register(TinkerWorld.skySlimeParticle.get(), new SlimeParticle.Factory(SlimeType.SKY));
+    Minecraft.getInstance().particleEngine.register(TinkerWorld.enderSlimeParticle.get(), new SlimeParticle.Factory(SlimeType.ENDER));
+    Minecraft.getInstance().particleEngine.register(TinkerWorld.terracubeParticle.get(), new SlimeParticle.Factory(Items.CLAY_BALL));
   }
 
   @SubscribeEvent
@@ -58,60 +58,60 @@ public class WorldClientEvents extends ClientEventBase {
     RenderingRegistry.registerEntityRenderingHandler(TinkerWorld.enderSlimeEntity.get(), TinkerSlimeRenderer.ENDER_SLIME_FACTORY);
     RenderingRegistry.registerEntityRenderingHandler(TinkerWorld.terracubeEntity.get(), TerracubeRenderer.TERRACUBE_RENDERER);
 
-    RenderType cutout = RenderType.getCutout();
-    RenderType cutoutMipped = RenderType.getCutoutMipped();
+    RenderType cutout = RenderType.cutout();
+    RenderType cutoutMipped = RenderType.cutoutMipped();
 
     // render types - slime plants
     for (SlimeType type : SlimeType.values()) {
       if (type != SlimeType.BLOOD) {
-        RenderTypeLookup.setRenderLayer(TinkerWorld.slimeLeaves.get(type), cutoutMipped);
+        ItemBlockRenderTypes.setRenderLayer(TinkerWorld.slimeLeaves.get(type), cutoutMipped);
       }
-      RenderTypeLookup.setRenderLayer(TinkerWorld.vanillaSlimeGrass.get(type), cutoutMipped);
-      RenderTypeLookup.setRenderLayer(TinkerWorld.earthSlimeGrass.get(type), cutoutMipped);
-      RenderTypeLookup.setRenderLayer(TinkerWorld.skySlimeGrass.get(type), cutoutMipped);
-      RenderTypeLookup.setRenderLayer(TinkerWorld.enderSlimeGrass.get(type), cutoutMipped);
-      RenderTypeLookup.setRenderLayer(TinkerWorld.ichorSlimeGrass.get(type), cutoutMipped);
-      RenderTypeLookup.setRenderLayer(TinkerWorld.slimeFern.get(type), cutout);
-      RenderTypeLookup.setRenderLayer(TinkerWorld.slimeTallGrass.get(type), cutout);
-      RenderTypeLookup.setRenderLayer(TinkerWorld.slimeSapling.get(type), cutout);
+      ItemBlockRenderTypes.setRenderLayer(TinkerWorld.vanillaSlimeGrass.get(type), cutoutMipped);
+      ItemBlockRenderTypes.setRenderLayer(TinkerWorld.earthSlimeGrass.get(type), cutoutMipped);
+      ItemBlockRenderTypes.setRenderLayer(TinkerWorld.skySlimeGrass.get(type), cutoutMipped);
+      ItemBlockRenderTypes.setRenderLayer(TinkerWorld.enderSlimeGrass.get(type), cutoutMipped);
+      ItemBlockRenderTypes.setRenderLayer(TinkerWorld.ichorSlimeGrass.get(type), cutoutMipped);
+      ItemBlockRenderTypes.setRenderLayer(TinkerWorld.slimeFern.get(type), cutout);
+      ItemBlockRenderTypes.setRenderLayer(TinkerWorld.slimeTallGrass.get(type), cutout);
+      ItemBlockRenderTypes.setRenderLayer(TinkerWorld.slimeSapling.get(type), cutout);
     }
-    RenderTypeLookup.setRenderLayer(TinkerWorld.enderSlimeVine.get(), cutout);
-    RenderTypeLookup.setRenderLayer(TinkerWorld.skySlimeVine.get(), cutout);
+    ItemBlockRenderTypes.setRenderLayer(TinkerWorld.enderSlimeVine.get(), cutout);
+    ItemBlockRenderTypes.setRenderLayer(TinkerWorld.skySlimeVine.get(), cutout);
 
     // render types - slime blocks
-    RenderType translucent = RenderType.getTranslucent();
+    RenderType translucent = RenderType.translucent();
     for (SlimeType type : SlimeType.TINKER) {
-      RenderTypeLookup.setRenderLayer(TinkerWorld.slime.get(type), translucent);
+      ItemBlockRenderTypes.setRenderLayer(TinkerWorld.slime.get(type), translucent);
     }
 
     // doors
-    RenderTypeLookup.setRenderLayer(TinkerWorld.greenheart.getDoor(), cutout);
-    RenderTypeLookup.setRenderLayer(TinkerWorld.greenheart.getTrapdoor(), cutout);
-    RenderTypeLookup.setRenderLayer(TinkerWorld.skyroot.getDoor(), cutout);
-    RenderTypeLookup.setRenderLayer(TinkerWorld.skyroot.getTrapdoor(), cutout);
-    RenderTypeLookup.setRenderLayer(TinkerWorld.bloodshroom.getDoor(), cutout);
-    RenderTypeLookup.setRenderLayer(TinkerWorld.bloodshroom.getTrapdoor(), cutout);
+    ItemBlockRenderTypes.setRenderLayer(TinkerWorld.greenheart.getDoor(), cutout);
+    ItemBlockRenderTypes.setRenderLayer(TinkerWorld.greenheart.getTrapdoor(), cutout);
+    ItemBlockRenderTypes.setRenderLayer(TinkerWorld.skyroot.getDoor(), cutout);
+    ItemBlockRenderTypes.setRenderLayer(TinkerWorld.skyroot.getTrapdoor(), cutout);
+    ItemBlockRenderTypes.setRenderLayer(TinkerWorld.bloodshroom.getDoor(), cutout);
+    ItemBlockRenderTypes.setRenderLayer(TinkerWorld.bloodshroom.getTrapdoor(), cutout);
 
     // skull rendering
-    GenericHeadModel normalHead = new GenericHeadModel(0, 0, 64, 32);
-    GenericHeadModel tinkersOverlayHead = new HeadWithOverlayModel(0, 0, 0, 16, 32, 32);
-    SkullTileEntityRenderer.MODELS.put(TinkerHeadType.BLAZE, normalHead);
-    SkullTileEntityRenderer.MODELS.put(TinkerHeadType.ENDERMAN, new GenericHeadModel(0, 0, 32, 16));
-    SkullTileEntityRenderer.MODELS.put(TinkerHeadType.STRAY, tinkersOverlayHead);
-    SkullTileEntityRenderer.SKINS.put(TinkerHeadType.BLAZE, new ResourceLocation("textures/entity/blaze.png"));
-    SkullTileEntityRenderer.SKINS.put(TinkerHeadType.ENDERMAN, TConstruct.getResource("textures/entity/skull/enderman.png"));
-    SkullTileEntityRenderer.SKINS.put(TinkerHeadType.STRAY, TConstruct.getResource("textures/entity/skull/stray.png"));
+    SkullModel normalHead = new SkullModel(0, 0, 64, 32);
+    SkullModel tinkersOverlayHead = new HeadWithOverlayModel(0, 0, 0, 16, 32, 32);
+    SkullBlockRenderer.MODEL_BY_TYPE.put(TinkerHeadType.BLAZE, normalHead);
+    SkullBlockRenderer.MODEL_BY_TYPE.put(TinkerHeadType.ENDERMAN, new SkullModel(0, 0, 32, 16));
+    SkullBlockRenderer.MODEL_BY_TYPE.put(TinkerHeadType.STRAY, tinkersOverlayHead);
+    SkullBlockRenderer.SKIN_BY_TYPE.put(TinkerHeadType.BLAZE, new ResourceLocation("textures/entity/blaze.png"));
+    SkullBlockRenderer.SKIN_BY_TYPE.put(TinkerHeadType.ENDERMAN, TConstruct.getResource("textures/entity/skull/enderman.png"));
+    SkullBlockRenderer.SKIN_BY_TYPE.put(TinkerHeadType.STRAY, TConstruct.getResource("textures/entity/skull/stray.png"));
     // zombies
-    SkullTileEntityRenderer.MODELS.put(TinkerHeadType.HUSK, new GenericHeadModel(0, 0, 64, 64));
-    SkullTileEntityRenderer.MODELS.put(TinkerHeadType.DROWNED, tinkersOverlayHead);
-    SkullTileEntityRenderer.SKINS.put(TinkerHeadType.HUSK, new ResourceLocation("textures/entity/zombie/husk.png"));
-    SkullTileEntityRenderer.SKINS.put(TinkerHeadType.DROWNED, TConstruct.getResource("textures/entity/skull/drowned.png"));
+    SkullBlockRenderer.MODEL_BY_TYPE.put(TinkerHeadType.HUSK, new SkullModel(0, 0, 64, 64));
+    SkullBlockRenderer.MODEL_BY_TYPE.put(TinkerHeadType.DROWNED, tinkersOverlayHead);
+    SkullBlockRenderer.SKIN_BY_TYPE.put(TinkerHeadType.HUSK, new ResourceLocation("textures/entity/zombie/husk.png"));
+    SkullBlockRenderer.SKIN_BY_TYPE.put(TinkerHeadType.DROWNED, TConstruct.getResource("textures/entity/skull/drowned.png"));
     // spider
-    GenericHeadModel spiderHead = new GenericHeadModel(32, 4, 64, 32);
-    SkullTileEntityRenderer.MODELS.put(TinkerHeadType.SPIDER, spiderHead);
-    SkullTileEntityRenderer.MODELS.put(TinkerHeadType.CAVE_SPIDER, spiderHead);
-    SkullTileEntityRenderer.SKINS.put(TinkerHeadType.SPIDER, new ResourceLocation("textures/entity/spider/spider.png"));
-    SkullTileEntityRenderer.SKINS.put(TinkerHeadType.CAVE_SPIDER, new ResourceLocation("textures/entity/spider/cave_spider.png"));
+    SkullModel spiderHead = new SkullModel(32, 4, 64, 32);
+    SkullBlockRenderer.MODEL_BY_TYPE.put(TinkerHeadType.SPIDER, spiderHead);
+    SkullBlockRenderer.MODEL_BY_TYPE.put(TinkerHeadType.CAVE_SPIDER, spiderHead);
+    SkullBlockRenderer.SKIN_BY_TYPE.put(TinkerHeadType.SPIDER, new ResourceLocation("textures/entity/spider/spider.png"));
+    SkullBlockRenderer.SKIN_BY_TYPE.put(TinkerHeadType.CAVE_SPIDER, new ResourceLocation("textures/entity/spider/cave_spider.png"));
   }
 
   @SubscribeEvent
@@ -171,7 +171,7 @@ public class WorldClientEvents extends ClientEventBase {
       return SlimeColorizer.getColorStatic(type);
     }
     if (add != null) {
-      pos = pos.add(add);
+      pos = pos.offset(add);
     }
 
     return SlimeColorizer.getColorForPos(pos, type);

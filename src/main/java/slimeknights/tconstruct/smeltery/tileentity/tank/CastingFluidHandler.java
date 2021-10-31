@@ -3,9 +3,9 @@ package slimeknights.tconstruct.smeltery.tileentity.tank;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -17,6 +17,8 @@ import slimeknights.tconstruct.smeltery.network.FluidUpdatePacket;
 import slimeknights.tconstruct.smeltery.tileentity.CastingTileEntity;
 
 import java.util.Objects;
+
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
 @RequiredArgsConstructor
 public class CastingFluidHandler implements IFluidHandler {
@@ -172,7 +174,7 @@ public class CastingFluidHandler implements IFluidHandler {
   private static final String TAG_CAPACITY = "capacity";
 
   /** Reads the tank from NBT */
-  public void readFromNBT(CompoundNBT nbt) {
+  public void readFromNBT(CompoundTag nbt) {
     capacity = nbt.getInt(TAG_CAPACITY);
     if (nbt.contains(TAG_FLUID, NBT.TAG_COMPOUND)) {
       setFluid(FluidStack.loadFluidStackFromNBT(nbt.getCompound(TAG_FLUID)));

@@ -1,24 +1,24 @@
 package slimeknights.tconstruct.gadgets.entity;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.item.ItemFrameEntity;
+import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
 import slimeknights.tconstruct.common.Sounds;
@@ -26,22 +26,22 @@ import slimeknights.tconstruct.gadgets.TinkerGadgets;
 
 import javax.annotation.Nullable;
 
-public class FancyItemFrameEntity extends ItemFrameEntity implements IEntityAdditionalSpawnData {
+public class FancyItemFrameEntity extends ItemFrame implements IEntityAdditionalSpawnData {
   private static final int DIAMOND_TIMER = 300;
-  private static final DataParameter<Integer> VARIANT = EntityDataManager.createKey(FancyItemFrameEntity.class, DataSerializers.VARINT);
+  private static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(FancyItemFrameEntity.class, EntityDataSerializers.INT);
   private static final String TAG_VARIANT = "Variant";
   private static final String TAG_ROTATION_TIMER = "RotationTimer";
 
   private int rotationTimer = 0;
-  public FancyItemFrameEntity(EntityType<? extends FancyItemFrameEntity> type, World world) {
+  public FancyItemFrameEntity(EntityType<? extends FancyItemFrameEntity> type, Level world) {
     super(type, world);
   }
 
-  public FancyItemFrameEntity(World worldIn, BlockPos blockPos, Direction face, FrameType variant) {
+  public FancyItemFrameEntity(Level worldIn, BlockPos blockPos, Direction face, FrameType variant) {
     super(TinkerGadgets.itemFrameEntity.get(), worldIn);
-    this.hangingPosition = blockPos;
-    this.updateFacingWithBoundingBox(face);
-    this.dataManager.set(VARIANT, variant.getId());
+    this.pos = blockPos;
+    this.setDirection(face);
+    this.entityData.set(VARIANT, variant.getId());
   }
 
   /** Quick helper as two types spin */

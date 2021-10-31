@@ -1,14 +1,14 @@
 package slimeknights.tconstruct.smeltery.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -22,6 +22,8 @@ import slimeknights.tconstruct.smeltery.tileentity.component.TankTileEntity;
 
 import javax.annotation.Nullable;
 import java.util.List;
+
+import net.minecraft.world.item.Item.Properties;
 
 public class TankItem extends BlockTooltipItem {
   private static final String KEY_FLUID = TConstruct.makeTranslationKey("block", "tank.fluid");
@@ -46,21 +48,21 @@ public class TankItem extends BlockTooltipItem {
 
   @Override
   @OnlyIn(Dist.CLIENT)
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+  public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
     if (stack.hasTag()) {
       FluidTank tank = getFluidTank(stack);
       if (tank.getFluidAmount() > 0) {
-        tooltip.add(new TranslationTextComponent(KEY_FLUID, tank.getFluid().getDisplayName()).mergeStyle(TextFormatting.GRAY));
+        tooltip.add(new TranslatableComponent(KEY_FLUID, tank.getFluid().getDisplayName()).withStyle(ChatFormatting.GRAY));
         int amount = tank.getFluidAmount();
         if (tank.getCapacity() % FluidValues.INGOT != 0 || Screen.hasShiftDown()) {
-          tooltip.add(new TranslationTextComponent(KEY_MB, amount).mergeStyle(TextFormatting.GRAY));
+          tooltip.add(new TranslatableComponent(KEY_MB, amount).withStyle(ChatFormatting.GRAY));
         } else {
           int ingots = amount / FluidValues.INGOT;
           int mb = amount % FluidValues.INGOT;
           if (mb == 0) {
-            tooltip.add(new TranslationTextComponent(KEY_INGOTS, ingots).mergeStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslatableComponent(KEY_INGOTS, ingots).withStyle(ChatFormatting.GRAY));
           } else {
-            tooltip.add(new TranslationTextComponent(KEY_MIXED, ingots, mb).mergeStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslatableComponent(KEY_MIXED, ingots, mb).withStyle(ChatFormatting.GRAY));
           }
           tooltip.add(FluidTooltipHandler.HOLD_SHIFT);
         }
@@ -68,13 +70,13 @@ public class TankItem extends BlockTooltipItem {
       }
     }
     else {
-      super.addInformation(stack, worldIn, tooltip, flagIn);
+      super.appendHoverText(stack, worldIn, tooltip, flagIn);
     }
   }
 
   @Nullable
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
+  public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
     return new TankItemFluidHandler(stack);
   }
 
@@ -86,7 +88,7 @@ public class TankItem extends BlockTooltipItem {
    */
   public static ItemStack setTank(ItemStack stack, FluidTank tank) {
     if (tank.isEmpty()) {
-      CompoundNBT nbt = stack.getTag();
+      CompoundTag nbt = stack.getTag();
       if (nbt != null) {
         nbt.remove(NBTTags.TANK);
         if (nbt.isEmpty()) {
@@ -94,7 +96,7 @@ public class TankItem extends BlockTooltipItem {
         }
       }
     } else {
-      stack.getOrCreateTag().put(NBTTags.TANK, tank.writeToNBT(new CompoundNBT()));
+      stack.getOrCreateTag().put(NBTTags.TANK, tank.writeToNBT(new CompoundTag()));
     }
     return stack;
   }

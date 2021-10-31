@@ -4,8 +4,8 @@ import net.minecraft.advancements.ICriterionInstance;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.CookingRecipeBuilder;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -13,7 +13,7 @@ import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.Tags;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.common.data.BaseRecipeProvider;
@@ -38,15 +38,15 @@ public class GadgetRecipeProvider extends BaseRecipeProvider {
   }
 
   @Override
-  protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
+  protected void buildShapelessRecipes(Consumer<FinishedRecipe> consumer) {
     // slime
     String folder = "gadgets/slimeboots/";
     for (SlimeType slime : SlimeType.values()) {
-      ResourceLocation name = modResource(folder + slime.getString());
-      ShapedRecipeBuilder.shapedRecipe(TinkerGadgets.slimeBoots.get(slime))
-                         .setGroup("tconstruct:slime_boots")
-                         .key('#', TinkerWorld.congealedSlime.get(slime))
-                         .key('X', slime.getSlimeballTag())
+      ResourceLocation name = modResource(folder + slime.getSerializedName());
+      ShapedRecipeBuilder.shaped(TinkerGadgets.slimeBoots.get(slime))
+                         .group("tconstruct:slime_boots")
+                         .define('#', TinkerWorld.congealedSlime.get(slime))
+                         .define('X', slime.getSlimeballTag())
                          .patternLine("X X")
                          .patternLine("# #")
                          .addCriterion("has_item", hasItem(slime.getSlimeballTag()))

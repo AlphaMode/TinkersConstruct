@@ -1,16 +1,16 @@
 package slimeknights.tconstruct.tools.item.broad;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.entity.item.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
 import slimeknights.tconstruct.library.tools.context.ToolAttackContext;
 import slimeknights.tconstruct.library.tools.helper.ToolAttackUtil;
@@ -20,11 +20,15 @@ import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 import slimeknights.tconstruct.tools.TinkerModifiers;
 import slimeknights.tconstruct.tools.item.small.KamaTool;
 
+import net.minecraft.world.item.Item.Properties;
+import slimeknights.tconstruct.library.tools.helper.ToolHarvestLogic.AOEMatchType;
+import slimeknights.tconstruct.tools.item.small.KamaTool.HarvestLogic;
+
 public class ScytheTool extends KamaTool {
   /** Tool harvest logic to damage when breaking instant break blocks */
   public static final ToolHarvestLogic HARVEST_LOGIC = new HarvestLogic(3, true) {
     @Override
-    public Iterable<BlockPos> getAOEBlocks(IModifierToolStack tool, ItemStack stack, PlayerEntity player, BlockState state, World world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
+    public Iterable<BlockPos> getAOEBlocks(IModifierToolStack tool, ItemStack stack, Player player, BlockState state, Level world, BlockPos origin, Direction sideHit, AOEMatchType matchType) {
       // include depth in boost
       int expanded = tool.getModifierLevel(TinkerModifiers.expanded.get());
       int sides = (expanded + 1) / 2;

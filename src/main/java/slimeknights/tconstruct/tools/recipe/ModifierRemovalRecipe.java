@@ -4,12 +4,12 @@ import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.recipe.RecipeSerializer;
 import slimeknights.mantle.recipe.data.AbstractRecipeBuilder;
 import slimeknights.mantle.util.JsonHelper;
@@ -43,7 +43,7 @@ public class ModifierRemovalRecipe implements ITinkerStationRecipe {
   private final ItemStack container;
 
   @Override
-  public boolean matches(ITinkerStationInventory inv, World world) {
+  public boolean matches(ITinkerStationInventory inv, Level world) {
     if (!TinkerTags.Items.MODIFIABLE.contains(inv.getTinkerableStack().getItem())) {
       return false;
     }

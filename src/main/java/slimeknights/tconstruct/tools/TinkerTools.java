@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.tools;
 
-import net.minecraft.advancements.criterion.ItemPredicate;
+import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.particles.BasicParticleType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -56,12 +56,12 @@ public final class TinkerTools extends TinkerModule {
   }
 
   /** Creative tab for all tool items */
-  public static final ItemGroup TAB_TOOLS = new SupplierItemGroup(TConstruct.MOD_ID, "tools", () -> TinkerTools.pickaxe.get().getRenderTool());
+  public static final CreativeModeTab TAB_TOOLS = new SupplierItemGroup(TConstruct.MOD_ID, "tools", () -> TinkerTools.pickaxe.get().getRenderTool());
 
   /*
    * Items
    */
-  private static final Supplier<Item.Properties> TOOL = () -> new Item.Properties().group(TAB_TOOLS);
+  private static final Supplier<Item.Properties> TOOL = () -> new Item.Properties().tab(TAB_TOOLS);
 
   public static final ItemObject<HarvestTool> pickaxe = ITEMS.register("pickaxe", () -> new PickaxeTool(TOOL.get().addToolType(ToolType.PICKAXE, 0), ToolDefinitions.PICKAXE));
   public static final ItemObject<SledgeHammerTool> sledgeHammer = ITEMS.register("sledge_hammer", () -> new SledgeHammerTool(TOOL.get().addToolType(ToolType.PICKAXE, 0), ToolDefinitions.SLEDGE_HAMMER));
@@ -85,16 +85,16 @@ public final class TinkerTools extends TinkerModule {
   /*
    * Particles
    */
-  public static final RegistryObject<BasicParticleType> hammerAttackParticle = PARTICLE_TYPES.register("hammer_attack", () -> new BasicParticleType(false));
-  public static final RegistryObject<BasicParticleType> axeAttackParticle = PARTICLE_TYPES.register("axe_attack", () -> new BasicParticleType(false));
+  public static final RegistryObject<SimpleParticleType> hammerAttackParticle = PARTICLE_TYPES.register("hammer_attack", () -> new SimpleParticleType(false));
+  public static final RegistryObject<SimpleParticleType> axeAttackParticle = PARTICLE_TYPES.register("axe_attack", () -> new SimpleParticleType(false));
 
   /*
    * Entities
    */
   public static final RegistryObject<EntityType<IndestructibleItemEntity>> indestructibleItem = ENTITIES.register("indestructible_item", () -> {
-    return EntityType.Builder.<IndestructibleItemEntity>create(IndestructibleItemEntity::new, EntityClassification.MISC)
-      .size(0.25F, 0.25F)
-      .immuneToFire();
+    return EntityType.Builder.<IndestructibleItemEntity>of(IndestructibleItemEntity::new, MobCategory.MISC)
+      .sized(0.25F, 0.25F)
+      .fireImmune();
   });
 
   /*
@@ -102,7 +102,7 @@ public final class TinkerTools extends TinkerModule {
    */
 
   @SubscribeEvent
-  void registerRecipeSerializers(RegistryEvent.Register<IRecipeSerializer<?>> event) {
+  void registerRecipeSerializers(RegistryEvent.Register<RecipeSerializer<?>> event) {
     ItemPredicate.register(ToolPredicate.ID, ToolPredicate::deserialize);
   }
 

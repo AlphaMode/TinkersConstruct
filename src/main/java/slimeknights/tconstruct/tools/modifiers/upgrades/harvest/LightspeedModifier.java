@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.harvest;
 
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.LightType;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.LightLayer;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.modifiers.IncrementalModifier;
@@ -29,7 +29,7 @@ public class LightspeedModifier extends IncrementalModifier {
     }
     BlockPos pos = event.getPos();
     if (pos != null) {
-      int light = event.getPlayer().getEntityWorld().getLightFor(LightType.BLOCK, pos.offset(sideHit));
+      int light = event.getPlayer().getCommandSenderWorld().getBrightness(LightLayer.BLOCK, pos.relative(sideHit));
       // bonus is +9 mining speed at light level 15, +3 at light level 10, +1 at light level 5
       float boost = (float)(level * Math.pow(3, (light - 5) / 5f) * tool.getModifier(ToolStats.MINING_SPEED) * miningSpeedModifier);
       event.setNewSpeed(event.getNewSpeed() + boost);
@@ -37,7 +37,7 @@ public class LightspeedModifier extends IncrementalModifier {
   }
 
   @Override
-  public void addInformation(IModifierToolStack tool, int level, List<ITextComponent> tooltip, boolean isAdvanced, boolean detailed) {
+  public void addInformation(IModifierToolStack tool, int level, List<Component> tooltip, boolean isAdvanced, boolean detailed) {
     addStatTooltip(tool, ToolStats.MINING_SPEED, TinkerTags.Items.HARVEST, 9 * getScaledLevel(tool, level), tooltip);
   }
 }

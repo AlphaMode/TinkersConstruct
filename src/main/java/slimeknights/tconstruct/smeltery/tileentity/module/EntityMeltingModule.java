@@ -1,16 +1,16 @@
 package slimeknights.tconstruct.smeltery.tileentity.module;
 
 import lombok.RequiredArgsConstructor;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
@@ -34,9 +34,9 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class EntityMeltingModule {
   /** Standard damage source for melting most mobs */
-  public static final DamageSource SMELTERY_DAMAGE = new DamageSource(TConstruct.prefix("smeltery_heat")).setFireDamage();
+  public static final DamageSource SMELTERY_DAMAGE = new DamageSource(TConstruct.prefix("smeltery_heat")).setIsFire();
   /** Special damage source for "absorbing" hot entities */
-  public static final DamageSource SMELTERY_MAGIC = new DamageSource(TConstruct.prefix("smeltery_magic")).setMagicDamage();
+  public static final DamageSource SMELTERY_MAGIC = new DamageSource(TConstruct.prefix("smeltery_magic")).setMagic();
 
   private final MantleTileEntity parent;
   private final IFluidHandler tank;
@@ -45,14 +45,14 @@ public class EntityMeltingModule {
   /** Function that tries to insert an item into the inventory */
   private final Function<ItemStack, ItemStack> insertFunction;
   /** Function that returns the bounds to check for entities */
-  private final Supplier<AxisAlignedBB> bounds;
+  private final Supplier<AABB> bounds;
 
   @Nullable
   private EntityMeltingRecipe lastRecipe;
 
   /** Gets a nonnull world instance from the parent */
-  private World getWorld() {
-    return Objects.requireNonNull(parent.getWorld(), "Parent tile entity has null world");
+  private Level getWorld() {
+    return Objects.requireNonNull(parent.getLevel(), "Parent tile entity has null world");
   }
 
   /**
@@ -89,11 +89,11 @@ public class EntityMeltingModule {
    */
   private boolean canMeltEntity(LivingEntity entity) {
     // fire based mobs are absorbed instead of damaged
-    return !entity.isInvulnerableTo(entity.isImmuneToFire() ? SMELTERY_MAGIC : SMELTERY_DAMAGE)
+    return !entity.isInvulnerableTo(entity.fireImmune() ? SMELTERY_MAGIC : SMELTERY_DAMAGE)
            // have to special case players because for some dumb reason creative players do not return true to invulnerable to
-           && !(entity instanceof PlayerEntity && ((PlayerEntity)entity).abilities.disableDamage)
+           && !(entity instanceof Player && ((Player)entity).abilities.invulnerable)
            // also have to special case fire resistance, so a blaze with fire resistance is immune to the smeltery
-           && !entity.isPotionActive(Effects.FIRE_RESISTANCE);
+           && !entity.hasEffect(MobEffects.FIRE_RESISTANCE);
   }
 
   /**
@@ -101,14 +101,14 @@ public class EntityMeltingModule {
    * @return True if something was melted and fuel is needed
    */
   public boolean interactWithEntities() {
-    AxisAlignedBB boundingBox = bounds.get();
+    AABB boundingBox = bounds.get();
     if (boundingBox == null) {
       return false;
     }
 
     Boolean canMelt = null;
     boolean melted = false;
-    for (Entity entity : getWorld().getEntitiesWithinAABB(Entity.class, boundingBox)) {
+    for (Entity entity : getWorld().getEntitiesOfClass(Entity.class, boundingBox)) {
       if (!entity.isAlive()) {
         continue;
       }

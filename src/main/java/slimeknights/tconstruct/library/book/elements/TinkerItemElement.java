@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.library.book.elements;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.Block;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.client.gui.Font;
+import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.gui.GuiUtils;
@@ -60,13 +60,13 @@ public class TinkerItemElement extends ItemElement {
   }
 
   @Override
-  public void drawOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks, FontRenderer fontRenderer) {
+  public void drawOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
     if (this.noTooltip) {
       return;
     }
 
     if (this.tooltip == null) {
-      fontRenderer = mc.fontRenderer;
+      fontRenderer = mc.font;
     }
 
     super.drawOverlay(matrixStack, mouseX, mouseY, partialTicks, fontRenderer);
@@ -74,8 +74,8 @@ public class TinkerItemElement extends ItemElement {
 
   //Fix odd tooltip rendering that makes the tooltip go off the screen.
   @Override
-  public void drawHoveringText(MatrixStack matrixStack, List<ITextComponent> textLines, int x, int y, FontRenderer font) {
+  public void drawHoveringText(PoseStack matrixStack, List<Component> textLines, int x, int y, Font font) {
     GuiUtils.drawHoveringText(matrixStack, textLines, x, y, BookScreen.PAGE_WIDTH, BookScreen.PAGE_HEIGHT, BookScreen.PAGE_WIDTH, font);
-    RenderHelper.disableStandardItemLighting();
+    Lighting.turnOff();
   }
 }

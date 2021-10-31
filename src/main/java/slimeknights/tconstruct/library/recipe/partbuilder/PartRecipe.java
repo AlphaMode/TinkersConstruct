@@ -2,10 +2,10 @@ package slimeknights.tconstruct.library.recipe.partbuilder;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import slimeknights.mantle.recipe.IMultiRecipe;
 import slimeknights.mantle.recipe.ItemOutput;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
@@ -38,7 +38,7 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<ItemPartReci
   protected final int outputCount;
 
   @Override
-  public IRecipeSerializer<?> getSerializer() {
+  public RecipeSerializer<?> getSerializer() {
     return TinkerTables.partRecipeSerializer.get();
   }
 
@@ -68,7 +68,7 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<ItemPartReci
    * @return  True if this recipe matches
    */
   @Override
-  public boolean matches(IPartBuilderInventory inv, World world) {
+  public boolean matches(IPartBuilderInventory inv, Level world) {
     // must have a material
     MaterialRecipe materialRecipe = inv.getMaterial();
     if (materialRecipe != null) {
@@ -83,7 +83,7 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<ItemPartReci
   /** @deprecated use {@link #getRecipeOutput(IMaterial)} */
   @Deprecated
   @Override
-  public ItemStack getRecipeOutput() {
+  public ItemStack getResultItem() {
     return new ItemStack(output);
   }
 
@@ -100,7 +100,7 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<ItemPartReci
   }
 
   @Override
-  public ItemStack getCraftingResult(IPartBuilderInventory inv) {
+  public ItemStack assemble(IPartBuilderInventory inv) {
     IMaterial material = IMaterial.UNKNOWN;
     MaterialRecipe materialRecipe = inv.getMaterial();
     if (materialRecipe != null) {

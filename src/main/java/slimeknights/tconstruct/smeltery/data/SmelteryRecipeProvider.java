@@ -4,8 +4,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.CookingRecipeBuilder;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.ShapelessRecipeBuilder;
 import net.minecraft.data.SingleItemRecipeBuilder;
 import net.minecraft.entity.EntityType;
@@ -82,7 +82,7 @@ public class SmelteryRecipeProvider extends BaseRecipeProvider implements ISmelt
   }
 
   @Override
-  protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
+  protected void buildShapelessRecipes(Consumer<FinishedRecipe> consumer) {
     this.addCraftingRecipes(consumer);
     this.addSmelteryRecipes(consumer);
     this.addFoundryRecipes(consumer);
@@ -94,9 +94,9 @@ public class SmelteryRecipeProvider extends BaseRecipeProvider implements ISmelt
     this.addCompatRecipes(consumer);
   }
 
-  private void addCraftingRecipes(Consumer<IFinishedRecipe> consumer) {
-    ShapedRecipeBuilder.shapedRecipe(TinkerSmeltery.copperCan, 3)
-                       .key('c', TinkerMaterials.copper.getIngotTag())
+  private void addCraftingRecipes(Consumer<FinishedRecipe> consumer) {
+    ShapedRecipeBuilder.shaped(TinkerSmeltery.copperCan, 3)
+                       .define('c', TinkerMaterials.copper.getIngotTag())
                        .patternLine("c c")
                        .patternLine(" c ")
                        .addCriterion("has_item", hasItem(TinkerMaterials.copper.getIngotTag()))

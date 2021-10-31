@@ -5,15 +5,15 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.world.gen.blockstateprovider.BlockStateProvider;
-import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import slimeknights.tconstruct.world.worldgen.trees.SupplierBlockStateProvider;
 
 import java.util.function.Supplier;
 
-public class SlimeTreeConfig implements IFeatureConfig {
+public class SlimeTreeConfig implements FeatureConfiguration {
 
   public static final Codec<SlimeTreeConfig> CODEC = RecordCodecBuilder.create((treeConfig) -> treeConfig.group(
     BlockStateProvider.CODEC.fieldOf("trunk_provider").forGetter(instance -> instance.trunkProvider),
@@ -49,7 +49,7 @@ public class SlimeTreeConfig implements IFeatureConfig {
   @NoArgsConstructor
   @Accessors(fluent = true)
   public static class Builder {
-    private static final SupplierBlockStateProvider AIR_PROVIDER = new SupplierBlockStateProvider(Blocks.AIR::getDefaultState);
+    private static final SupplierBlockStateProvider AIR_PROVIDER = new SupplierBlockStateProvider(Blocks.AIR::defaultBlockState);
 
     @Setter
     private BlockStateProvider trunkProvider = AIR_PROVIDER;

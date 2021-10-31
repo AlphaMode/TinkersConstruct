@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.general;
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import slimeknights.tconstruct.library.modifiers.IncrementalModifier;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 import slimeknights.tconstruct.library.utils.Util;
@@ -57,13 +57,13 @@ public class ReinforcedModifier extends IncrementalModifier {
   }
 
   @Override
-  public void addInformation(IModifierToolStack tool, int level, List<ITextComponent> tooltip, boolean isAdvanced, boolean detailed) {
+  public void addInformation(IModifierToolStack tool, int level, List<Component> tooltip, boolean isAdvanced, boolean detailed) {
     float reinforced;
     if (tool.getModifierLevel(TinkerModifiers.unbreakable.get()) > 0) {
       reinforced = 1;
     } else {
       reinforced = getPercentage(getScaledLevel(tool, level));
     }
-    tooltip.add(applyStyle(new StringTextComponent(Util.PERCENT_FORMAT.format(reinforced) + " ").appendSibling(makeDisplayName())));
+    tooltip.add(applyStyle(new TextComponent(Util.PERCENT_FORMAT.format(reinforced) + " ").append(makeDisplayName())));
   }
 }

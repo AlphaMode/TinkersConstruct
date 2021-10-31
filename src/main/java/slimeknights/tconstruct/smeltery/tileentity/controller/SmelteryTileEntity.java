@@ -44,7 +44,7 @@ public class SmelteryTileEntity extends HeatingStructureTileEntity {
 
   @Override
   protected void heat() {
-    if (structure == null || world == null) {
+    if (structure == null || level == null) {
       return;
     }
 

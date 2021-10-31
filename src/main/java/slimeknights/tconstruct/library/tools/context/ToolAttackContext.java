@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.library.tools.context;
 
 import lombok.Data;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Hand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,10 +17,10 @@ public class ToolAttackContext {
   private final LivingEntity attacker;
   /** Player doing the attacking, null if not a player */
   @Nullable
-  private final PlayerEntity playerAttacker;
+  private final Player playerAttacker;
   /** Hand containing the tool */
   @Nonnull
-  private final Hand hand;
+  private final InteractionHand hand;
   /** Originally targeted entity, may be different from {@link #getTarget()} for multipart entities */
   @Nonnull
   private final Entity target;

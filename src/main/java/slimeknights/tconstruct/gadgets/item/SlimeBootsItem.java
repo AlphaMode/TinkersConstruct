@@ -2,31 +2,33 @@ package slimeknights.tconstruct.gadgets.item;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IArmorMaterial;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.sounds.SoundEvent;
 import slimeknights.mantle.item.ArmorTooltipItem;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.Sounds;
 import slimeknights.tconstruct.shared.block.SlimeType;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class SlimeBootsItem extends ArmorTooltipItem {
 
   public SlimeBootsItem(SlimeType slimeType, Properties props) {
-    super(new SlimeArmorMaterial(slimeType.getString() + "_slime"), EquipmentSlotType.FEET, props);
+    super(new SlimeArmorMaterial(slimeType.getSerializedName() + "_slime"), EquipmentSlot.FEET, props);
   }
 
   @Override
-  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+  public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
     return HashMultimap.create();
   }
 
-  public static class SlimeArmorMaterial implements IArmorMaterial {
-    private final Ingredient empty_repair_material = Ingredient.fromItems(Items.AIR);
+  public static class SlimeArmorMaterial implements ArmorMaterial {
+    private final Ingredient empty_repair_material = Ingredient.of(Items.AIR);
     private final String name;
 
     public SlimeArmorMaterial(String slimeName) {
@@ -34,22 +36,22 @@ public class SlimeBootsItem extends ArmorTooltipItem {
     }
 
     @Override
-    public int getDurability(EquipmentSlotType slotIn) {
+    public int getDurabilityForSlot(EquipmentSlot slotIn) {
       return 0;
     }
 
     @Override
-    public int getDamageReductionAmount(EquipmentSlotType slotIn) {
+    public int getDefenseForSlot(EquipmentSlot slotIn) {
       return 0;
     }
 
     @Override
-    public int getEnchantability() {
+    public int getEnchantmentValue() {
       return 0;
     }
 
     @Override
-    public SoundEvent getSoundEvent() {
+    public SoundEvent getEquipSound() {
       return Sounds.EQUIP_SLIME.getSound();
     }
 

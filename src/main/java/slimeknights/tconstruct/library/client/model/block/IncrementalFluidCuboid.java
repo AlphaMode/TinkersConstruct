@@ -2,18 +2,20 @@ package slimeknights.tconstruct.library.client.model.block;
 
 import com.google.gson.JsonObject;
 import lombok.Getter;
-import net.minecraft.client.renderer.model.BlockFaceUV;
-import net.minecraft.client.renderer.model.BlockPart;
-import net.minecraft.client.renderer.model.BlockPartFace;
-import net.minecraft.util.Direction;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import net.minecraft.client.renderer.block.model.BlockElement;
+import net.minecraft.client.renderer.block.model.BlockElementFace;
+import net.minecraft.core.Direction;
+import net.minecraft.util.GsonHelper;
+import com.mojang.math.Vector3f;
 import slimeknights.mantle.client.model.fluid.FluidCuboid;
 import slimeknights.mantle.client.model.util.ModelHelper;
 
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import slimeknights.mantle.client.model.fluid.FluidCuboid.FluidFace;
 
 @Getter
 public class IncrementalFluidCuboid extends FluidCuboid {
@@ -31,13 +33,13 @@ public class IncrementalFluidCuboid extends FluidCuboid {
    * @return  Fluid part
    */
   @SuppressWarnings("WeakerAccess")
-  public BlockPart getPart(int amount, boolean gas) {
+  public BlockElement getPart(int amount, boolean gas) {
     // set cube height based on stack amount
     Vector3f from = getFrom();
     Vector3f to = getTo();
     // gas renders upside down
-    float minY = from.getY();
-    float maxY = to.getY();
+    float minY = from.y();
+    float maxY = to.y();
     if (gas) {
       from = from.copy();
       from.setY(maxY + (amount * (minY - maxY) / increments));
@@ -47,20 +49,20 @@ public class IncrementalFluidCuboid extends FluidCuboid {
     }
 
     // create faces based on face data
-    Map<Direction,BlockPartFace> faces = new EnumMap<>(Direction.class);
+    Map<Direction,BlockElementFace> faces = new EnumMap<>(Direction.class);
     for (Entry<Direction, FluidFace> entry : this.getFaces().entrySet()) {
       // only add the face if requested
       Direction dir = entry.getKey();
       FluidFace face = entry.getValue();
       // calculate in flowing and rotations
       boolean isFlowing = face.isFlowing();
-      faces.put(dir, new BlockPartFace(
+      faces.put(dir, new BlockElementFace(
         null, 0, isFlowing ? "flowing_fluid" : "fluid",
         getFaceUvs(from ,to, dir, face.getRotation(), isFlowing ? 0.5f : 1f)));
     }
 
     // create the part with the fluid
-    return new BlockPart(from, to, faces, null, false);
+    return new BlockElement(from, to, faces, null, false);
   }
 
   /**
@@ -77,29 +79,29 @@ public class IncrementalFluidCuboid extends FluidCuboid {
     float u1, u2, v1, v2;
     switch(side) {
       case DOWN:
-        u1 = from.getX(); v1 = 16f - to.getZ();
-        u2 = to.getX(); v2 = 16f - from.getZ();
+        u1 = from.x(); v1 = 16f - to.z();
+        u2 = to.x(); v2 = 16f - from.z();
         break;
       case UP:
-        u1 = from.getX(); v1 = from.getZ();
-        u2 = to.getX(); v2 = to.getZ();
+        u1 = from.x(); v1 = from.z();
+        u2 = to.x(); v2 = to.z();
         break;
       case NORTH:
       default:
-        u1 = 16f - to.getX(); v1 =  16f - to.getY();
-        u2 = 16f - from.getX(); v2 = 16f - from.getY();
+        u1 = 16f - to.x(); v1 =  16f - to.y();
+        u2 = 16f - from.x(); v2 = 16f - from.y();
         break;
       case SOUTH:
-        u1 = from.getX(); v1 =  16f - to.getY();
-        u2 = to.getX(); v2 = 16f - from.getY();
+        u1 = from.x(); v1 =  16f - to.y();
+        u2 = to.x(); v2 = 16f - from.y();
         break;
       case WEST:
-        u1 = from.getZ(); v1 =  16f - to.getY();
-        u2 = to.getZ(); v2 = 16f - from.getY();
+        u1 = from.z(); v1 =  16f - to.y();
+        u2 = to.z(); v2 = 16f - from.y();
         break;
       case EAST:
-        u1 = 16f - to.getZ(); v1 = 16f - to.getY();
-        u2 = 16f - from.getZ(); v2 = 16f - from.getY();
+        u1 = 16f - to.z(); v1 = 16f - to.y();
+        u2 = 16f - from.z(); v2 = 16f - from.y();
         break;
     }
     // cycle coords so they line up with the relevant block part
@@ -138,7 +140,7 @@ public class IncrementalFluidCuboid extends FluidCuboid {
     Vector3f from = ModelHelper.arrayToVector(json, "from");
     Vector3f to = ModelHelper.arrayToVector(json, "to");
     Map<Direction,FluidFace> faces = getFaces(json);
-    int increments = JSONUtils.getInt(json, "increments");
+    int increments = GsonHelper.getAsInt(json, "increments");
     return new IncrementalFluidCuboid(from, to, faces, increments);
   }
 }

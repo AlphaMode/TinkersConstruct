@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.tools.modifiers.upgrades.harvest;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.modifiers.IncrementalModifier;
@@ -28,16 +28,16 @@ public class HydraulicModifier extends IncrementalModifier {
     if (!isEffective) {
       return;
     }
-    PlayerEntity player = event.getPlayer();
+    Player player = event.getPlayer();
     float bonus = 0;
     // highest bonus in water
-    if (player.areEyesInFluid(FluidTags.WATER)) {
+    if (player.isEyeInFluid(FluidTags.WATER)) {
       bonus = 8;
       // if not enchanted with aqua affinity, multiply by 5 to cancel out the effects of water
       if (!EnchantmentHelper.hasAquaAffinity(player)) {
         bonus *= 5;
       }
-    } else if (player.getEntityWorld().isRainingAt(player.getPosition())) {
+    } else if (player.getCommandSenderWorld().isRainingAt(player.blockPosition())) {
       // partial bonus in the rain
       bonus = 4;
     }
@@ -48,7 +48,7 @@ public class HydraulicModifier extends IncrementalModifier {
   }
 
   @Override
-  public void addInformation(IModifierToolStack tool, int level, List<ITextComponent> tooltip, boolean isAdvanced, boolean detailed) {
+  public void addInformation(IModifierToolStack tool, int level, List<Component> tooltip, boolean isAdvanced, boolean detailed) {
     addStatTooltip(tool, ToolStats.MINING_SPEED, TinkerTags.Items.HARVEST, 8 * getScaledLevel(tool, level), tooltip);
   }
 }

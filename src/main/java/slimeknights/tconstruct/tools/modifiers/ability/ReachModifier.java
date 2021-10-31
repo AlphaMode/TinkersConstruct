@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.tools.modifiers.ability;
 
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.AttributeModifier.Operation;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.EquipmentSlotType.Group;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlot.Type;
 import net.minecraftforge.common.ForgeMod;
 import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
@@ -26,11 +26,11 @@ public class ReachModifier extends Modifier {
   }
 
   @Override
-  public void addAttributes(IModifierToolStack tool, int level, EquipmentSlotType slot, BiConsumer<Attribute,AttributeModifier> consumer) {
-    if (slot != EquipmentSlotType.OFFHAND) {
+  public void addAttributes(IModifierToolStack tool, int level, EquipmentSlot slot, BiConsumer<Attribute,AttributeModifier> consumer) {
+    if (slot != EquipmentSlot.OFFHAND) {
       // its very strong on armor, so less of a boost
-      float bonus = slot.getSlotType() == Group.ARMOR ? 0.5f : 1.0f;
-      consumer.accept(ForgeMod.REACH_DISTANCE.get(), new AttributeModifier(REACH_UUIDS[slot.getSlotIndex()], "tconstruct.modifier.reach", bonus * level, Operation.ADDITION));
+      float bonus = slot.getType() == Type.ARMOR ? 0.5f : 1.0f;
+      consumer.accept(ForgeMod.REACH_DISTANCE.get(), new AttributeModifier(REACH_UUIDS[slot.getFilterFlag()], "tconstruct.modifier.reach", bonus * level, Operation.ADDITION));
     }
   }
 }

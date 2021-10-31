@@ -1,22 +1,24 @@
 package slimeknights.tconstruct.tools.item.small;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ToolType;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
 import slimeknights.tconstruct.library.tools.helper.ToolHarvestLogic;
 import slimeknights.tconstruct.library.tools.item.ToolItem;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 
+import net.minecraft.world.item.Item.Properties;
+
 /** Tool with sword harvest and creative block breaking prevention */
 public class SwordTool extends ToolItem {
   public static final ToolType TOOL_TYPE = ToolType.get("sword");
-  public static final ImmutableSet<Material> EFFECTIVE_MATERIALS = ImmutableSet.of(Material.WEB, Material.TALL_PLANTS, Material.CORAL, Material.GOURD, Material.LEAVES);
+  public static final ImmutableSet<Material> EFFECTIVE_MATERIALS = ImmutableSet.of(Material.WEB, Material.REPLACEABLE_PLANT, Material.CORAL, Material.VEGETABLE, Material.LEAVES);
   public static final ToolHarvestLogic HARVEST_LOGIC = new HarvestLogic();
 
   public SwordTool(Properties properties, ToolDefinition toolDefinition) {
@@ -24,7 +26,7 @@ public class SwordTool extends ToolItem {
   }
 
   @Override
-  public boolean canPlayerBreakBlockWhileHolding(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
+  public boolean canAttackBlock(BlockState state, Level worldIn, BlockPos pos, Player player) {
     return !player.isCreative();
   }
 
