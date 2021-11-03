@@ -5,31 +5,21 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.fmllegacy.network.NetworkEvent.Context;
 import slimeknights.mantle.network.packet.IThreadsafePacket;
-import slimeknights.tconstruct.library.tools.ToolDefinition;
-import slimeknights.tconstruct.library.tools.item.IModifiable;
+import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
 import slimeknights.tconstruct.tables.inventory.table.tinkerstation.TinkerStationContainer;
 
 @RequiredArgsConstructor
 public class TinkerStationSelectionPacket implements IThreadsafePacket {
-
-  private final int activeSlots;
-  private final boolean tinkerSlotHidden;
-  private final Item toolFilter;
-
+  private final ResourceLocation layoutName;
   public TinkerStationSelectionPacket(FriendlyByteBuf buffer) {
-    this.activeSlots = buffer.readInt();
-    this.tinkerSlotHidden = buffer.readBoolean();
-    this.toolFilter = buffer.readRegistryIdUnsafe(ForgeRegistries.ITEMS);
+    this.layoutName = buffer.readResourceLocation();
   }
 
   @Override
   public void encode(FriendlyByteBuf buffer) {
-    buffer.writeInt(this.activeSlots);
-    buffer.writeBoolean(this.tinkerSlotHidden);
-    buffer.writeRegistryIdUnsafe(ForgeRegistries.ITEMS, toolFilter);
+    buffer.writeResourceLocation(this.layoutName);
   }
 
   @Override
@@ -38,11 +28,7 @@ public class TinkerStationSelectionPacket implements IThreadsafePacket {
     if (sender != null) {
       AbstractContainerMenu container = sender.containerMenu;
       if (container instanceof TinkerStationContainer) {
-        ToolDefinition filter = null;
-        if (toolFilter instanceof IModifiable) {
-          filter = ((IModifiable) toolFilter).getToolDefinition();
-        }
-        ((TinkerStationContainer) container).setToolSelection(this.activeSlots, this.tinkerSlotHidden, filter);
+        ((TinkerStationContainer) container).setToolSelection(StationSlotLayoutLoader.getInstance().get(layoutName));
       }
     }
   }

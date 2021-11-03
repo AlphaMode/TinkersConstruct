@@ -8,10 +8,10 @@ import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
+import slimeknights.tconstruct.library.tools.definition.PartRequirement;
 import slimeknights.tconstruct.library.tools.item.IModifiable;
 import slimeknights.tconstruct.library.tools.nbt.MaterialIdNBT;
 import slimeknights.tconstruct.library.tools.nbt.ToolStack;
-import slimeknights.tconstruct.library.tools.part.IToolPart;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,18 +58,12 @@ public final class ToolBuildHandler {
    * @return  Tool for rendering
    */
   public static ItemStack buildToolForRendering(Item item, ToolDefinition definition) {
-    List<IToolPart> requirements = definition.getRequiredComponents();
-    int size = requirements.size();
+    int size = definition.getData().getParts().size();
     // if no parts, just return the item directly with the display tag
-    ItemStack stack;
-    if (size == 0) {
-      stack = new ItemStack(item);
-    } else {
-      List<MaterialId> toolMaterials = new ArrayList<>(size);
-      for (int i = 0; i < size; i++) {
-        toolMaterials.add(i, getRenderMaterial(i));
-      }
-      stack = new MaterialIdNBT(toolMaterials).updateStack(new ItemStack(item));
+    ItemStack stack = new ItemStack(item);
+    if (definition.isMultipart()) {
+		// use all 5 render materials for display stacks, having too many materials is not a problem and its easier than making this reload sensitive
+      stack = new MaterialIdNBT(RENDER_MATERIALS).updateStack(stack);
     }
     stack.getOrCreateTag().putBoolean(TooltipUtil.KEY_DISPLAY, true);
     return stack;
@@ -117,13 +111,13 @@ public final class ToolBuildHandler {
 
   /** Makes a single sub item for the given materials */
   private static boolean addSubItem(IModifiable item, List<ItemStack> items, IMaterial material, IMaterial[] fixedMaterials) {
-    List<IToolPart> required = item.getToolDefinition().getRequiredComponents();
+    List<PartRequirement> required = item.getToolDefinition().getData().getParts();
     List<IMaterial> materials = new ArrayList<>(required.size());
     for (int i = 0; i < required.size(); i++) {
-      if (fixedMaterials.length > i && fixedMaterials[i] != null && required.get(i).canUseMaterial(fixedMaterials[i])) {
+      if (fixedMaterials.length > i && fixedMaterials[i] != null && required.get(i).getPart().canUseMaterial(fixedMaterials[i])) {
         materials.add(fixedMaterials[i]);
       }
-      else if (required.get(i).canUseMaterial(material)) {
+      else if (required.get(i).getPart().canUseMaterial(material)) {
         materials.add(material);
       } else {
         return false;

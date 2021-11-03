@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fmllegacy.RegistryObject;
-import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import slimeknights.mantle.item.RetexturedBlockItem;
 import slimeknights.mantle.registration.object.ItemObject;
 import slimeknights.tconstruct.common.TinkerModule;
@@ -26,6 +26,7 @@ import slimeknights.tconstruct.library.recipe.tinkerstation.building.ToolBuildin
 import slimeknights.tconstruct.library.recipe.tinkerstation.repairing.SpecializedRepairKitRecipe;
 import slimeknights.tconstruct.library.recipe.tinkerstation.repairing.SpecializedRepairRecipe;
 import slimeknights.tconstruct.library.recipe.tinkerstation.repairing.SpecializedRepairRecipeSerializer;
+import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
 import slimeknights.tconstruct.shared.block.TableBlock;
 import slimeknights.tconstruct.tables.block.ChestBlock;
 import slimeknights.tconstruct.tables.block.TinkersChestBlock;
@@ -118,6 +119,16 @@ public final class TinkerTables extends TinkerModule {
   public static final RegistryObject<SpecializedRepairRecipeSerializer<?>> specializedRepairKitSerializer = RECIPE_SERIALIZERS.register("specialized_repair_kit", () -> new SpecializedRepairRecipeSerializer<>(SpecializedRepairKitRecipe::new));
   public static final RegistryObject<SimpleRecipeSerializer<TinkerStationPartSwapping>> tinkerStationPartSwappingSerializer = RECIPE_SERIALIZERS.register("tinker_station_part_swapping", () -> new SimpleRecipeSerializer<>(TinkerStationPartSwapping::new));
   public static final RegistryObject<TinkerStationDamagingRecipe.Serializer> tinkerStationDamagingSerializer = RECIPE_SERIALIZERS.register("tinker_station_damaging", TinkerStationDamagingRecipe.Serializer::new);
+
+  @SubscribeEvent
+  void commonSetup(final FMLCommonSetupEvent event) {
+    event.enqueueWork(() -> {
+      StationSlotLayoutLoader loader = StationSlotLayoutLoader.getInstance();
+      loader.registerRequiredLayout(tinkerStation.getRegistryName());
+      loader.registerRequiredLayout(tinkersAnvil.getRegistryName());
+      loader.registerRequiredLayout(scorchedAnvil.getRegistryName());
+    });
+  }
 
   @SubscribeEvent
   void gatherData(final GatherDataEvent event) {
