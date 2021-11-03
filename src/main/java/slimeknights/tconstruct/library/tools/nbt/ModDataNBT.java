@@ -56,7 +56,7 @@ public class ModDataNBT implements IModDataReadOnly {
   }
 
   @Override
-  public <T> T get(ResourceLocation name, BiFunction<CompoundNBT,String,T> function) {
+  public <T> T get(ResourceLocation name, BiFunction<CompoundTag,String,T> function) {
     return function.apply(data, name.toString());
   }
 
@@ -123,7 +123,7 @@ public class ModDataNBT implements IModDataReadOnly {
    * @param data  data
    * @return  Parsed mod data
    */
-  public static ModDataNBT readFromNBT(CompoundNBT data) {
+  public static ModDataNBT readFromNBT(CompoundTag data) {
     return new ModDataNBT(data);
   }
 

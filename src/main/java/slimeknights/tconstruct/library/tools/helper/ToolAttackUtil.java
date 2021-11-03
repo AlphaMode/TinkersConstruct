@@ -2,17 +2,31 @@ package slimeknights.tconstruct.library.tools.helper;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
+
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.entity.ai.attributes.AttributeModifierManager;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
+import net.minecraft.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.player.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SEntityVelocityPacket;
@@ -24,9 +38,13 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Mth;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.server.ServerWorld;
+
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.entity.PartEntity;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
@@ -74,13 +92,13 @@ public class ToolAttackUtil {
    * If your goal is damage for display, you are better off checking the tool attack damage stat directly, then displaying relevant attribute modifiers in the tooltip
    * @param tool     Held tool
    * @param holder   Entity holding the tool
-   * @param hand     Hand used
+   * @param hand     InteractionHand used
    * @return  Attack damage
    */
   public static float getAttributeAttackDamage(IModifierToolStack tool, LivingEntity holder, InteractionHand hand) {
     if (hand == InteractionHand.OFF_HAND && !holder.level.isClientSide()) {
       // first, get a map of existing damage modifiers to exclude
-      Multimap<Attribute,AttributeModifier> mainModifiers = new SingleKeyMultimap<>(Attributes.ATTACK_DAMAGE, holder.getMainHandItem().getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE));
+      Multimap<Attribute,AttributeModifier> mainModifiers = new SingleKeyMultimap<>(Attributes.ATTACK_DAMAGE, holder.getMainInteractionHandItem().getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE));
 
       // next, build a list of damage modifiers from the offhand stack, handled directly as it saves parsing the tool twice and lets us simplify by filtering
       ImmutableList.Builder<AttributeModifier> listBuilder = ImmutableList.builder();
@@ -91,19 +109,19 @@ public class ToolAttackUtil {
         }
       };
       for (ModifierEntry entry : tool.getModifierList()) {
-        entry.getModifier().addAttributes(tool, entry.getLevel(), EquipmentSlotType.MAINHAND, attributeConsumer);
+        entry.getModifier().addAttributes(tool, entry.getLevel(), EquipmentSlot.MAINHAND, attributeConsumer);
       }
       Multimap<Attribute,AttributeModifier> offhandModifiers = new SingleKeyMultimap<>(Attributes.ATTACK_DAMAGE, listBuilder.build());
 
       // remove the old, add the new
-      AttributeModifierManager modifiers = holder.getAttributeManager();
-      modifiers.removeModifiers(mainModifiers);
-      modifiers.reapplyModifiers(offhandModifiers);
+      AttributeMap modifiers = holder.getAttributes();
+      modifiers.removeAttributeModifiers(mainModifiers);
+      modifiers.addTransientAttributeModifiers(offhandModifiers);
       // fetch damage using these temporary modifiers
       float damage = (float) holder.getAttributeValue(Attributes.ATTACK_DAMAGE);
       // revert modifiers to the original state
-      modifiers.removeModifiers(offhandModifiers);
-      modifiers.reapplyModifiers(mainModifiers);
+      modifiers.removeAttributeModifiers(offhandModifiers);
+      modifiers.addTransientAttributeModifiers(mainModifiers);
       return damage;
     } else {
       // if is the held tool, attributes are already set up
@@ -113,24 +131,24 @@ public class ToolAttackUtil {
 
   /** Performs a standard attack */
   public static boolean dealDefaultDamage(LivingEntity attacker, Entity target, float damage) {
-    if (attacker instanceof PlayerEntity) {
-      return target.attackEntityFrom(DamageSource.causePlayerDamage((PlayerEntity) attacker), damage);
+    if (attacker instanceof Player) {
+      return target.hurt(DamageSource.playerAttack((Player) attacker), damage);
     }
-    return target.attackEntityFrom(DamageSource.causeMobDamage(attacker), damage);
+    return target.hurt(DamageSource.mobAttack(attacker), damage);
   }
 
   /**
    * General version of attackEntity. Applies cooldowns but has no projectile entity
    */
-  public static boolean attackEntity(ItemStack stack, IModifiableWeapon weapon, PlayerEntity attacker, Entity targetEntity) {
-    return attackEntity(weapon, ToolStack.from(stack), attacker, Hand.MAIN_HAND, targetEntity, getCooldownFunction(attacker, Hand.MAIN_HAND), false);
+  public static boolean attackEntity(ItemStack stack, IModifiableWeapon weapon, Player attacker, Entity targetEntity) {
+    return attackEntity(weapon, ToolStack.from(stack), attacker, InteractionHand.MAIN_HAND, targetEntity, getCooldownFunction(attacker, InteractionHand.MAIN_HAND), false);
   }
 
   /**
    * Base attack logic, used by normal attacks, projectiles, and extra attacks.
-   * Based on {@link PlayerEntity#attackTargetEntityWithCurrentItem(Entity)}
+   * Based on {@link Player#attackTargetEntityWithCurrentItem(Entity)}
    */
-  public static boolean attackEntity(IModifiableWeapon weapon, IModifierToolStack tool, LivingEntity attackerLiving, Hand hand,
+  public static boolean attackEntity(IModifiableWeapon weapon, IModifierToolStack tool, LivingEntity attackerLiving, InteractionHand hand,
                                      Entity targetEntity, DoubleSupplier cooldownFunction, boolean isExtraAttack) {
     // TODO: general modifiable
     // broken? give to vanilla
@@ -139,7 +157,7 @@ public class ToolAttackUtil {
     }
     // nothing to do? cancel
     // TODO: is it a problem that we return true instead of false when isExtraAttack and the final damage is 0 or we fail to hit? I don't think anywhere clientside uses that
-    if (attackerLiving.world.isRemote || !targetEntity.canBeAttackedWithItem() || targetEntity.hitByEntity(attackerLiving)) {
+    if (attackerLiving.level.isClientSide || !targetEntity.isAttackable() || targetEntity.skipAttackInteraction(attackerLiving)) {
       return true;
     }
 
@@ -153,9 +171,9 @@ public class ToolAttackUtil {
         targetLiving = (LivingEntity)parent;
       }
     }
-    PlayerEntity attackerPlayer = null;
-    if (attackerLiving instanceof PlayerEntity) {
-      attackerPlayer = (PlayerEntity) attackerLiving;
+    Player attackerPlayer = null;
+    if (attackerLiving instanceof Player) {
+      attackerPlayer = (Player) attackerLiving;
     }
 
     // players base damage (includes tools damage stat)
@@ -170,8 +188,8 @@ public class ToolAttackUtil {
 
     // calculate if it's a critical hit
     // that is, in the air, not blind, targeting living, and not sprinting
-    boolean isCritical = !isExtraAttack && fullyCharged && attackerLiving.fallDistance > 0.0F && !attackerLiving.isOnGround() && !attackerLiving.isOnLadder()
-                         && !attackerLiving.isInWater() && !attackerLiving.isPotionActive(Effects.BLINDNESS)
+    boolean isCritical = !isExtraAttack && fullyCharged && attackerLiving.fallDistance > 0.0F && !attackerLiving.isOnGround() && !attackerLiving.onClimbable()
+                         && !attackerLiving.isInWater() && !attackerLiving.hasEffect(MobEffects.BLINDNESS)
                          && !attackerLiving.isPassenger() && targetLiving != null && !attackerLiving.isSprinting();
 
     // shared context for all modifier hooks
@@ -199,12 +217,12 @@ public class ToolAttackUtil {
     // if sprinting, deal bonus knockback
     SoundEvent sound;
     if (attackerLiving.isSprinting() && fullyCharged) {
-      sound = SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK;
+      sound = SoundEvents.PLAYER_ATTACK_KNOCKBACK;
       knockback += 0.5f;
     } else if (fullyCharged) {
-      sound = SoundEvents.ENTITY_PLAYER_ATTACK_STRONG;
+      sound = SoundEvents.PLAYER_ATTACK_STRONG;
     } else {
-      sound = SoundEvents.ENTITY_PLAYER_ATTACK_WEAK;
+      sound = SoundEvents.PLAYER_ATTACK_WEAK;
     }
 
     // knockback moved lower
@@ -234,7 +252,7 @@ public class ToolAttackUtil {
     }
 
     // track original health and motion before attack
-    Vector3d originalTargetMotion = targetEntity.getMotion();
+    Vec3 originalTargetMotion = targetEntity.getDeltaMovement();
     float oldHealth = 0.0F;
     if (targetLiving != null) {
       oldHealth = targetLiving.getHealth();
@@ -250,10 +268,10 @@ public class ToolAttackUtil {
     }
 
     // set hand for proper looting context
-    ModifierLootingHandler.setLootingHand(attackerLiving, hand);
+    ModifierLootingInteractionHandler.setLootingInteractionHand(attackerLiving, hand);
 
     // prevent knockback if needed
-    Optional<ModifiableAttributeInstance> knockbackModifier = getKnockbackAttribute(targetLiving);
+    Optional<AttributeInstance> knockbackModifier = getKnockbackAttribute(targetLiving);
     // if knockback is below the vanilla amount, we need to prevent knockback, the remainder will be applied later
     boolean canceledKnockback = false;
     if (knockback < 0.4f) {
@@ -277,7 +295,7 @@ public class ToolAttackUtil {
     }
 
     // reset hand to make sure we don't mess with vanilla tools
-    ModifierLootingHandler.setLootingHand(attackerLiving, Hand.MAIN_HAND);
+    ModifierLootingHandler.setLootingHand(attackerLiving, InteractionHand.MAIN_HAND);
 
     // reset knockback if needed
     if (canceledKnockback) {
@@ -287,7 +305,7 @@ public class ToolAttackUtil {
     // if we failed to hit, fire failure hooks
     if (!didHit) {
       if (!isExtraAttack) {
-        attackerLiving.world.playSound(null, attackerLiving.getPosX(), attackerLiving.getPosY(), attackerLiving.getPosZ(), SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, attackerLiving.getSoundCategory(), 1.0F, 1.0F);
+        attackerLiving.level.playSound(null, attackerLiving.getX(), attackerLiving.getY(), attackerLiving.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, attackerLiving.getSoundCategory(), 1.0F, 1.0F);
       }
       // alert modifiers nothing was hit, mainly used for fiery
       for (ModifierEntry entry : modifiers) {
@@ -306,47 +324,47 @@ public class ToolAttackUtil {
     // apply knockback
     if (knockback > 0) {
       if (targetLiving != null) {
-        targetLiving.applyKnockback(knockback, MathHelper.sin(attackerLiving.rotationYaw * DEGREE_TO_RADIANS), -MathHelper.cos(attackerLiving.rotationYaw * DEGREE_TO_RADIANS));
+        targetLiving.knockback(knockback, Mth.sin(attackerLiving.getYRot() * DEGREE_TO_RADIANS), -Mth.cos(attackerLiving.getYRot() * DEGREE_TO_RADIANS));
       } else {
-        targetEntity.addVelocity(-MathHelper.sin(attackerLiving.rotationYaw * DEGREE_TO_RADIANS) * knockback, 0.1d, MathHelper.cos(attackerLiving.rotationYaw * DEGREE_TO_RADIANS) * knockback);
+        targetEntity.push(-Mth.sin(attackerLiving.getYRot() * DEGREE_TO_RADIANS) * knockback, 0.1d, Mth.cos(attackerLiving.getYRot() * DEGREE_TO_RADIANS) * knockback);
       }
-      attackerLiving.setMotion(attackerLiving.getMotion().mul(0.6D, 1.0D, 0.6D));
+      attackerLiving.setDeltaMovement(attackerLiving.getDeltaMovement().multiply(0.6D, 1.0D, 0.6D));
       attackerLiving.setSprinting(false);
     }
 
     // removed: sword sweep attack, handled above
 
     // apply velocity change to players if needed
-    if (targetEntity.velocityChanged && targetEntity instanceof ServerPlayerEntity) {
-      ((ServerPlayerEntity)targetEntity).connection.sendPacket(new SEntityVelocityPacket(targetEntity));
-      targetEntity.velocityChanged = false;
-      targetEntity.setMotion(originalTargetMotion);
+    if (targetEntity.hurtMarked && targetEntity instanceof ServerPlayer serverPlayer) {
+      serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(targetEntity));
+      targetEntity.hurtMarked = false;
+      targetEntity.setDeltaMovement(originalTargetMotion);
     }
 
     // play sound effects and particles
     if (attackerPlayer != null) {
       // particles
       if (isCritical) {
-        sound = SoundEvents.ENTITY_PLAYER_ATTACK_CRIT;
-        attackerPlayer.onCriticalHit(targetEntity);
+        sound = SoundEvents.PLAYER_ATTACK_CRIT;
+        attackerPlayer.crit(targetEntity);
       }
       if (isMagic) {
-        attackerPlayer.onEnchantmentCritical(targetEntity);
+        attackerPlayer.magicCrit(targetEntity);
       }
       // sounds
       if (sound != null) {
-        attackerLiving.world.playSound(null, attackerLiving.getPosX(), attackerLiving.getPosY(), attackerLiving.getPosZ(), sound, attackerLiving.getSoundCategory(), 1.0F, 1.0F);
+        attackerLiving.level.playSound(null, attackerLiving.getX(), attackerLiving.getY(), attackerLiving.getZ(), sound, attackerLiving.getSoundCategory(), 1.0F, 1.0F);
       }
     }
-    if (attackerLiving.world instanceof ServerWorld && damageDealt > 2.0F) {
+    if (attackerLiving.level instanceof ServerLevel serverWorld && damageDealt > 2.0F) {
       int particleCount = (int)(damageDealt * 0.5f);
-      ((ServerWorld)attackerLiving.world).spawnParticle(ParticleTypes.DAMAGE_INDICATOR, targetEntity.getPosX(), targetEntity.getPosYHeight(0.5), targetEntity.getPosZ(), particleCount, 0.1, 0, 0.1, 0.2);
+     serverWorld.sendParticles(ParticleTypes.DAMAGE_INDICATOR, targetEntity.getX(), targetEntity.getY(0.5), targetEntity.getZ(), particleCount, 0.1, 0, 0.1, 0.2);
     }
 
     // deal attacker thorns damage
-    attackerLiving.setLastAttackedEntity(targetEntity);
+    attackerLiving.setLastHurtMob(targetEntity);
     if (targetLiving != null) {
-      EnchantmentHelper.applyThornEnchantments(targetLiving, attackerLiving);
+      EnchantmentHelper.doPostHurtEffects(targetLiving, attackerLiving);
     }
 
     // apply modifier effects
@@ -359,23 +377,23 @@ public class ToolAttackUtil {
     // hurt resistance adjustment for high speed weapons
     float speed = tool.getStats().getFloat(ToolStats.ATTACK_SPEED);
     int time = Math.round(20f / speed);
-    if (time < targetEntity.hurtResistantTime) {
-      targetEntity.hurtResistantTime = (targetEntity.hurtResistantTime + time) / 2;
+    if (time < targetEntity.invulnerableTime) {
+      targetEntity.invulnerableTime = (targetEntity.invulnerableTime + time) / 2;
     }
 
     // final attack hooks
     if (attackerPlayer != null) {
       if (targetLiving != null) {
-        if (!attackerLiving.world.isRemote && !isExtraAttack) {
-          ItemStack held = attackerLiving.getHeldItem(hand);
+        if (!attackerLiving.level.isClientSide && !isExtraAttack) {
+          ItemStack held = attackerLiving.getItemInHand(hand);
           if (!held.isEmpty()) {
-            held.hitEntity(targetLiving, attackerPlayer);
+            held.hurtEnemy(targetLiving, attackerPlayer);
           }
         }
-        attackerPlayer.addStat(Stats.DAMAGE_DEALT, Math.round(damageDealt * 10.0F));
+        attackerPlayer.awardStat(Stats.DAMAGE_DEALT, Math.round(damageDealt * 10.0F));
       }
       // removed: fire damage, handled in modifier hook above
-      attackerPlayer.addExhaustion(0.1F);
+      attackerPlayer.causeFoodExhaustion(0.1F);
     }
 
     // damage the tool
@@ -395,7 +413,7 @@ public class ToolAttackUtil {
    * @param targetEntity    Target
    * @return  True if hit
    */
-  public static boolean extraEntityAttack(IModifiableWeapon weapon, IModifierToolStack tool, LivingEntity attackerLiving, Hand hand, Entity targetEntity) {
+  public static boolean extraEntityAttack(IModifiableWeapon weapon, IModifierToolStack tool, LivingEntity attackerLiving, InteractionHand hand, Entity targetEntity) {
     return attackEntity(weapon, tool, attackerLiving, hand, targetEntity, NO_COOLDOWN, true);
   }
 
@@ -406,34 +424,34 @@ public class ToolAttackUtil {
    * @param entity the entity
    * @param height the height offset for the particle position
    */
-  public static void spawnAttackParticle(IParticleData particleData, Entity entity, double height) {
-    double xd = -MathHelper.sin(entity.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(entity.rotationPitch / 180.0F * (float) Math.PI);
-    double zd = +MathHelper.cos(entity.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(entity.rotationPitch / 180.0F * (float) Math.PI);
-    double yd = -MathHelper.sin(entity.rotationPitch / 180.0F * (float) Math.PI);
+  public static void spawnAttackParticle(ParticleOptions particleData, Entity entity, double height) {
+    double xd = -Mth.sin(entity.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(entity.getXRot() / 180.0F * (float) Math.PI);
+    double zd = +Mth.cos(entity.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(entity.getXRot() / 180.0F * (float) Math.PI);
+    double yd = -Mth.sin(entity.getYRot() / 180.0F * (float) Math.PI);
 
     xd *= 1f;
     yd *= 1f;
     zd *= 1f;
 
-    if (entity.world instanceof ServerWorld) {
-      ((ServerWorld) entity.world).spawnParticle(particleData, entity.getPosX() + xd, entity.getPosY() + entity.getHeight() * height, entity.getPosZ() + zd, 0, xd, yd, zd, 1.0D);
+    if (entity.level instanceof ServerLevel serverWorld) {
+      serverWorld.sendParticles(particleData, entity.getX() + xd, entity.getY() + entity.getBbHeight() * height, entity.getZ() + zd, 0, xd, yd, zd, 1.0D);
     }
   }
 
   /** Gets the knockback attribute instance if the modifier is not already present */
-  private static Optional<ModifiableAttributeInstance> getKnockbackAttribute(@Nullable LivingEntity living) {
+  private static Optional<AttributeInstance> getKnockbackAttribute(@Nullable LivingEntity living) {
     return Optional.ofNullable(living)
                    .map(e -> e.getAttribute(Attributes.KNOCKBACK_RESISTANCE))
                    .filter(attribute -> !attribute.hasModifier(ANTI_KNOCKBACK_MODIFIER));
   }
 
   /** Enable the anti-knockback modifier */
-  private static void disableKnockback(ModifiableAttributeInstance instance) {
+  private static void disableKnockback(AttributeInstance instance) {
     instance.applyNonPersistentModifier(ANTI_KNOCKBACK_MODIFIER);
   }
 
   /** Disables the anti knockback modifier */
-  private static void enableKnockback(ModifiableAttributeInstance instance) {
+  private static void enableKnockback(AttributeInstance instance) {
     instance.removeModifier(ANTI_KNOCKBACK_MODIFIER);
   }
 
@@ -447,7 +465,7 @@ public class ToolAttackUtil {
    * @return  True if damaged
    */
   public static boolean attackEntitySecondary(DamageSource source, float damage, Entity target, @Nullable LivingEntity living, boolean noKnockback) {
-    Optional<ModifiableAttributeInstance> knockbackResistance = getKnockbackAttribute(living);
+    Optional<AttributeInstance> knockbackResistance = getKnockbackAttribute(living);
     // store last damage before secondary attack
     float oldLastDamage = living == null ? 0 : living.lastDamage;
 
@@ -457,8 +475,8 @@ public class ToolAttackUtil {
     }
 
     // set hurt resistance time to 0 because we always want to deal damage in traits
-    target.hurtResistantTime = 0;
-    boolean hit = target.attackEntityFrom(source, damage);
+    target.invulnerableTime = 0;
+    boolean hit = target.hurt(source, damage);
     // set total received damage, important for AI and stuff
     if (living != null) {
       living.lastDamage += oldLastDamage;

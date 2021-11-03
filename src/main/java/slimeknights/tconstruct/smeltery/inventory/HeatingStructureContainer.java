@@ -1,9 +1,13 @@
 package slimeknights.tconstruct.smeltery.inventory;
 
 import lombok.Getter;
+
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.IntReferenceHolder;
+import net.minecraft.world.inventory.DataSlot;
+
 import slimeknights.mantle.util.sync.ValidZeroIntReference;
 import slimeknights.tconstruct.shared.inventory.TriggeringMultiModuleContainer;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
@@ -26,7 +30,7 @@ public class HeatingStructureContainer extends TriggeringMultiModuleContainer<He
       sideInventory = new SideInventoryContainer<>(TinkerSmeltery.smelteryContainer.get(), id, inv, structure, 0, 0, calcColumns(inventory.getSlots()));
       addSubContainer(sideInventory, true);
 
-      Consumer<IntReferenceHolder> referenceConsumer = this::trackInt;
+      Consumer<DataSlot> referenceConsumer = this::trackInt;
       ValidZeroIntReference.trackIntArray(referenceConsumer, structure.getFuelModule());
       inventory.trackInts(array -> ValidZeroIntReference.trackIntArray(referenceConsumer, array));
     } else {
@@ -35,7 +39,7 @@ public class HeatingStructureContainer extends TriggeringMultiModuleContainer<He
     addInventorySlots();
   }
 
-  public HeatingStructureContainer(int id, PlayerInventory inv, PacketBuffer buf) {
+  public HeatingStructureContainer(int id, Inventory inv, FriendlyByteBuf buf) {
     this(id, inv, getTileEntityFromBuf(buf, HeatingStructureTileEntity.class));
   }
 

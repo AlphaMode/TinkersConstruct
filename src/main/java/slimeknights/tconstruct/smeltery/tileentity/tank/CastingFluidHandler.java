@@ -188,10 +188,10 @@ public class CastingFluidHandler implements IFluidHandler {
   }
 
   /** Write the tank from NBT */
-  public CompoundNBT writeToNBT(CompoundNBT nbt) {
+  public CompoundTag writeToNBT(CompoundTag nbt) {
     nbt.putInt(TAG_CAPACITY, capacity);
     if (!fluid.isEmpty()) {
-      nbt.put(TAG_FLUID, fluid.writeToNBT(new CompoundNBT()));
+      nbt.put(TAG_FLUID, fluid.writeToNBT(new CompoundTag()));
     }
     if (filter != Fluids.EMPTY) {
       nbt.putString(TAG_FILTER, Objects.requireNonNull(filter.getRegistryName()).toString());

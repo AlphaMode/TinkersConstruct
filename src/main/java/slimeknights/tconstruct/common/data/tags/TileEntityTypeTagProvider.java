@@ -14,14 +14,14 @@ import slimeknights.tconstruct.tables.TinkerTables;
 import javax.annotation.Nullable;
 import java.nio.file.Path;
 
-public class TileEntityTypeTagProvider extends TagsProvider<BlockEntityType<?>> {
-  public TileEntityTypeTagProvider(DataGenerator generatorIn, @Nullable ExistingFileHelper existingFileHelper) {
+public class BlockEntityTypeTagProvider extends TagsProvider<BlockEntityType<?>> {
+  public BlockEntityTypeTagProvider(DataGenerator generatorIn, @Nullable ExistingFileHelper existingFileHelper) {
     super(generatorIn, Registry.BLOCK_ENTITY_TYPE, TConstruct.MOD_ID, existingFileHelper, "tile_entity_types");
   }
 
   @Override
   protected void addTags() {
-    this.tag(TinkerTags.TileEntityTypes.CRAFTING_STATION_BLACKLIST)
+    this.tag(TinkerTags.BlockEntityTypes.CRAFTING_STATION_BLACKLIST)
         .add(TinkerTables.craftingStationTile.get(), TinkerTables.tinkerStationTile.get(), TinkerTables.partBuilderTile.get(),
 						 TinkerTables.partChestTile.get(), TinkerTables.tinkersChestTile.get(), TinkerTables.castChestTile.get(),
 						 TinkerSmeltery.basin.get(), TinkerSmeltery.table.get(), TinkerSmeltery.smeltery.get());

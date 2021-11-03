@@ -157,7 +157,7 @@ public class BaseStationContainer<TILE extends BlockEntity> extends TriggeringMu
    */
   private static boolean isUsable(BlockEntity tileEntity, Player player) {
     // must not be blacklisted and be usable
-    return !TinkerTags.TileEntityTypes.CRAFTING_STATION_BLACKLIST.contains(tileEntity.getType())
+    return !TinkerTags.BlockEntityTypes.CRAFTING_STATION_BLACKLIST.contains(tileEntity.getType())
            && (!(tileEntity instanceof Container) || ((Container)tileEntity).stillValid(player));
   }
 

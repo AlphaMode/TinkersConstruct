@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.library.tools.nbt;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
@@ -62,7 +62,7 @@ class MaterialNBTTest extends BaseMcTest {
 
   @Test
   void wrongNbtType_emptyList() {
-    INBT wrongNbt = new CompoundNBT();
+    INBT wrongNbt = new CompoundTag();
 
     MaterialNBT materialNBT = MaterialNBT.readFromNBT(wrongNbt);
 
@@ -72,7 +72,7 @@ class MaterialNBTTest extends BaseMcTest {
   @Test
   void wrongListNbtType_emptyList() {
     ListNBT wrongNbt = new ListNBT();
-    wrongNbt.add(new CompoundNBT());
+    wrongNbt.add(new CompoundTag());
 
     MaterialNBT materialNBT = MaterialNBT.readFromNBT(wrongNbt);
 

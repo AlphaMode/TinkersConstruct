@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.library.tools.nbt;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import org.junit.jupiter.api.BeforeAll;
@@ -72,7 +72,7 @@ class ModifierNBTest extends BaseMcTest {
 
     ListNBT list = builder.build().serializeToNBT();
     assertThat(list.size()).isEqualTo(2);
-    CompoundNBT tag = list.getCompound(0);
+    CompoundTag tag = list.getCompound(0);
     assertThat(tag.getString(ModifierNBT.TAG_MODIFIER)).isEqualTo(ModifierFixture.TEST_1.toString());
     assertThat(tag.getInt(ModifierNBT.TAG_LEVEL)).isEqualTo(2);
 
@@ -84,11 +84,11 @@ class ModifierNBTest extends BaseMcTest {
   @Test
   void deserialize() {
     ListNBT list = new ListNBT();
-    CompoundNBT tag = new CompoundNBT();
+    CompoundTag tag = new CompoundTag();
     tag.putString(ModifierNBT.TAG_MODIFIER, ModifierFixture.TEST_1.toString());
     tag.putInt(ModifierNBT.TAG_LEVEL, 2);
     list.add(tag);
-    tag = new CompoundNBT();
+    tag = new CompoundTag();
     tag.putString(ModifierNBT.TAG_MODIFIER, ModifierFixture.TEST_2.toString());
     tag.putInt(ModifierNBT.TAG_LEVEL, 3);
     list.add(tag);
@@ -109,7 +109,7 @@ class ModifierNBTest extends BaseMcTest {
 
   @Test
   void wrongNbtType_empty() {
-    INBT wrongNbt = new CompoundNBT();
+    INBT wrongNbt = new CompoundTag();
 
     ModifierNBT modifierNBT = ModifierNBT.readFromNBT(wrongNbt);
 

@@ -11,25 +11,31 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.EquipmentSlotType.Group;
+import net.minecraft.entity.player.Player;
+import net.minecraft.inventory.EquipmentSlot;
+import net.minecraft.inventory.EquipmentSlot.Group;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
+import net.minecraft.item.UseOnContext;
 import net.minecraft.item.Rarity;
 import net.minecraft.item.UseAction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
+import net.minecraft.util.InteractionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -58,6 +64,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
 /**
  * A standard modifiable item which implements melee hooks
@@ -115,7 +124,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   }
 
   @Override
-  public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
+  public void onCreated(ItemStack stack, Level worldIn, Player playerIn) {
     ToolStack.ensureInitialized(stack, getToolDefinition());
   }
 
@@ -144,9 +153,9 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   }
 
   @Override
-  public Entity createEntity(World world, Entity original, ItemStack stack) {
+  public Entity createEntity(Level world, Entity original, ItemStack stack) {
     if (ToolStack.from(stack).getVolatileData().getBoolean(INDESTRUCTIBLE_ENTITY)) {
-      IndestructibleItemEntity entity = new IndestructibleItemEntity(world, original.getPosX(), original.getPosY(), original.getPosZ(), stack);
+      IndestructibleItemEntity entity = new IndestructibleItemEntity(world, original.getX(), original.getY(), original.getZ(), stack);
       entity.setPickupDelayFrom(original);
       return entity;
     }
@@ -162,13 +171,13 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   }
 
   @Override
-  public boolean isDamageable() {
+  public boolean canBeDepleted() {
     return true;
   }
 
   @Override
   public int getMaxDamage(ItemStack stack) {
-    if (!isDamageable()) {
+    if (!canBeDepleted()) {
       return 0;
     }
     ToolStack tool = ToolStack.from(stack);
@@ -179,7 +188,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
 
   @Override
   public int getDamage(ItemStack stack) {
-    if (!isDamageable()) {
+    if (!canBeDepleted()) {
       return 0;
     }
     return ToolStack.from(stack).getDamage();
@@ -187,7 +196,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
 
   @Override
   public void setDamage(ItemStack stack, int damage) {
-    if (isDamageable()) {
+    if (canBeDepleted()) {
       ToolStack.from(stack).setDamage(damage);
     }
   }
@@ -196,7 +205,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T damager, Consumer<T> onBroken) {
     // We basically emulate Itemstack.damageItem here. We always return 0 to skip the handling in ItemStack.
     // If we don't tools ignore our damage logic
-    if (isDamageable() && ToolDamageUtil.damage(ToolStack.from(stack), amount, damager, stack)) {
+    if (canBeDepleted() && ToolDamageUtil.damage(ToolStack.from(stack), amount, damager, stack)) {
       onBroken.accept(damager);
     }
 
@@ -208,7 +217,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
 
   @Override
   public boolean showDurabilityBar(ItemStack stack) {
-    if (!isDamageable()) {
+    if (!canBeDepleted()) {
       return false;
     }
     ToolStack tool = ToolStack.from(stack);
@@ -262,20 +271,20 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
         return rgb;
       }
     }
-    return MathHelper.hsvToRGB(Math.max(0.0f, (float) (1.0f - getDamagePercentage(tool))) / 3.0f, 1.0f, 1.0f);
+    return Mth.hsvToRgb(Math.max(0.0f, (float) (1.0f - getDamagePercentage(tool))) / 3.0f, 1.0f, 1.0f);
   }
 
 
   /* Attacking */
 
   @Override
-  public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity) {
+  public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
     return ToolAttackUtil.attackEntity(stack, this, player, entity);
   }
 
   @Override
-  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot, ItemStack stack) {
-    CompoundNBT nbt = stack.getTag();
+  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+    CompoundTag nbt = stack.getTag();
     if (nbt == null || nbt.getBoolean(TooltipUtil.KEY_DISPLAY)) {
       return ImmutableMultimap.of();
     }
@@ -284,7 +293,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
     ToolStack tool = ToolStack.from(stack);
     if (!tool.isBroken()) {
       // base stats
-      if (slot == EquipmentSlotType.MAINHAND) {
+      if (slot == EquipmentSlot.MAINHAND) {
         StatsNBT statsNBT = tool.getStats();
         builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "tconstruct.tool.attack_damage", statsNBT.getFloat(ToolStats.ATTACK_DAMAGE), AttributeModifier.Operation.ADDITION));
         // base attack speed is 4, but our numbers start from 4
@@ -307,7 +316,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   /* Modifier interactions */
 
   @Override
-  public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+  public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
     super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
 
     // don't care about non-living, they skip most tool context
@@ -333,54 +342,54 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   }
   
   @Override
-  public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
+  public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
     ToolStack tool = ToolStack.from(stack);
     if (shouldInteract(context.getPlayer(), tool, context.getHand())) {
       for (ModifierEntry entry : tool.getModifierList()) {
-        ActionResultType result = entry.getModifier().beforeBlockUse(tool, entry.getLevel(), context);
+        InteractionResult result = entry.getModifier().beforeBlockUse(tool, entry.getLevel(), context);
         if (result.isSuccessOrConsume()) {
           return result;
         }
       }
     }
-    return ActionResultType.PASS;
+    return InteractionResult.PASS;
   }
 
   @Override
-  public ActionResultType onItemUse(ItemUseContext context) {
+  public InteractionResult onItemUse(UseOnContext context) {
     ToolStack tool = ToolStack.from(context.getItem());
     if (shouldInteract(context.getPlayer(), tool, context.getHand())) {
       for (ModifierEntry entry : tool.getModifierList()) {
-        ActionResultType result = entry.getModifier().afterBlockUse(tool, entry.getLevel(), context);
+        InteractionResult result = entry.getModifier().afterBlockUse(tool, entry.getLevel(), context);
         if (result.isSuccessOrConsume()) {
           return result;
         }
       }
     }
-    return ActionResultType.PASS;
+    return InteractionResult.PASS;
   }
 
   @Override
-  public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+  public InteractionResult itemInteractionForEntity(ItemStack stack, Player playerIn, LivingEntity target, Hand hand) {
     ToolStack tool = ToolStack.from(stack);
     if (shouldInteract(playerIn, tool, hand)) {
       for (ModifierEntry entry : tool.getModifierList()) {
-        ActionResultType result = entry.getModifier().onEntityUse(tool, entry.getLevel(), playerIn, target, hand);
+        InteractionResult result = entry.getModifier().onEntityUse(tool, entry.getLevel(), playerIn, target, hand);
         if (result.isSuccessOrConsume()) {
           return result;
         }
       }
     }
-    return ActionResultType.PASS;
+    return InteractionResult.PASS;
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
+  public ActionResult<ItemStack> onItemRightClick(Level worldIn, Player playerIn, Hand hand) {
     ItemStack stack = playerIn.getHeldItem(hand);
     ToolStack tool = ToolStack.from(playerIn.getHeldItem(hand));
     if (shouldInteract(playerIn, tool, hand)) {
       for (ModifierEntry entry : tool.getModifierList()) {
-        ActionResultType result = entry.getModifier().onToolUse(tool, entry.getLevel(), worldIn, playerIn, hand);
+        InteractionResult result = entry.getModifier().onToolUse(tool, entry.getLevel(), worldIn, playerIn, hand);
         if (result.isSuccessOrConsume()) {
           return new ActionResult<>(result, stack);
         }
@@ -390,7 +399,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   }
 
   @Override
-  public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+  public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity entityLiving) {
     ToolStack tool = ToolStack.from(stack);
     for (ModifierEntry entry : tool.getModifierList()) {
       if (entry.getModifier().onFinishUsing(tool, entry.getLevel(), worldIn, entityLiving)) {
@@ -401,7 +410,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   }
 
   @Override
-  public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
+  public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
     ToolStack tool = ToolStack.from(stack);
     for (ModifierEntry entry : tool.getModifierList()) {
       boolean result = entry.getModifier().onStoppedUsing(tool, entry.getLevel(), worldIn, entityLiving, timeLeft);
@@ -424,15 +433,15 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   }
 
   @Override
-  public UseAction getUseAction(ItemStack stack) {
+  public UseAnim getUseAnimation(ItemStack stack) {
     ToolStack tool = ToolStack.from(stack);
     for (ModifierEntry entry : tool.getModifierList()) {
-      UseAction result = entry.getModifier().getUseAction(tool, entry.getLevel());
-      if (result != UseAction.NONE) {
+      UseAnim result = entry.getModifier().getUseAction(tool, entry.getLevel());
+      if (result != UseAnim.NONE) {
         return result;
       }
     }
-    return UseAction.NONE;
+    return UseAnim.NONE;
   }
 
 
@@ -466,7 +475,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
 
   @Override
   @OnlyIn(Dist.CLIENT)
-  public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+  public void addInformation(ItemStack stack, @Nullable Level worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
     TooltipUtil.addInformation(this, stack, tooltip, TooltipKey.fromScreen(), flagIn == TooltipFlags.ADVANCED);
   }
 
@@ -519,8 +528,8 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
     }
 
     // if the attributes changed, reequip
-    Multimap<Attribute, AttributeModifier> attributesNew = newStack.getAttributeModifiers(EquipmentSlotType.MAINHAND);
-    Multimap<Attribute, AttributeModifier> attributesOld = oldStack.getAttributeModifiers(EquipmentSlotType.MAINHAND);
+    Multimap<Attribute, AttributeModifier> attributesNew = newStack.getAttributeModifiers(EquipmentSlot.MAINHAND);
+    Multimap<Attribute, AttributeModifier> attributesOld = oldStack.getAttributeModifiers(EquipmentSlot.MAINHAND);
     if (attributesNew.size() != attributesOld.size()) {
       return true;
     }
@@ -552,7 +561,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
    *
    * @return  Raytrace
    */
-  public static BlockRayTraceResult blockRayTrace(World worldIn, PlayerEntity player, RayTraceContext.FluidMode fluidMode) {
+  public static BlockRayTraceResult blockRayTrace(Level worldIn, Player player, RayTraceContext.FluidMode fluidMode) {
     return Item.rayTrace(worldIn, player, fluidMode);
   }
 }

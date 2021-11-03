@@ -22,7 +22,7 @@ public class TinkerTags {
     Items.init();
     Fluids.init();
     EntityTypes.init();
-    TileEntityTypes.init();
+    BlockEntityTypes.init();
   }
 
   public static class Blocks {
@@ -277,7 +277,7 @@ public class TinkerTags {
     }
   }
 
-  public static class TileEntityTypes {
+  public static class BlockEntityTypes {
     private static void init() {}
     public static final IOptionalNamedTag<BlockEntityType<?>> CRAFTING_STATION_BLACKLIST = tag("crafting_station_blacklist");
 

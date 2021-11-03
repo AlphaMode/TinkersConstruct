@@ -6,7 +6,9 @@ import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.IConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.tuple.Pair;
 import slimeknights.tconstruct.TConstruct;
@@ -315,10 +317,10 @@ public class Config {
   }
 
   /** Called when config reloaded to update cached settings */
-  private static void configChanged(ModConfig.Reloading event) {
+  private static void configChanged(ModConfigEvent.Reloading event) {
     ModConfig config = event.getConfig();
     if (config.getModId().equals(TConstruct.MOD_ID)) {
-      ForgeConfigSpec spec = config.getSpec();
+      IConfigSpec spec = config.getSpec();
       if (spec == Config.commonSpec) {
         TinkerStructures.addStructureSeparation();
       }

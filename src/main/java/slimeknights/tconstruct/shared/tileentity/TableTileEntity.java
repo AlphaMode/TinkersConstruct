@@ -1,12 +1,15 @@
 package slimeknights.tconstruct.shared.tileentity;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
+
 import slimeknights.mantle.tileentity.InventoryTileEntity;
 import slimeknights.tconstruct.common.SoundUtils;
 import slimeknights.tconstruct.common.Sounds;
@@ -23,12 +26,12 @@ import java.util.function.Consumer;
  */
 public abstract class TableTileEntity extends InventoryTileEntity {
 
-  public TableTileEntity(BlockEntityType<?> tileEntityTypeIn, String name, int inventorySize) {
-    super(tileEntityTypeIn, new TranslatableComponent(name), inventorySize);
+  public TableTileEntity(BlockEntityType<?> BlockEntityTypeIn, BlockPos pos, BlockState state, String name, int inventorySize) {
+    super(BlockEntityTypeIn, pos, state, new TranslatableComponent(name), inventorySize);
   }
 
-  public TableTileEntity(BlockEntityType<?> tileEntityTypeIn, String name, int inventorySize, int maxStackSize) {
-    super(tileEntityTypeIn, new TranslatableComponent(name), inventorySize, maxStackSize);
+  public TableTileEntity(BlockEntityType<?> BlockEntityTypeIn, BlockPos pos, BlockState state, String name, int inventorySize, int maxStackSize) {
+    super(BlockEntityTypeIn, pos, state, new TranslatableComponent(name), inventorySize, maxStackSize);
   }
 
   /* Syncing */
@@ -36,8 +39,8 @@ public abstract class TableTileEntity extends InventoryTileEntity {
   @Override
   public void setItem(int slot, @Nonnull ItemStack itemstack) {
     // send a slot update to the client when items change, so we can update the TESR
-    if (level != null && level instanceof ServerLevel && !level.isClientSide && !ItemStack.matches(itemstack, getItem(slot))) {
-      TinkerNetwork.getInstance().sendToClientsAround(new InventorySlotSyncPacket(itemstack, slot, worldPosition), (ServerLevel) level, this.worldPosition);
+    if (level != null && level instanceof ServerLevel serverLevel && !level.isClientSide && !ItemStack.matches(itemstack, getItem(slot))) {
+      TinkerNetwork.getInstance().sendToClientsAround(new InventorySlotSyncPacket(itemstack, slot, worldPosition), serverLevel, this.worldPosition);
     }
     super.setItem(slot, itemstack);
   }
@@ -81,16 +84,16 @@ public abstract class TableTileEntity extends InventoryTileEntity {
    * @param player the player
    */
   protected void playCraftSound(Player player) {
-    SoundUtils.playSoundForAll(player, Sounds.SAW.getSound(), 0.8f, 0.8f + 0.4f * player.getEntityWorld().rand.nextFloat());
+    SoundUtils.playSoundForAll(player, Sounds.SAW.getSound(), 0.8f, 0.8f + 0.4f * player.getCommandSenderWorld().random.nextFloat());
   }
 
   /**
    * Update the screen to the given player
    * @param player  Player to send an update to
    */
-  protected void syncScreen(PlayerEntity player) {
-    if (this.world != null && !this.world.isRemote && player instanceof ServerPlayerEntity) {
-      TinkerNetwork.getInstance().sendTo(new UpdateStationScreenPacket(), (ServerPlayerEntity) player);
+  protected void syncScreen(Player player) {
+    if (this.level != null && !this.level.isClientSide && player instanceof ServerPlayer serverPlayer) {
+      TinkerNetwork.getInstance().sendTo(new UpdateStationScreenPacket(), serverPlayer);
     }
   }
 }

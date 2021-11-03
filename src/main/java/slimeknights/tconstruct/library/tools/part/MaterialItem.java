@@ -41,7 +41,7 @@ public class MaterialItem extends Item implements IMaterialItem {
   @Override
   public Optional<MaterialId> getMaterialId(ItemStack stack) {
     return Optional.ofNullable(stack.getTag())
-                   .map(compoundNBT -> compoundNBT.getString(NBTTags.PART_MATERIAL))
+                   .map(CompoundTag -> CompoundTag.getString(NBTTags.PART_MATERIAL))
                    .filter(string -> !string.isEmpty())
                    .map(MaterialId::tryCreate);
   }

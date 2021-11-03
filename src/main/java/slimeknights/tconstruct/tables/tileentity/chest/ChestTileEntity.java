@@ -28,8 +28,8 @@ public abstract class ChestTileEntity extends NamableTileEntity {
   @Getter
   private final ItemStackHandler itemHandler;
   private final LazyOptional<IItemHandler> capability;
-  protected ChestTileEntity(BlockEntityType<?> tileEntityTypeIn, String name, ItemStackHandler itemHandler) {
-    super(tileEntityTypeIn, new TranslatableComponent(name));
+  protected ChestTileEntity(BlockEntityType<?> BlockEntityTypeIn, String name, ItemStackHandler itemHandler) {
+    super(BlockEntityTypeIn, new TranslatableComponent(name));
     this.itemHandler = itemHandler;
     this.capability = LazyOptional.of(() -> itemHandler);
   }

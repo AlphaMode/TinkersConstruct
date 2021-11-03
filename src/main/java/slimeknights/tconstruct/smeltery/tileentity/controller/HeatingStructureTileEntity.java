@@ -1,24 +1,26 @@
 package slimeknights.tconstruct.smeltery.tileentity.controller;
 
 import lombok.Getter;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
+
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.entity.TickingBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.AABB;
+
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -57,7 +59,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public abstract class HeatingStructureTileEntity extends NamableTileEntity implements TickableBlockEntity, IMasterLogic, ISmelteryTankHandler {
+public abstract class HeatingStructureTileEntity extends NamableTileEntity implements TickingBlockEntity, IMasterLogic, ISmelteryTankHandler {
   private static final String TAG_STRUCTURE = "structure";
   private static final String TAG_TANK = "tank";
   private static final String TAG_INVENTORY = "inventory";
@@ -110,7 +112,7 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
   /** If true, fluids have changed since the last update and should be synced to the client, synced at most once every 4 ticks */
   private boolean fluidUpdateQueued = false;
   /** Cache of the bounds for the case of no structure */
-  private AxisAlignedBB defaultBounds;
+  private AABB defaultBounds;
 
   /* Client display */
   @Getter
@@ -121,8 +123,8 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
   /** Function to drop an item */
   protected final Consumer<ItemStack> dropItem = this::dropItem;
 
-  protected HeatingStructureTileEntity(TileEntityType<? extends HeatingStructureTileEntity> type, ITextComponent name) {
-    super(type, name);
+  protected HeatingStructureTileEntity(BlockEntityType<? extends HeatingStructureTileEntity> type, BlockPos pos, BlockState state, MutableComponent name) {
+    super(type, pos, state, name);
   }
 
   /* Abstract methods */
@@ -144,13 +146,13 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
     BlockPos oldErrorPos = this.errorPos;
     this.errorPos = multiblock.getLastResult().getPos();
     if (!Objects.equals(oldErrorPos, errorPos)) {
-      TinkerNetwork.getInstance().sendToClientsAround(new StructureErrorPositionPacket(pos, errorPos), world, pos);
+      TinkerNetwork.getInstance().sendToClientsAround(new StructureErrorPositionPacket(worldPosition, errorPos), level, worldPosition);
     }
   }
 
   @Override
   public void tick() {
-    if (world == null || world.isRemote) {
+    if (level == null || level.isClientSide) {
       if (errorVisibleFor > 0) {
         errorVisibleFor--;
       }
@@ -169,14 +171,14 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
     }
 
     // if we have a structure, run smeltery logic
-    if (structure != null && state.get(SmelteryControllerBlock.IN_STRUCTURE)) {
+    if (structure != null && state.getValue(SmelteryControllerBlock.IN_STRUCTURE)) {
       // every 15 seconds, check above the smeltery to try to expand
       if (tick == 0) {
         expandCounter++;
         if (expandCounter >= 10 && structure.getInnerY() < multiblock.getMaxHeight()) {
           expandCounter = 0;
           // instead of rechecking the whole structure, just recheck the layer above and queue an update if its usable
-          if (multiblock.canExpand(structure, world)) {
+          if (multiblock.canExpand(structure, level)) {
             updateStructure();
           } else {
             updateErrorPos();
@@ -184,7 +186,7 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
         }
       } else if (tick % 4 == 0) {
         // check the next inside position to see if its a valid inner block every other tick
-        if (!multiblock.isInnerBlock(world, structure.getNextInsideCheck())) {
+        if (!multiblock.isInnerBlock(level, structure.getNextInsideCheck())) {
           updateStructure();
         }
       }
@@ -207,20 +209,25 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
     tick = (tick + 1) % 20;
   }
 
+  @Override
+  public BlockPos getPos() {
+    return worldPosition;
+  }
+
   /**
    * Drops an item into the world
    * @param stack  Item to drop
    */
   protected void dropItem(ItemStack stack) {
-    assert world != null;
-    if (!world.isRemote && !stack.isEmpty()) {
-      double x = (double)(world.rand.nextFloat() * 0.5F) + 0.25D;
-      double y = (double)(world.rand.nextFloat() * 0.5F) + 0.25D;
-      double z = (double)(world.rand.nextFloat() * 0.5F) + 0.25D;
-      BlockPos pos = this.pos.offset(getBlockState().get(ControllerBlock.FACING));
-      ItemEntity itementity = new ItemEntity(world, (double)pos.getX() + x, (double)pos.getY() + y, (double)pos.getZ() + z, stack);
-      itementity.setDefaultPickupDelay();
-      world.addEntity(itementity);
+    assert level != null;
+    if (!level.isClientSide && !stack.isEmpty()) {
+      double x = (double)(level.random.nextFloat() * 0.5F) + 0.25D;
+      double y = (double)(level.random.nextFloat() * 0.5F) + 0.25D;
+      double z = (double)(level.random.nextFloat() * 0.5F) + 0.25D;
+      BlockPos pos = this.worldPosition.relative(getBlockState().getValue(ControllerBlock.FACING));
+      ItemEntity itementity = new ItemEntity(level, (double)pos.getX() + x, (double)pos.getY() + y, (double)pos.getZ() + z, stack);
+      itementity.setDefaultPickUpDelay();
+      level.addFreshEntity(itementity);
     }
   }
 
@@ -228,7 +235,7 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
   /* Capability */
 
   @Override
-  protected void invalidateCaps() {
+  public void invalidateCaps() {
     super.invalidateCaps();
     this.itemCapability.invalidate();
   }
@@ -263,24 +270,24 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
    * Attempts to locate a valid smeltery structure
    */
   protected void checkStructure() {
-    if (world == null || world.isRemote) {
+    if (level == null || level.isClientSide) {
       return;
     }
-    boolean wasFormed = getBlockState().get(ControllerBlock.IN_STRUCTURE);
+    boolean wasFormed = getBlockState().getValue(ControllerBlock.IN_STRUCTURE);
     StructureData oldStructure = structure;
-    StructureData newStructure = multiblock.detectMultiblock(world, pos, getBlockState().get(BlockStateProperties.HORIZONTAL_FACING));
+    StructureData newStructure = multiblock.detectMultiblock(level, worldPosition, getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING));
 
     // update block state
     boolean formed = newStructure != null;
     if (formed != wasFormed) {
-      world.setBlockState(pos, getBlockState().with(ControllerBlock.IN_STRUCTURE, formed));
+      level.setBlockAndUpdate(worldPosition, getBlockState().setValue(ControllerBlock.IN_STRUCTURE, formed));
     }
 
     // structure info updates
     if (formed) {
       // sync size to the client
       TinkerNetwork.getInstance().sendToClientsAround(
-        new StructureUpdatePacket(pos, newStructure.getMinPos(), newStructure.getMaxPos(), newStructure.getTanks()), world, pos);
+        new StructureUpdatePacket(worldPosition, newStructure.getMinPos(), newStructure.getMaxPos(), newStructure.getTanks()), level, worldPosition);
 
       // update tank capability, do first for update listeners on the drain blocks
       if (!fluidCapability.isPresent()) {
@@ -329,8 +336,8 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
       return;
     }
 
-    assert world != null;
-    if (multiblock.shouldUpdate(world, structure, pos, state)) {
+    assert level != null;
+    if (multiblock.shouldUpdate(level, structure, pos, state)) {
       updateStructure();
     }
   }
@@ -352,12 +359,12 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
    * @param fluid  Fluid
    */
   private void updateDisplayFluid(Fluid fluid) {
-    if (world != null && world.isRemote) {
+    if (level != null && level.isClientSide) {
       // update ourself
       modelData.setData(IDisplayFluidListener.PROPERTY, fluid);
       this.requestModelDataUpdate();
       BlockState state = getBlockState();
-      world.notifyBlockUpdate(pos, state, state, 48);
+      level.sendBlockUpdated(worldPosition, state, state, 48);
 
       // update all listeners
       Iterator<WeakReference<IDisplayFluidListener>> iterator = fluidDisplayListeners.iterator();
@@ -390,11 +397,11 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
   }
 
   @Override
-  public AxisAlignedBB getRenderBoundingBox() {
+  public AABB getRenderBoundingBox() {
     if (structure != null) {
       return structure.getBounds();
     } else if (defaultBounds == null) {
-      defaultBounds = new AxisAlignedBB(pos, pos.add(1, 1, 1));
+      defaultBounds = new AABB(worldPosition, worldPosition.offset(1, 1, 1));
     }
     return defaultBounds;
   }
@@ -406,8 +413,8 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
   }
 
   @Override
-  public void setWorldAndPos(World world, BlockPos pos) {
-    super.setWorldAndPos(world, pos);
+  public void setLevelAndPosition(Level world, BlockPos pos) {
+    super.setLevelAndPosition(level, pos);
     defaultBounds = null;
   }
 
@@ -437,7 +444,7 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
 
   @Nullable
   @Override
-  public Container createMenu(int id, PlayerInventory inv, PlayerEntity player) {
+  public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
     return new HeatingStructureContainer(id, inv, this);
   }
 
@@ -462,7 +469,7 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
   /** Updates the error position from the server */
   public void setErrorPos(@Nullable BlockPos errorPos) {
     this.errorPos = errorPos;
-    if (errorPos != null && this.world != null) {
+    if (errorPos != null && this.level != null) {
       // 10 seconds after its set
       this.errorVisibleFor = 200;
     }
@@ -482,8 +489,8 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
   }
 
   @Override
-  public void read(BlockState state, CompoundNBT nbt) {
-    super.read(state, nbt);
+  public void load(CompoundTag nbt) {
+    super.load(nbt);
     if (nbt.contains(TAG_TANK, NBT.TAG_COMPOUND)) {
       tank.read(nbt.getCompound(TAG_TANK));
       Fluid first = tank.getFluidInTank(0).getFluid();
@@ -502,15 +509,15 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
     }
     // only exists to be sent server to client in update packets
     if (nbt.contains(TAG_ERROR_POS, NBT.TAG_COMPOUND)) {
-      this.errorPos = NBTUtil.readBlockPos(nbt.getCompound(TAG_ERROR_POS));
+      this.errorPos = NbtUtils.readBlockPos(nbt.getCompound(TAG_ERROR_POS));
     }
     fuelModule.readFromNBT(nbt);
   }
 
   @Override
-  public CompoundNBT write(CompoundNBT compound) {
+  public CompoundTag save(CompoundTag compound) {
     // NBT that just writes to disk
-    compound = super.write(compound);
+    compound = super.save(compound);
     if (structure != null) {
       compound.put(TAG_STRUCTURE, structure.writeToNBT());
     }
@@ -519,23 +526,23 @@ public abstract class HeatingStructureTileEntity extends NamableTileEntity imple
   }
 
   @Override
-  public void writeSynced(CompoundNBT compound) {
+  public void writeSynced(CompoundTag compound) {
     // NBT that writes to disk and syncs to client
     super.writeSynced(compound);
-    compound.put(TAG_TANK, tank.write(new CompoundNBT()));
+    compound.put(TAG_TANK, tank.write(new CompoundTag()));
     compound.put(TAG_INVENTORY, meltingInventory.writeToNBT());
   }
 
   @Override
-  public CompoundNBT getUpdateTag() {
+  public CompoundTag getUpdateTag() {
     // NBT that just syncs to client
-    CompoundNBT nbt = super.getUpdateTag();
+    CompoundTag nbt = super.getUpdateTag();
     if (structure != null) {
       nbt.put(TAG_STRUCTURE, structure.writeClientNBT());
     }
     // sync error position, not actually saved in NBT
     if (errorPos != null) {
-      nbt.put(TAG_ERROR_POS, NBTUtil.writeBlockPos(errorPos));
+      nbt.put(TAG_ERROR_POS, NbtUtils.writeBlockPos(errorPos));
     }
     return nbt;
   }

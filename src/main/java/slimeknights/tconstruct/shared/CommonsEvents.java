@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -57,8 +57,8 @@ public class CommonsEvents {
   @SubscribeEvent
   static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
     if (Config.COMMON.shouldSpawnWithTinkersBook.get()) {
-      CompoundNBT playerData = event.getPlayer().getPersistentData();
-      CompoundNBT data = playerData.getCompound(PlayerEntity.PERSISTED_NBT_TAG);
+      CompoundTag playerData = event.getPlayer().getPersistentData();
+      CompoundTag data = playerData.getCompound(PlayerEntity.PERSISTED_NBT_TAG);
       if (!data.getBoolean(TAG_PLAYER_HAS_BOOK)) {
         ItemHandlerHelper.giveItemToPlayer(event.getPlayer(), new ItemStack(TinkerCommons.materialsAndYou.get()));
         data.putBoolean(TAG_PLAYER_HAS_BOOK, true);

@@ -66,8 +66,8 @@ public class FaucetTileEntity extends MantleTileEntity implements TickableBlockE
   }
 
   @SuppressWarnings("WeakerAccess")
-  protected FaucetTileEntity(BlockEntityType<?> tileEntityTypeIn) {
-    super(tileEntityTypeIn);
+  protected FaucetTileEntity(BlockEntityType<?> BlockEntityTypeIn) {
+    super(BlockEntityTypeIn);
   }
 
 

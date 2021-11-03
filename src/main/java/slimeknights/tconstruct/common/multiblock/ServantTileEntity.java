@@ -27,8 +27,8 @@ public class ServantTileEntity extends MantleTileEntity implements IServantLogic
   private BlockPos masterPos;
   @Nullable
   private Block masterBlock;
-  public ServantTileEntity(BlockEntityType<?> tileEntityTypeIn) {
-    super(tileEntityTypeIn);
+  public ServantTileEntity(BlockEntityType<?> BlockEntityTypeIn) {
+    super(BlockEntityTypeIn);
   }
 
   /** Checks if this servant has a master */

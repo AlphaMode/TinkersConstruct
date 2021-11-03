@@ -23,8 +23,8 @@ public class SmelteryComponentTileEntity extends ServantTileEntity {
     this(TinkerSmeltery.smelteryComponent.get());
   }
 
-  protected SmelteryComponentTileEntity(BlockEntityType<?> tileEntityTypeIn) {
-    super(tileEntityTypeIn);
+  protected SmelteryComponentTileEntity(BlockEntityType<?> BlockEntityTypeIn) {
+    super(BlockEntityTypeIn);
   }
 
   @Override

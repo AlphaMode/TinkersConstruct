@@ -4,11 +4,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -245,10 +246,10 @@ public class FuelModule implements ContainerData {
    * @return   Temperature of the consumed fuel, 0 if none found
    */
   private int tryFindFuel(BlockPos pos, boolean consume) {
-    TileEntity te = getWorld().getTileEntity(pos);
-    if (te != null) {
+    BlockEntity be = getWorld().getBlockEntity(pos);
+    if (be != null) {
       // if we find a valid cap, try to consume fuel from it
-      LazyOptional<IFluidHandler> capability = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+      LazyOptional<IFluidHandler> capability = be.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
       Optional<Integer> temperature = capability.map(tryLiquidFuel(consume));
       if (temperature.isPresent()) {
         itemHandler = null;
@@ -258,7 +259,7 @@ public class FuelModule implements ContainerData {
         return temperature.get();
       } else {
         // if we find a valid item cap, consume fuel from that
-        LazyOptional<IItemHandler> itemCap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        LazyOptional<IItemHandler> itemCap = be.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
         temperature = itemCap.map(trySolidFuel(consume));
         if (temperature.isPresent()) {
           fluidHandler = null;
@@ -324,7 +325,7 @@ public class FuelModule implements ContainerData {
    * Reads the fuel from NBT
    * @param nbt  NBT to read from
    */
-  public void readFromNBT(CompoundNBT nbt) {
+  public void readFromNBT(CompoundTag nbt) {
     if (nbt.contains(TAG_FUEL, NBT.TAG_ANY_NUMERIC)) {
       fuel = nbt.getInt(TAG_FUEL);
     }
@@ -341,7 +342,7 @@ public class FuelModule implements ContainerData {
    * @param nbt  NBT to write to
    * @return  NBT written to
    */
-  public CompoundNBT writeToNBT(CompoundNBT nbt) {
+  public CompoundTag writeToNBT(CompoundTag nbt) {
     nbt.putInt(TAG_FUEL, fuel);
     nbt.putInt(TAG_TEMPERATURE, temperature);
     // technically unneeded for melters, but does not hurt to add
@@ -361,7 +362,7 @@ public class FuelModule implements ContainerData {
   private static final int LAST_Z = 5;
 
   @Override
-  public int size() {
+  public int getCount() {
     return 6;
   }
 
@@ -451,7 +452,7 @@ public class FuelModule implements ContainerData {
 
     // fetch primary fuel handler
     if (fluidHandler == null && itemHandler == null) {
-      TileEntity te = getWorld().getTileEntity(mainTank);
+      BlockEntity te = getWorld().getBlockEntity(mainTank);
       if (te != null) {
         LazyOptional<IFluidHandler> fluidCap = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
         if (fluidCap.isPresent()) {
@@ -491,14 +492,14 @@ public class FuelModule implements ContainerData {
     // add extra fluid display
     if (!info.isEmpty()) {
       // fetch fluid handler list if missing
-      World world = getWorld();
+      Level world = getWorld();
       if (tankDisplayHandlers == null) {
         tankDisplayHandlers = new ArrayList<>();
         // only need to fetch this if either case requests
         if (positions == null) positions = tankSupplier.get();
         for (BlockPos pos : positions) {
           if (!pos.equals(mainTank)) {
-            TileEntity te = world.getTileEntity(pos);
+            BlockEntity te = world.getBlockEntity(pos);
             if (te != null) {
               LazyOptional<IFluidHandler> handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
               if (handler.isPresent()) {

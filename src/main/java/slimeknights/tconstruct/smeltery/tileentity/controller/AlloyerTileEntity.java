@@ -6,9 +6,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.tileentity.BlockEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
@@ -54,7 +54,7 @@ public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEnt
   private final SingleAlloyingModule alloyingModule = new SingleAlloyingModule(this, alloyTank);
   /** Fuel handling logic */
   @Getter
-  private final FuelModule fuelModule = new FuelModule(this, () -> Collections.singletonList(this.pos.down()));
+  private final FuelModule fuelModule = new FuelModule(this, () -> Collections.singletonList(this.worldPosition.down()));
 
   /** Last comparator strength to reduce block updates */
   @Getter @Setter
@@ -67,7 +67,7 @@ public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEnt
     this(TinkerSmeltery.alloyer.get());
   }
 
-  protected AlloyerTileEntity(TileEntityType<?> type) {
+  protected AlloyerTileEntity(BlockEntityType<?> type) {
     super(type, TConstruct.makeTranslation("gui", "alloyer"));
   }
 
@@ -171,20 +171,20 @@ public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEnt
   }
 
   @Override
-  public void writeSynced(CompoundNBT tag) {
+  public void writeSynced(CompoundTag tag) {
     super.writeSynced(tag);
-    tag.put(NBTTags.TANK, tank.writeToNBT(new CompoundNBT()));
+    tag.put(NBTTags.TANK, tank.writeToNBT(new CompoundTag()));
   }
 
   @Override
-  public CompoundNBT write(CompoundNBT tag) {
+  public CompoundTag write(CompoundTag tag) {
     tag = super.write(tag);
     fuelModule.writeToNBT(tag);
     return tag;
   }
 
   @Override
-  public void read(BlockState state, CompoundNBT nbt) {
+  public void read(BlockState state, CompoundTag nbt) {
     super.read(state, nbt);
     tank.readFromNBT(nbt.getCompound(NBTTags.TANK));
     fuelModule.readFromNBT(nbt);

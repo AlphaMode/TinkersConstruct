@@ -66,8 +66,8 @@ public class FancyItemFrameRenderer extends ItemFrameRenderer {
     Direction facing = frame.getDirection();
     Vec3 offset = this.getRenderOffset(frame, partialTicks);
     matrices.translate(facing.getStepX() * 0.46875D - offset.x(), facing.getStepY() * 0.46875D - offset.y(), facing.getStepZ() * 0.46875D - offset.z());
-    matrices.mulPose(Vector3f.XP.rotationDegrees(frame.xRot));
-    matrices.mulPose(Vector3f.YP.rotationDegrees(180.0F - frame.yRot));
+    matrices.mulPose(Vector3f.XP.rotationDegrees(frame.getXRot()));
+    matrices.mulPose(Vector3f.YP.rotationDegrees(180.0F - frame.getYRot()));
 
     // render the frame
     ItemStack stack = frame.getItem();

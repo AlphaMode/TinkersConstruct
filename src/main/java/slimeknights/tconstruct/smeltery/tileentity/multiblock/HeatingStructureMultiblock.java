@@ -248,8 +248,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
     }
 
     @Override
-    public CompoundNBT writeClientNBT() {
-      CompoundNBT nbt = super.writeClientNBT();
+    public CompoundTag writeClientNBT() {
+      CompoundTag nbt = super.writeClientNBT();
       nbt.put(TAG_TANKS, writePosList(tanks));
       return nbt;
     }
@@ -259,8 +259,8 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
      * @return  structure as NBT
      */
     @Override
-    public CompoundNBT writeToNBT() {
-      CompoundNBT nbt = super.writeToNBT();
+    public CompoundTag writeToNBT() {
+      CompoundTag nbt = super.writeToNBT();
       if (insideCheck != null) {
         nbt.put(TAG_INSIDE_CHECK, TagUtil.writePos(insideCheck));
       }

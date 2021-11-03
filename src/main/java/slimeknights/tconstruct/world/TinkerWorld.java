@@ -31,7 +31,7 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.item.WallOrFloorItem;
 import net.minecraft.item.crafting.FireworkStarRecipe;
 import net.minecraft.particles.BasicParticleType;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.tileentity.BlockEntityType;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.gen.Heightmap;
@@ -47,7 +47,7 @@ import net.minecraftforge.common.PlantType;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import org.apache.logging.log4j.Logger;
@@ -325,12 +325,12 @@ public final class TinkerWorld extends TinkerModule {
       // inject heads into the tile entity type
       event.enqueueWork(() -> {
         ImmutableSet.Builder<Block> builder = ImmutableSet.builder();
-        builder.addAll(TileEntityType.SKULL.validBlocks);
+        builder.addAll(BlockEntityType.SKULL.validBlocks);
         //noinspection Convert2MethodRef
         TinkerWorld.heads.forEach(head -> builder.add(head));
         //noinspection Convert2MethodRef
         TinkerWorld.wallHeads.forEach(head -> builder.add(head));
-        TileEntityType.SKULL.validBlocks = builder.build();
+        BlockEntityType.SKULL.validBlocks = builder.build();
       });
     });
 

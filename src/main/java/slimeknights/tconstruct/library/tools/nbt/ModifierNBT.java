@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -134,7 +134,7 @@ public class ModifierNBT {
 
     ImmutableList.Builder<ModifierEntry> builder = ImmutableList.builder();
     for (int i = 0; i < listNBT.size(); i++) {
-      CompoundNBT tag = listNBT.getCompound(i);
+      CompoundTag tag = listNBT.getCompound(i);
       if (tag.contains(TAG_MODIFIER) && tag.contains(TAG_LEVEL)) {
         ModifierId id = ModifierId.tryCreate(tag.getString(TAG_MODIFIER));
         int level = tag.getInt(TAG_LEVEL);
@@ -153,7 +153,7 @@ public class ModifierNBT {
   public ListNBT serializeToNBT() {
     ListNBT list = new ListNBT();
     for (ModifierEntry entry : modifiers) {
-      CompoundNBT tag = new CompoundNBT();
+      CompoundTag tag = new CompoundTag();
       tag.putString(TAG_MODIFIER, entry.getModifier().getId().toString());
       tag.putShort(TAG_LEVEL, (short)entry.getLevel());
       list.add(tag);

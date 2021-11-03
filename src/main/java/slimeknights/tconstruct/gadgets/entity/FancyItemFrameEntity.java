@@ -7,7 +7,7 @@ import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -195,7 +195,7 @@ public class FancyItemFrameEntity extends ItemFrame implements IEntityAdditional
 
 
   @Override
-  public void writeAdditional(CompoundNBT compound) {
+  public void writeAdditional(CompoundTag compound) {
     super.writeAdditional(compound);
     int frameId = this.getFrameId();
     compound.putInt(TAG_VARIANT, frameId);
@@ -205,7 +205,7 @@ public class FancyItemFrameEntity extends ItemFrame implements IEntityAdditional
   }
 
   @Override
-  public void readAdditional(CompoundNBT compound) {
+  public void readAdditional(CompoundTag compound) {
     super.readAdditional(compound);
     int frameId = compound.getInt(TAG_VARIANT);
     this.dataManager.set(VARIANT, frameId);

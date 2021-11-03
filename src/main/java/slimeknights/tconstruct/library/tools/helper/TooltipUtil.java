@@ -1,11 +1,11 @@
 package slimeknights.tconstruct.library.tools.helper;
 
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Item;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.ChatFormatting;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerTags;
@@ -87,10 +87,10 @@ public class TooltipUtil {
    * @param stack     Stack instance
    * @param tooltips  Tooltip list
    */
-  public static void getDefaultInfo(ItemStack stack, List<ITextComponent> tooltips) {
+  public static void getDefaultInfo(ItemStack stack, List<Component> tooltips) {
     ToolStack tool = ToolStack.from(stack);
     // shows as broken when broken, hold shift for proper durability
-    if (stack.isDamageable()) {
+    if (stack.isDamageableItem()) {
       tooltips.add(TooltipBuilder.formatDurability(tool.getCurrentDurability(), tool.getStats().getInt(ToolStats.DURABILITY), true));
     }
     // modifier tooltip
@@ -99,7 +99,7 @@ public class TooltipUtil {
         tooltips.add(entry.getModifier().getDisplayName(tool, entry.getLevel()));
       }
     }
-    tooltips.add(StringTextComponent.EMPTY);
+    tooltips.add(TextComponent.EMPTY);
     tooltips.add(TOOLTIP_HOLD_SHIFT);
     if (tool.getDefinition().isMultipart()) {
       tooltips.add(TOOLTIP_HOLD_CTRL);
@@ -114,7 +114,7 @@ public class TooltipUtil {
    * @param flag      Tooltip flag
    * @return List from the parameter after filling
    */
-  public static List<ITextComponent> getDefaultStats(IModifierToolStack tool, List<ITextComponent> tooltip, TooltipFlag flag) {
+  public static List<Component> getDefaultStats(IModifierToolStack tool, List<Component> tooltip, TooltipFlag flag) {
     TooltipBuilder builder = new TooltipBuilder(tool, tooltip);
     Item item = tool.getItem();
     if (TinkerTags.Items.DURABILITY.contains(item)) {
@@ -146,7 +146,7 @@ public class TooltipUtil {
    * @param stack     Item stack being displayed
    * @param tooltips  List of tooltips
    */
-  public static void getComponents(IModifiable item, ItemStack stack, List<ITextComponent> tooltips) {
+  public static void getComponents(IModifiable item, ItemStack stack, List<Component> tooltips) {
     // no components, nothing to do
     List<IToolPart> components = item.getToolDefinition().getRequiredComponents();
     if (components.isEmpty()) {
@@ -168,10 +168,10 @@ public class TooltipUtil {
       IToolPart requirement = components.get(i);
       IMaterial material = materials.get(i);
       ItemStack partStack = requirement.withMaterial(material);
-      tooltips.add(partStack.getDisplayName().deepCopy().mergeStyle(TextFormatting.UNDERLINE).modifyStyle(style -> style.setColor(material.getColor())));
+      tooltips.add(partStack.getDisplayName().copy().withStyle(ChatFormatting.UNDERLINE).withStyle(style -> style.withColor(material.getColor())));
       MaterialRegistry.getInstance().getMaterialStats(material.getIdentifier(), requirement.getStatType()).ifPresent(stat -> tooltips.addAll(stat.getLocalizedInfo()));
       if (i != max) {
-        tooltips.add(StringTextComponent.EMPTY);
+        tooltips.add(TextComponent.EMPTY);
       }
     }
   }

@@ -3,7 +3,7 @@ package slimeknights.tconstruct.common.recipe;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import slimeknights.mantle.recipe.RecipeSerializer;
+import slimeknights.mantle.recipe.AbstractRecipeSerializer;
 import slimeknights.tconstruct.TConstruct;
 
 import javax.annotation.Nullable;
@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
  * TODO: move to Mantle
  * @param <T>  Recipe class
  */
-public abstract class LoggingRecipeSerializer<T extends Recipe<?>> extends RecipeSerializer<T> {
+public abstract class LoggingRecipeSerializer<T extends Recipe<?>> extends AbstractRecipeSerializer<T> {
   /**
    * Read the recipe from the packet
    * @param id      Recipe ID

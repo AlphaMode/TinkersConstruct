@@ -631,7 +631,7 @@ public class ToolStack implements IModifierToolStack {
    * @return  True if initialized
    */
   public static boolean isInitialized(ItemStack stack) {
-    CompoundNBT nbt = stack.getTag();
+    CompoundTag nbt = stack.getTag();
     return nbt != null && nbt.contains(TAG_STATS, NBT.TAG_COMPOUND);
   }
 
@@ -641,7 +641,7 @@ public class ToolStack implements IModifierToolStack {
    * @return  True if initialized
    */
   public static boolean hasMaterials(ItemStack stack) {
-    CompoundNBT nbt = stack.getTag();
+    CompoundTag nbt = stack.getTag();
     return nbt != null && nbt.contains(TAG_MATERIALS, NBT.TAG_LIST);
   }
 

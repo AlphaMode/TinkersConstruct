@@ -98,7 +98,7 @@ public class ToolItem extends ModifiableItem implements IModifiableHarvest {
 
       this.switchItemsInHands(player);
       // remember, off is in the mainhand now
-      CompoundNBT tag = off.getOrCreateTag();
+      CompoundTag tag = off.getOrCreateTag();
       tag.putLong(TAG_SWITCHED_HAND_HAX, player.getEntityWorld().getGameTime());
       off.setTag(tag);
     }*/

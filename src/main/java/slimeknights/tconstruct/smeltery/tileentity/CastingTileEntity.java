@@ -10,7 +10,7 @@ import net.minecraft.world.WorldlyContainer;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -85,8 +85,8 @@ public abstract class CastingTileEntity extends TableTileEntity implements Ticka
   /** Cache recipe to reduce time during recipe lookups. Not saved to NBT */
   private MoldingRecipe lastMoldingRecipe;
 
-  protected CastingTileEntity(BlockEntityType<?> tileEntityTypeIn, RecipeType<ICastingRecipe> castingType, RecipeType<MoldingRecipe> moldingType) {
-    super(tileEntityTypeIn, "gui.tconstruct.casting", 2, 1);
+  protected CastingTileEntity(BlockEntityType<?> BlockEntityTypeIn, RecipeType<ICastingRecipe> castingType, RecipeType<MoldingRecipe> moldingType) {
+    super(BlockEntityTypeIn, "gui.tconstruct.casting", 2, 1);
     this.itemHandler = new SidedInvWrapper(this, Direction.DOWN);
     this.castingType = castingType;
     this.moldingType = moldingType;
@@ -439,15 +439,15 @@ public abstract class CastingTileEntity extends TableTileEntity implements Ticka
   }
 
   @Override
-  public void writeSynced(CompoundNBT tags) {
+  public void writeSynced(CompoundTag tags) {
     super.writeSynced(tags);
-    tags.put(TAG_TANK, tank.writeToNBT(new CompoundNBT()));
+    tags.put(TAG_TANK, tank.writeToNBT(new CompoundTag()));
     tags.putInt(TAG_TIMER, timer);
   }
 
   @Override
   @Nonnull
-  public CompoundNBT write(CompoundNBT tags) {
+  public CompoundTag write(CompoundTag tags) {
     tags = super.write(tags);
     if (currentRecipe != null) {
       tags.putString(TAG_RECIPE, currentRecipe.getId().toString());
@@ -458,7 +458,7 @@ public abstract class CastingTileEntity extends TableTileEntity implements Ticka
   }
 
   @Override
-  public void read(BlockState state, CompoundNBT tags) {
+  public void read(BlockState state, CompoundTag tags) {
     super.read(state, tags);
     tank.readFromNBT(tags.getCompound(TAG_TANK));
     timer = tags.getInt(TAG_TIMER);

@@ -12,7 +12,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import slimeknights.mantle.item.RetexturedBlockItem;
 import slimeknights.mantle.registration.object.ItemObject;
@@ -87,15 +87,15 @@ public final class TinkerTables extends TinkerModule {
   /*
    * Tile entites
    */
-  public static final RegistryObject<BlockEntityType<CraftingStationTileEntity>> craftingStationTile = TILE_ENTITIES.register("crafting_station", CraftingStationTileEntity::new, craftingStation);
-  public static final RegistryObject<BlockEntityType<TinkerStationTileEntity>> tinkerStationTile = TILE_ENTITIES.register("tinker_station", TinkerStationTileEntity::new, builder -> {
+  public static final RegistryObject<BlockEntityType<CraftingStationTileEntity>> craftingStationTile = BLOCK_ENTITIES.register("crafting_station", CraftingStationTileEntity::new, craftingStation);
+  public static final RegistryObject<BlockEntityType<TinkerStationTileEntity>> tinkerStationTile = BLOCK_ENTITIES.register("tinker_station", TinkerStationTileEntity::new, builder -> {
     builder.add(tinkerStation.get(), tinkersAnvil.get(), scorchedAnvil.get());
   });
-  public static final RegistryObject<BlockEntityType<PartBuilderTileEntity>> partBuilderTile = TILE_ENTITIES.register("part_builder", PartBuilderTileEntity::new, partBuilder);
+  public static final RegistryObject<BlockEntityType<PartBuilderTileEntity>> partBuilderTile = BLOCK_ENTITIES.register("part_builder", PartBuilderTileEntity::new, partBuilder);
   // legacy name as tile entities cannot be remapped
-  public static final RegistryObject<BlockEntityType<TinkersChestTileEntity>> tinkersChestTile = TILE_ENTITIES.register("modifier_chest", TinkersChestTileEntity::new, tinkersChest);
-  public static final RegistryObject<BlockEntityType<PartChestTileEntity>> partChestTile = TILE_ENTITIES.register("part_chest", PartChestTileEntity::new, partChest);
-  public static final RegistryObject<BlockEntityType<CastChestTileEntity>> castChestTile = TILE_ENTITIES.register("cast_chest", CastChestTileEntity::new, castChest);
+  public static final RegistryObject<BlockEntityType<TinkersChestTileEntity>> tinkersChestTile = BLOCK_ENTITIES.register("modifier_chest", TinkersChestTileEntity::new, tinkersChest);
+  public static final RegistryObject<BlockEntityType<PartChestTileEntity>> partChestTile = BLOCK_ENTITIES.register("part_chest", PartChestTileEntity::new, partChest);
+  public static final RegistryObject<BlockEntityType<CastChestTileEntity>> castChestTile = BLOCK_ENTITIES.register("cast_chest", CastChestTileEntity::new, castChest);
 
   /*
    * Containers
