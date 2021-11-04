@@ -2,6 +2,7 @@ package slimeknights.tconstruct.gadgets.item;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -187,7 +188,7 @@ public class PiggyBackPackItem extends TooltipItem {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderHUDEffect(MobEffectInstance effect, GuiComponent gui, PoseStack matrices, int x, int y, float z, float alpha) {
-      Minecraft.getInstance().getTextureManager().bind(Icons.ICONS);
+      RenderSystem.setShaderTexture(0, Icons.ICONS);
       ElementScreen element;
 
       switch (effect.getAmplifier()) {

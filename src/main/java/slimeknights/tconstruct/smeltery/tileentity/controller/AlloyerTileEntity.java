@@ -2,20 +2,21 @@ package slimeknights.tconstruct.smeltery.tileentity.controller;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.tileentity.BlockEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import slimeknights.mantle.tileentity.NamableTileEntity;
+import slimeknights.mantle.util.TickableBlockEntity;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.fluid.FluidTankAnimated;
@@ -54,7 +55,7 @@ public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEnt
   private final SingleAlloyingModule alloyingModule = new SingleAlloyingModule(this, alloyTank);
   /** Fuel handling logic */
   @Getter
-  private final FuelModule fuelModule = new FuelModule(this, () -> Collections.singletonList(this.worldPosition.down()));
+  private final FuelModule fuelModule = new FuelModule(this, () -> Collections.singletonList(this.worldPosition.below()));
 
   /** Last comparator strength to reduce block updates */
   @Getter @Setter
@@ -63,12 +64,12 @@ public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEnt
   /** Internal tick counter */
   private int tick;
 
-  public AlloyerTileEntity() {
-    this(TinkerSmeltery.alloyer.get());
+  public AlloyerTileEntity(BlockPos pos, BlockState state) {
+    this(TinkerSmeltery.alloyer.get(), pos, state);
   }
 
-  protected AlloyerTileEntity(BlockEntityType<?> type) {
-    super(type, TConstruct.makeTranslation("gui", "alloyer"));
+  protected AlloyerTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    super(type, pos, state, TConstruct.makeTranslation("gui", "alloyer"));
   }
 
   /*
@@ -84,7 +85,7 @@ public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEnt
   }
 
   @Override
-  protected void invalidateCaps() {
+  public void invalidateCaps() {
     super.invalidateCaps();
     this.tankHolder.invalidate();
   }
@@ -97,12 +98,12 @@ public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEnt
   /** Checks if the tile entity is active */
   private boolean isFormed() {
     BlockState state = this.getBlockState();
-    return state.hasProperty(MelterBlock.IN_STRUCTURE) && state.get(MelterBlock.IN_STRUCTURE);
+    return state.hasProperty(MelterBlock.IN_STRUCTURE) && state.getValue(MelterBlock.IN_STRUCTURE);
   }
 
   @Override
   public void tick() {
-    if (world == null || world.isRemote || !isFormed()) {
+    if (level == null || level.isClientSide || !isFormed()) {
       return;
     }
 
@@ -120,13 +121,13 @@ public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEnt
         boolean hasFuel = fuelModule.hasFuel();
 
         // update state for new fuel state
-        if (state.get(ControllerBlock.ACTIVE) != hasFuel) {
-          world.setBlockState(pos, state.with(ControllerBlock.ACTIVE, hasFuel));
+        if (state.getValue(ControllerBlock.ACTIVE) != hasFuel) {
+          level.setBlockAndUpdate(worldPosition, state.setValue(ControllerBlock.ACTIVE, hasFuel));
           // update the heater below
-          BlockPos down = pos.down();
-          BlockState downState = world.getBlockState(down);
-          if (TinkerTags.Blocks.FUEL_TANKS.contains(downState.getBlock()) && downState.hasProperty(ControllerBlock.ACTIVE) && downState.get(ControllerBlock.ACTIVE) != hasFuel) {
-            world.setBlockState(down, downState.with(ControllerBlock.ACTIVE, hasFuel));
+          BlockPos down = worldPosition.below();
+          BlockState downState = level.getBlockState(down);
+          if (TinkerTags.Blocks.FUEL_TANKS.contains(downState.getBlock()) && downState.hasProperty(ControllerBlock.ACTIVE) && downState.getValue(ControllerBlock.ACTIVE) != hasFuel) {
+            level.setBlockAndUpdate(down, downState.setValue(ControllerBlock.ACTIVE, hasFuel));
           }
         }
 
@@ -156,7 +157,7 @@ public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEnt
 
   @Nullable
   @Override
-  public Container createMenu(int id, PlayerInventory inv, PlayerEntity playerEntity) {
+  public AbstractContainerMenu createMenu(int id, Inventory inv, Player playerEntity) {
     return new AlloyerContainer(id, inv, this);
   }
 
@@ -177,15 +178,15 @@ public class AlloyerTileEntity extends NamableTileEntity implements ITankTileEnt
   }
 
   @Override
-  public CompoundTag write(CompoundTag tag) {
-    tag = super.write(tag);
+  public CompoundTag save(CompoundTag tag) {
+    tag = super.save(tag);
     fuelModule.writeToNBT(tag);
     return tag;
   }
 
   @Override
-  public void read(BlockState state, CompoundTag nbt) {
-    super.read(state, nbt);
+  public void load(CompoundTag nbt) {
+    super.load(nbt);
     tank.readFromNBT(nbt.getCompound(NBTTags.TANK));
     fuelModule.readFromNBT(nbt);
   }

@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.plugin.jei;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -11,17 +11,19 @@ import mezz.jei.api.gui.ingredient.ITooltipCallback;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.fluid.Fluid;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.material.Fluid;
+
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.ForgeI18n;
+import net.minecraftforge.fmllegacy.ForgeI18n;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.FluidTooltipHandler;
 import slimeknights.tconstruct.library.recipe.alloying.AlloyRecipe;
@@ -74,13 +76,13 @@ public class AlloyRecipeCategory implements IRecipeCategory<AlloyRecipe>, IToolt
   }
 
   @Override
-  public void draw(AlloyRecipe recipe, MatrixStack matrices, double mouseX, double mouseY) {
+  public void draw(AlloyRecipe recipe, PoseStack matrices, double mouseX, double mouseY) {
     arrow.draw(matrices, 90, 21);
     // temperature info
-    FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-    String tempString = I18n.format(KEY_TEMPERATURE, recipe.getTemperature());
-    int x = 102 - (fontRenderer.getStringWidth(tempString) / 2);
-    fontRenderer.drawString(matrices, tempString, x, 5, Color.GRAY.getRGB());
+    Font fontRenderer = Minecraft.getInstance().font;
+    String tempString = I18n.get(KEY_TEMPERATURE, recipe.getTemperature());
+    int x = 102 - (fontRenderer.width(tempString) / 2);
+    fontRenderer.draw(matrices, tempString, x, 5, Color.GRAY.getRGB());
   }
 
   /**
@@ -138,11 +140,11 @@ public class AlloyRecipeCategory implements IRecipeCategory<AlloyRecipe>, IToolt
   }
 
   @Override
-  public void onTooltip(int index, boolean input, FluidStack stack, List<ITextComponent> list) {
+  public void onTooltip(int index, boolean input, FluidStack stack, List<Component> list) {
     Fluid fluid = stack.getFluid();
     if (fluid != null) {
-      ITextComponent name = list.get(0);
-      ITextComponent modId = list.get(list.size() - 1);
+      Component name = list.get(0);
+      Component modId = list.get(list.size() - 1);
       list.clear();
       list.add(name);
 
@@ -152,7 +154,7 @@ public class AlloyRecipeCategory implements IRecipeCategory<AlloyRecipe>, IToolt
       } else {
         // add temperature to fuels
         MeltingFuelHandler.getTemperature(stack.getFluid())
-                          .ifPresent(temperature -> list.add(new TranslationTextComponent(KEY_TEMPERATURE, temperature).mergeStyle(TextFormatting.GRAY)));
+                          .ifPresent(temperature -> list.add(new TranslatableComponent(KEY_TEMPERATURE, temperature).withStyle(ChatFormatting.GRAY)));
       }
       list.add(modId);
     }

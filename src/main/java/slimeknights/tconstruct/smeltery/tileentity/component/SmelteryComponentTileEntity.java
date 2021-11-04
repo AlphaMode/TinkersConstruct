@@ -19,12 +19,12 @@ import javax.annotation.Nullable;
 /** Mostly extended to make type validaton easier, and the servant base class is not registered */
 public class SmelteryComponentTileEntity extends ServantTileEntity {
 
-  public SmelteryComponentTileEntity() {
-    this(TinkerSmeltery.smelteryComponent.get());
+  public SmelteryComponentTileEntity(BlockPos pos, BlockState state) {
+    this(TinkerSmeltery.smelteryComponent.get(), pos, state);
   }
 
-  protected SmelteryComponentTileEntity(BlockEntityType<?> BlockEntityTypeIn) {
-    super(BlockEntityTypeIn);
+  protected SmelteryComponentTileEntity(BlockEntityType<?> BlockEntityTypeIn, BlockPos pos, BlockState state) {
+    super(BlockEntityTypeIn, pos, state);
   }
 
   @Override

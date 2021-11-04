@@ -330,8 +330,7 @@ public class InfoPanelScreen extends ModuleScreen {
 
   @Override
   protected void renderBg(PoseStack matrices, float partialTicks, int mouseX, int mouseY) {
-    assert this.minecraft != null;
-    this.minecraft.getTextureManager().bind(BACKGROUND_IMAGE);
+    RenderSystem.setShaderTexture(0, BACKGROUND_IMAGE);
 
     this.border.draw(matrices);
     BACKGROUND.drawScaled(matrices, this.leftPos + 4, this.topPos + 4, this.imageWidth - 8, this.imageHeight - 8);
@@ -362,7 +361,7 @@ public class InfoPanelScreen extends ModuleScreen {
 
     float textHeight = font.lineHeight + 0.5f;
     float lowerBound = (this.topPos + this.imageHeight - 5) / this.textScale;
-    RenderSystem.scalef(this.textScale, this.textScale, 1.0f);
+    matrices.scale(this.textScale, this.textScale, 1.0f);
     x /= this.textScale;
     y /= this.textScale;
 
@@ -378,10 +377,10 @@ public class InfoPanelScreen extends ModuleScreen {
       y += textHeight;
     }
 
-    RenderSystem.scalef(1f / textScale, 1f / textScale, 1.0f);
+    matrices.scale(1f / textScale, 1f / textScale, 1.0f);
 
-    this.minecraft.getTextureManager().bind(BACKGROUND_IMAGE);
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+    RenderSystem.setShaderTexture(0, BACKGROUND_IMAGE);
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     this.slider.update(mouseX, mouseY);
     this.slider.draw(matrices);
   }

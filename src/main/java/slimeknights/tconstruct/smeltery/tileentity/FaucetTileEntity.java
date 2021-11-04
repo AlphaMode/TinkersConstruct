@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.smeltery.tileentity;
 
 import lombok.Getter;
+
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
@@ -61,13 +61,13 @@ public class FaucetTileEntity extends MantleTileEntity implements TickableBlockE
   /** Listener for when the output handler is invalidated */
   private final NonNullConsumer<LazyOptional<IFluidHandler>> outputListener = new WeakConsumerWrapper<>(this, (self, handler) -> self.outputHandler = null);
 
-  public FaucetTileEntity() {
-    this(TinkerSmeltery.faucet.get());
+  public FaucetTileEntity(BlockPos pos, BlockState state) {
+    this(TinkerSmeltery.faucet.get(), pos, state);
   }
 
   @SuppressWarnings("WeakerAccess")
-  protected FaucetTileEntity(BlockEntityType<?> BlockEntityTypeIn) {
-    super(BlockEntityTypeIn);
+  protected FaucetTileEntity(BlockEntityType<?> BlockEntityTypeIn, BlockPos pos, BlockState state) {
+    super(BlockEntityTypeIn, pos, state);
   }
 
 
@@ -374,8 +374,8 @@ public class FaucetTileEntity extends MantleTileEntity implements TickableBlockE
   }
 
   @Override
-  public void load(BlockState state, CompoundTag compound) {
-    super.load(state, compound);
+  public void load(CompoundTag compound) {
+    super.load(compound);
 
     faucetState = FaucetState.fromIndex(compound.getByte(TAG_STATE));
     stopPouring = compound.getBoolean(TAG_STOP);

@@ -5,8 +5,6 @@ import com.google.common.collect.Multimap;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,28 +20,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
-import net.minecraft.entity.ai.attributes.AttributeModifierManager;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.entity.player.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.SEntityVelocityPacket;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.Effects;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.DamageSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.Mth;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.server.ServerWorld;
 
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.entity.PartEntity;
@@ -98,7 +82,7 @@ public class ToolAttackUtil {
   public static float getAttributeAttackDamage(IModifierToolStack tool, LivingEntity holder, InteractionHand hand) {
     if (hand == InteractionHand.OFF_HAND && !holder.level.isClientSide()) {
       // first, get a map of existing damage modifiers to exclude
-      Multimap<Attribute,AttributeModifier> mainModifiers = new SingleKeyMultimap<>(Attributes.ATTACK_DAMAGE, holder.getMainInteractionHandItem().getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE));
+      Multimap<Attribute,AttributeModifier> mainModifiers = new SingleKeyMultimap<>(Attributes.ATTACK_DAMAGE, holder.getMainHandItem().getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_DAMAGE));
 
       // next, build a list of damage modifiers from the offhand stack, handled directly as it saves parsing the tool twice and lets us simplify by filtering
       ImmutableList.Builder<AttributeModifier> listBuilder = ImmutableList.builder();
@@ -146,7 +130,7 @@ public class ToolAttackUtil {
 
   /**
    * Base attack logic, used by normal attacks, projectiles, and extra attacks.
-   * Based on {@link Player#attackTargetEntityWithCurrentItem(Entity)}
+   * Based on {@link Player#attack(Entity)}
    */
   public static boolean attackEntity(IModifiableWeapon weapon, IModifierToolStack tool, LivingEntity attackerLiving, InteractionHand hand,
                                      Entity targetEntity, DoubleSupplier cooldownFunction, boolean isExtraAttack) {
@@ -268,7 +252,7 @@ public class ToolAttackUtil {
     }
 
     // set hand for proper looting context
-    ModifierLootingInteractionHandler.setLootingInteractionHand(attackerLiving, hand);
+    ModifierLootingHandler.setLootingHand(attackerLiving, hand);
 
     // prevent knockback if needed
     Optional<AttributeInstance> knockbackModifier = getKnockbackAttribute(targetLiving);
@@ -305,7 +289,7 @@ public class ToolAttackUtil {
     // if we failed to hit, fire failure hooks
     if (!didHit) {
       if (!isExtraAttack) {
-        attackerLiving.level.playSound(null, attackerLiving.getX(), attackerLiving.getY(), attackerLiving.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, attackerLiving.getSoundCategory(), 1.0F, 1.0F);
+        attackerLiving.level.playSound(null, attackerLiving.getX(), attackerLiving.getY(), attackerLiving.getZ(), SoundEvents.PLAYER_ATTACK_NODAMAGE, attackerLiving.getSoundSource(), 1.0F, 1.0F);
       }
       // alert modifiers nothing was hit, mainly used for fiery
       for (ModifierEntry entry : modifiers) {
@@ -353,7 +337,7 @@ public class ToolAttackUtil {
       }
       // sounds
       if (sound != null) {
-        attackerLiving.level.playSound(null, attackerLiving.getX(), attackerLiving.getY(), attackerLiving.getZ(), sound, attackerLiving.getSoundCategory(), 1.0F, 1.0F);
+        attackerLiving.level.playSound(null, attackerLiving.getX(), attackerLiving.getY(), attackerLiving.getZ(), sound, attackerLiving.getSoundSource(), 1.0F, 1.0F);
       }
     }
     if (attackerLiving.level instanceof ServerLevel serverWorld && damageDealt > 2.0F) {
@@ -447,7 +431,7 @@ public class ToolAttackUtil {
 
   /** Enable the anti-knockback modifier */
   private static void disableKnockback(AttributeInstance instance) {
-    instance.applyNonPersistentModifier(ANTI_KNOCKBACK_MODIFIER);
+    instance.addTransientModifier(ANTI_KNOCKBACK_MODIFIER);
   }
 
   /** Disables the anti knockback modifier */
@@ -467,7 +451,7 @@ public class ToolAttackUtil {
   public static boolean attackEntitySecondary(DamageSource source, float damage, Entity target, @Nullable LivingEntity living, boolean noKnockback) {
     Optional<AttributeInstance> knockbackResistance = getKnockbackAttribute(living);
     // store last damage before secondary attack
-    float oldLastDamage = living == null ? 0 : living.lastDamage;
+    float oldLastDamage = living == null ? 0 : living.lastHurt;
 
     // prevent knockback in secondary attacks, if requested
     if (noKnockback) {
@@ -479,7 +463,7 @@ public class ToolAttackUtil {
     boolean hit = target.hurt(source, damage);
     // set total received damage, important for AI and stuff
     if (living != null) {
-      living.lastDamage += oldLastDamage;
+      living.lastHurt += oldLastDamage;
     }
 
     // remove no knockback marker

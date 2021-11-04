@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.smeltery.client.inventory.module;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.resources.ResourceLocation;
@@ -36,10 +37,9 @@ public class HeatingStructureSideInventoryScreen extends SideInventoryScreen<Hea
 
   @Override
   protected int drawSlots(PoseStack matrices, int xPos, int yPos) {
-    assert minecraft != null;
-    minecraft.getTextureManager().bind(SLOT_LOCATION);
+    RenderSystem.setShaderTexture(0, SLOT_LOCATION);
     int ret = super.drawSlots(matrices, xPos, yPos);
-    minecraft.getTextureManager().bind(GENERIC_INVENTORY);
+    RenderSystem.setShaderTexture(0, GENERIC_INVENTORY);
     return ret;
   }
 

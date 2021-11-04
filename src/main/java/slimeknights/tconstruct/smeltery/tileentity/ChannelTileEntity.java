@@ -1,8 +1,8 @@
 package slimeknights.tconstruct.smeltery.tileentity;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
@@ -21,6 +21,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler;
 import slimeknights.mantle.tileentity.MantleTileEntity;
+import slimeknights.mantle.util.TickableBlockEntity;
 import slimeknights.mantle.util.WeakConsumerWrapper;
 import slimeknights.tconstruct.common.network.TinkerNetwork;
 import slimeknights.tconstruct.library.fluid.FillOnlyFluidHandler;
@@ -64,12 +65,12 @@ public class ChannelTileEntity extends MantleTileEntity implements TickableBlock
 	/** Stores if the channel is currently flowing, set to 2 to allow a small buffer */
 	private final byte[] isFlowing = new byte[5];
 
-	public ChannelTileEntity() {
-		this(TinkerSmeltery.channel.get());
+	public ChannelTileEntity(BlockPos pos, BlockState state) {
+		this(TinkerSmeltery.channel.get(), pos, state);
 	}
 
-	protected ChannelTileEntity(BlockEntityType<?> type) {
-		super(type);
+	protected ChannelTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 	}
 
 	/**
@@ -191,7 +192,7 @@ public class ChannelTileEntity extends MantleTileEntity implements TickableBlock
 	}
 
 	@Override
-	protected void invalidateCaps() {
+	public void invalidateCaps() {
 		super.invalidateCaps();
 		topHandler.invalidate();
 		for (LazyOptional<IFluidHandler> handler : sideHandlers.values()) {
@@ -430,8 +431,8 @@ public class ChannelTileEntity extends MantleTileEntity implements TickableBlock
   }
 
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 
 		// isFlowing
 		if (nbt.contains(TAG_IS_FLOWING)) {

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
@@ -347,7 +348,7 @@ public class FuelModule implements ContainerData {
     nbt.putInt(TAG_TEMPERATURE, temperature);
     // technically unneeded for melters, but does not hurt to add
     if (lastPos != null) {
-      nbt.put(TAG_LAST_FUEL, TagUtil.writePos(lastPos));
+      nbt.put(TAG_LAST_FUEL, NbtUtils.writeBlockPos(lastPos));
     }
     return nbt;
   }

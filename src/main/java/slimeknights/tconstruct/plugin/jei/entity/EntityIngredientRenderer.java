@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.plugin.jei.entity;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.RequiredArgsConstructor;
 import mezz.jei.api.ingredients.IIngredientRenderer;
@@ -77,8 +78,7 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityType>
       }
 
       // fallback, draw a pink and black "spawn egg"
-      Minecraft minecraft = Minecraft.getInstance();
-      minecraft.getTextureManager().bind(EntityMeltingRecipeCategory.BACKGROUND_LOC);
+      RenderSystem.setShaderTexture(0, EntityMeltingRecipeCategory.BACKGROUND_LOC);
       int offset = (size - 16) / 2;
       Screen.blit(matrixStack, x + offset, y + offset, 149f, 58f, 16, 16, 256, 256);
     }

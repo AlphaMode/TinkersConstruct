@@ -29,7 +29,7 @@ public class BlockOrEntityCondition implements LootItemCondition {
     return lootContext.hasParam(LootContextParams.THIS_ENTITY) || lootContext.hasParam(LootContextParams.BLOCK_STATE);
   }
 
-  private static class Serializer implements Serializer<BlockOrEntityCondition> {
+  private static class Serializer implements net.minecraft.world.level.storage.loot.Serializer<BlockOrEntityCondition> {
     @Override
     public void serialize(JsonObject json, BlockOrEntityCondition loot, JsonSerializationContext context) { }
 

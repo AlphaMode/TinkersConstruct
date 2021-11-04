@@ -15,12 +15,13 @@ import mezz.jei.api.gui.ingredient.ITooltipCallback;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.tconstruct.TConstruct;
@@ -79,14 +80,14 @@ public abstract class AbstractMeltingCategory implements IRecipeCategory<Melting
 
     // temperature
     int temperature = recipe.getTemperature();
-    FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-    String tempString = I18n.format(KEY_TEMPERATURE, temperature);
-    int x = 56 - fontRenderer.getStringWidth(tempString) / 2;
-    fontRenderer.drawString(matrices, tempString, x, 3, Color.GRAY.getRGB());
+    Font fontRenderer = Minecraft.getInstance().font;
+    String tempString = I18n.get(KEY_TEMPERATURE, temperature);
+    int x = 56 - fontRenderer.width(tempString) / 2;
+    fontRenderer.draw(matrices, tempString, x, 3, Color.GRAY.getRGB());
   }
 
   @Override
-  public List<ITextComponent> getTooltipStrings(MeltingRecipe recipe, double mouseXD, double mouseYD) {
+  public List<Component> getTooltipStrings(MeltingRecipe recipe, double mouseXD, double mouseYD) {
     int mouseX = (int)mouseXD;
     int mouseY = (int)mouseYD;
     if (recipe.isOre() && GuiUtil.isHovered(mouseX, mouseY, 87, 31, 16, 16)) {
@@ -94,7 +95,7 @@ public abstract class AbstractMeltingCategory implements IRecipeCategory<Melting
     }
     // time tooltip
     if (GuiUtil.isHovered(mouseX, mouseY, 56, 18, 24, 17)) {
-      return Collections.singletonList(new TranslationTextComponent(KEY_COOLING_TIME, recipe.getTime() / 4));
+      return Collections.singletonList(new TranslatableComponent(KEY_COOLING_TIME, recipe.getTime() / 4));
     }
     return Collections.emptyList();
   }
@@ -110,12 +111,12 @@ public abstract class AbstractMeltingCategory implements IRecipeCategory<Melting
      * @param list   Tooltip so far
      * @return  True if the shift message should display
      */
-    protected abstract boolean addOreTooltip(FluidStack stack, List<ITextComponent> list);
+    protected abstract boolean addOreTooltip(FluidStack stack, List<Component> list);
 
     @Override
-    public void onTooltip(int index, boolean input, FluidStack stack, List<ITextComponent> list) {
-      ITextComponent name = list.get(0);
-      ITextComponent modId = list.get(list.size() - 1);
+    public void onTooltip(int index, boolean input, FluidStack stack, List<Component> list) {
+      Component name = list.get(0);
+      Component modId = list.get(list.size() - 1);
       list.clear();
       list.add(name);
 
@@ -133,8 +134,8 @@ public abstract class AbstractMeltingCategory implements IRecipeCategory<Melting
       // fuels show temperature and quality
       if (index == -1) {
         MeltingFuelHandler.getTemperature(stack.getFluid()).ifPresent(temperature -> {
-          list.add(new TranslationTextComponent(KEY_TEMPERATURE, temperature).mergeStyle(TextFormatting.GRAY));
-          list.add(new TranslationTextComponent(KEY_MULTIPLIER, temperature / 1000f).mergeStyle(TextFormatting.GRAY));
+          list.add(new TranslatableComponent(KEY_TEMPERATURE, temperature).withStyle(ChatFormatting.GRAY));
+          list.add(new TranslatableComponent(KEY_MULTIPLIER, temperature / 1000f).withStyle(ChatFormatting.GRAY));
         });
       }
       list.add(modId);

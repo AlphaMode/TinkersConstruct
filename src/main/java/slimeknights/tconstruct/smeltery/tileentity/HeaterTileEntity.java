@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.smeltery.tileentity;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
@@ -29,12 +30,12 @@ public class HeaterTileEntity extends NamableTileEntity {
   private final HeaterItemHandler itemHandler = new HeaterItemHandler(this);
   private final LazyOptional<IItemHandler> itemCapability = LazyOptional.of(() -> itemHandler);
 
-  protected HeaterTileEntity(BlockEntityType<?> type) {
-    super(type, TITLE);
+  protected HeaterTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    super(type, pos, state, TITLE);
   }
 
-  public HeaterTileEntity() {
-    this(TinkerSmeltery.heater.get());
+  public HeaterTileEntity(BlockPos pos, BlockState state) {
+    this(TinkerSmeltery.heater.get(), pos, state);
   }
 
   @Nullable
@@ -55,7 +56,7 @@ public class HeaterTileEntity extends NamableTileEntity {
   }
 
   @Override
-  protected void invalidateCaps() {
+  public void invalidateCaps() {
     super.invalidateCaps();
     itemCapability.invalidate();
   }
@@ -64,8 +65,8 @@ public class HeaterTileEntity extends NamableTileEntity {
   /* NBT */
 
   @Override
-  public void load(BlockState state, CompoundTag tags) {
-    super.load(state, tags);
+  public void load(CompoundTag tags) {
+    super.load(tags);
     if (tags.contains(TAG_ITEM, NBT.TAG_COMPOUND)) {
       itemHandler.readFromNBT(tags.getCompound(TAG_ITEM));
     }

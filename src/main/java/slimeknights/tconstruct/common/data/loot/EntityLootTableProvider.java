@@ -3,7 +3,7 @@ package slimeknights.tconstruct.common.data.loot;
 import net.minecraft.data.loot.EntityLoot;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.storage.loot.ConstantIntValue;
+import net.minecraft.world.level.storage.loot.ConstantValue;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -13,6 +13,8 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemEntityPropertyC
 import net.minecraft.world.level.storage.loot.functions.LootingEnchantFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.functions.SmeltItemFunction;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+
 import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.shared.TinkerCommons;
@@ -38,7 +40,7 @@ public class EntityLootTableProvider extends EntityLoot {
     this.add(TinkerWorld.enderSlimeEntity.get(), dropSlimeballs(SlimeType.ENDER));
     this.add(TinkerWorld.terracubeEntity.get(),
                            LootTable.lootTable().withPool(LootPool.lootPool()
-                                                                   .setRolls(ConstantIntValue.exactly(1))
+                                                                   .setRolls(ConstantValue.exactly(1))
                                                                    .add(LootItem.lootTableItem(Items.CLAY_BALL)
                                                                                           .apply(SetItemCountFunction.setCount(RandomValueBounds.between(-2.0F, 1.0F)))
                                                                                           .apply(LootingEnchantFunction.lootingMultiplier(RandomValueBounds.between(0.0F, 1.0F)))
@@ -48,7 +50,7 @@ public class EntityLootTableProvider extends EntityLoot {
   private static LootTable.Builder dropSlimeballs(SlimeType type) {
     return LootTable.lootTable()
                     .withPool(LootPool.lootPool()
-                                         .setRolls(ConstantIntValue.exactly(1))
+                                         .setRolls(ConstantValue.exactly(1))
                                          .add(LootItem.lootTableItem(TinkerCommons.slimeball.get(type))
                                                                 .apply(SetItemCountFunction.setCount(RandomValueBounds.between(0.0F, 2.0F)))
                                                                 .apply(LootingEnchantFunction.lootingMultiplier(RandomValueBounds.between(0.0F, 1.0F)))));

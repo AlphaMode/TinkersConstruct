@@ -1,6 +1,7 @@
 package slimeknights.tconstruct.smeltery.block;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -41,7 +42,7 @@ import java.util.Map;
 
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
-public class ChannelBlock extends Block {
+public class ChannelBlock extends Block implements EntityBlock {
 	private static final Component SIDE_IN = TConstruct.makeTranslation("block", "channel.side.in");
 	private static final Component SIDE_OUT = TConstruct.makeTranslation("block", "channel.side.out");
 	private static final Component SIDE_NONE = TConstruct.makeTranslation("block", "channel.side.none");
@@ -245,7 +246,7 @@ public class ChannelBlock extends Block {
 			} else {
 				// out is only valid if facing a fluid handler
 				ChannelConnection connection = state.getValue(prop);
-				if (connection != ChannelConnection.NONE && facingState.isAir(world, facingPos)) {
+				if (connection != ChannelConnection.NONE && facingState.isAir()) {
 					state = state.setValue(prop, ChannelConnection.NONE);
 				}
 			}
@@ -350,13 +351,8 @@ public class ChannelBlock extends Block {
 	}
 
   @Override
-  public boolean hasTileEntity(BlockState state) {
-    return true;
-  }
-
-  @Override
-  public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
-    return new ChannelTileEntity();
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new ChannelTileEntity(pos, state);
   }
 
   public enum ChannelConnection implements StringRepresentable {

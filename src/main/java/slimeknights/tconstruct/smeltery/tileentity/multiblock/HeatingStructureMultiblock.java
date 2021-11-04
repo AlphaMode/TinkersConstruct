@@ -2,17 +2,18 @@ package slimeknights.tconstruct.smeltery.tileentity.multiblock;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Getter;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+
 import slimeknights.mantle.tileentity.MantleTileEntity;
 import slimeknights.tconstruct.common.multiblock.IMasterLogic;
 import slimeknights.tconstruct.common.multiblock.IServantLogic;
-import slimeknights.tconstruct.library.utils.TagUtil;
 import slimeknights.tconstruct.smeltery.tileentity.multiblock.HeatingStructureMultiblock.StructureData;
 
 import javax.annotation.Nullable;
@@ -105,7 +106,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
    */
   public boolean canExpand(StructureData data, Level world) {
     BlockPos min = data.getMinPos();
-    BlockPos to = data.getMaxPos().up();
+    BlockPos to = data.getMaxPos().above();
     // want two positions one layer above the structure
     MultiblockResult result = detectLayer(world, new BlockPos(min.getX(), to.getY(), min.getZ()), to, pos -> {});
     setLastResult(result);
@@ -128,9 +129,9 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
   protected abstract boolean isValidWall(Block block);
 
   @Override
-  protected boolean isValidBlock(World world, BlockPos pos, CuboidSide side, boolean isFrame) {
+  protected boolean isValidBlock(Level world, BlockPos pos, CuboidSide side, boolean isFrame) {
     // controller always is valid
-    if (pos.equals(parent.getPos())) {
+    if (pos.equals(parent.getBlockPos())) {
       return true;
     }
     if (!isValidSlave(world, pos)) {
@@ -146,14 +147,14 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
 
     // add tanks to the internal lists
     if (isValidTank(state.getBlock())) {
-      tanks.add(pos.toImmutable());
+      tanks.add(pos.immutable());
       return true;
     }
     return isValidWall(state.getBlock());
   }
 
   @Override
-  public boolean shouldUpdate(World world, MultiblockStructureData structure, BlockPos pos, BlockState state) {
+  public boolean shouldUpdate(Level world, MultiblockStructureData structure, BlockPos pos, BlockState state) {
     if (structure.withinBounds(pos)) {
       // if its a part of the structure, need to update if its not a valid smeltery block
       if (structure.contains(pos)) {
@@ -162,7 +163,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
       // if not part of the actual structure, we only care if its a block that's not air in the inner section
       // in other words, ignore blocks added into the frame
       // note we don't do a check for a valid inner block, if it is a valid inner block we need to update to include it
-      return structure.isInside(pos) && !state.isAir(world, pos);
+      return structure.isInside(pos) && !state.isAir();
     }
 
     // if its one block above, might be trying to expand upwards
@@ -220,7 +221,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
           return new BlockPos(prev.getX() + 1, prev.getY(), min.getZ());
         }
       } else {
-        return prev.add(0, 0, 1);
+        return prev.offset(0, 0, 1);
       }
     }
 
@@ -262,7 +263,7 @@ public abstract class HeatingStructureMultiblock<T extends MantleTileEntity & IM
     public CompoundTag writeToNBT() {
       CompoundTag nbt = super.writeToNBT();
       if (insideCheck != null) {
-        nbt.put(TAG_INSIDE_CHECK, TagUtil.writePos(insideCheck));
+        nbt.put(TAG_INSIDE_CHECK, NbtUtils.writeBlockPos(insideCheck));
       }
       return nbt;
     }

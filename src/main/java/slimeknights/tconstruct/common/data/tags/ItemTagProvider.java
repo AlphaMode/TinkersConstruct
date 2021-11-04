@@ -3,15 +3,14 @@ package slimeknights.tconstruct.common.data.tags;
 import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.data.TagsProvider;
-import net.minecraft.item.DyeColor;
+import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.Items;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ITag.INamedTag;
+import net.minecraft.tags.Tag.Named;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import slimeknights.mantle.data.MantleTags;
@@ -27,6 +26,7 @@ import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import slimeknights.tconstruct.tools.TinkerToolParts;
 import slimeknights.tconstruct.tools.TinkerTools;
 import slimeknights.tconstruct.world.TinkerWorld;
+import slimeknights.tconstruct.world.item.SlimeGrassSeedItem;
 
 import java.util.function.Consumer;
 
@@ -46,6 +46,7 @@ import static slimeknights.tconstruct.common.TinkerTags.Items.SWORD;
 import static slimeknights.tconstruct.common.TinkerTags.Items.TWO_HANDED;
 
 import net.minecraft.data.tags.TagsProvider.TagAppender;
+import net.minecraft.world.level.ItemLike;
 
 public class ItemTagProvider extends ItemTagsProvider {
 
@@ -75,10 +76,10 @@ public class ItemTagProvider extends ItemTagsProvider {
     for (SlimeType type : SlimeType.values()) {
       slimeballs.addTag(type.getSlimeballTag());
     }
-    TinkerCommons.slimeball.forEach((type, ball) -> this.getOrCreateBuilder(type.getSlimeballTag()).add(ball));
+    TinkerCommons.slimeball.forEach((type, ball) -> this.tag(type.getSlimeballTag()).add(ball));
 
-    this.getOrCreateBuilder(Tags.Items.INGOTS).add(TinkerSmeltery.searedBrick.get(), TinkerSmeltery.scorchedBrick.get());
-    this.getOrCreateBuilder(TinkerTags.Items.WITHER_BONES).add(TinkerMaterials.necroticBone.get());
+    this.tag(Tags.Items.INGOTS).add(TinkerSmeltery.searedBrick.get(), TinkerSmeltery.scorchedBrick.get());
+    this.tag(TinkerTags.Items.WITHER_BONES).add(TinkerMaterials.necroticBone.get());
 
     // ores
     addMetalTags(TinkerMaterials.copper);
@@ -97,9 +98,9 @@ public class ItemTagProvider extends ItemTagsProvider {
     addMetalTags(TinkerMaterials.knightslime);
     this.copy(Tags.Blocks.STORAGE_BLOCKS, Tags.Items.STORAGE_BLOCKS);
 
-    this.getOrCreateBuilder(TinkerTags.Items.INGOTS_NETHERITE_SCRAP).add(Items.NETHERITE_SCRAP);
-    this.getOrCreateBuilder(TinkerTags.Items.NUGGETS_NETHERITE).add(TinkerMaterials.netheriteNugget.get());
-    this.getOrCreateBuilder(TinkerTags.Items.NUGGETS_NETHERITE_SCRAP).add(TinkerMaterials.debrisNugget.get());
+    this.tag(TinkerTags.Items.INGOTS_NETHERITE_SCRAP).add(Items.NETHERITE_SCRAP);
+    this.tag(TinkerTags.Items.NUGGETS_NETHERITE).add(TinkerMaterials.netheriteNugget.get());
+    this.tag(TinkerTags.Items.NUGGETS_NETHERITE_SCRAP).add(TinkerMaterials.debrisNugget.get());
 
     // glass
     copy(Tags.Blocks.GLASS_COLORLESS, Tags.Items.GLASS_COLORLESS);
@@ -107,9 +108,9 @@ public class ItemTagProvider extends ItemTagsProvider {
     copy(Tags.Blocks.STAINED_GLASS, Tags.Items.STAINED_GLASS);
     copy(Tags.Blocks.STAINED_GLASS_PANES, Tags.Items.STAINED_GLASS_PANES);
     for (DyeColor color : DyeColor.values()) {
-      ResourceLocation name = new ResourceLocation("forge", "glass/" + color.getString());
+      ResourceLocation name = new ResourceLocation("forge", "glass/" + color.getSerializedName());
       copy(BlockTags.createOptional(name), ItemTags.createOptional(name));
-      name = new ResourceLocation("forge", "glass_panes/" + color.getString());
+      name = new ResourceLocation("forge", "glass_panes/" + color.getSerializedName());
       copy(BlockTags.createOptional(name), ItemTags.createOptional(name));
     }
 
@@ -118,12 +119,12 @@ public class ItemTagProvider extends ItemTagsProvider {
     copy(TinkerTags.Blocks.ANVIL_METAL, TinkerTags.Items.ANVIL_METAL);
     copy(TinkerTags.Blocks.PLANKLIKE, TinkerTags.Items.PLANKLIKE);
 
-    Builder<Item> slimeslings = this.getOrCreateBuilder(TinkerTags.Items.SLIMESLINGS);
-    TinkerGadgets.slimeSling.forEach(slimeslings::addItemEntry);
+    TagAppender<Item> slimeslings = this.tag(TinkerTags.Items.SLIMESLINGS);
+    TinkerGadgets.slimeSling.forEach((slimeType, baseSlimeSlingItem) -> slimeslings.add(baseSlimeSlingItem));
   }
 
   private void addWorld() {
-    TagsProvider.Builder<Item> heads = this.getOrCreateBuilder(Tags.Items.HEADS);
+    TagsProvider.TagAppender<Item> heads = this.tag(Tags.Items.HEADS);
     TinkerWorld.heads.forEach(head -> heads.add(head.asItem()));
 
     this.copy(TinkerTags.Blocks.SLIME_BLOCK, TinkerTags.Items.SLIME_BLOCK);
@@ -187,34 +188,34 @@ public class ItemTagProvider extends ItemTagsProvider {
 
     // add tags to other tags
     // harvest primary and stone harvest are both automatically harvest
-    this.getOrCreateBuilder(TinkerTags.Items.HARVEST).addTag(HARVEST_PRIMARY).addTag(STONE_HARVEST);
+    this.tag(TinkerTags.Items.HARVEST).addTag(HARVEST_PRIMARY).addTag(STONE_HARVEST);
     // melee primary and swords
-    this.getOrCreateBuilder(MELEE).addTag(MELEE_PRIMARY).addTag(SWORD);
+    this.tag(MELEE).addTag(MELEE_PRIMARY).addTag(SWORD);
     // modifier helper tags
-    this.getOrCreateBuilder(MELEE_OR_HARVEST).addTag(MELEE).addTag(HARVEST);
-    this.getOrCreateBuilder(HELD).addTag(ONE_HANDED).addTag(TWO_HANDED);
+    this.tag(MELEE_OR_HARVEST).addTag(MELEE).addTag(HARVEST);
+    this.tag(HELD).addTag(ONE_HANDED).addTag(TWO_HANDED);
 
     // general
-    this.getOrCreateBuilder(MODIFIABLE)
+    this.tag(MODIFIABLE)
         .addTag(MULTIPART_TOOL).addTag(DURABILITY)
         .addTag(MELEE_OR_HARVEST).addTag(AOE)
         .addTag(HELD);
-    this.getOrCreateBuilder(MantleTags.Items.OFFHAND_COOLDOWN).addTag(TinkerTags.Items.MELEE);
+    this.tag(MantleTags.Items.OFFHAND_COOLDOWN).addTag(TinkerTags.Items.MELEE);
 
     // kamas are a shear type, when broken we don't pass it to loot tables
-    this.getOrCreateBuilder(Tags.Items.SHEARS).add(TinkerTools.kama.get());
+    this.tag(Tags.Items.SHEARS).add(TinkerTools.kama.get());
     // mark kama and scythe for mods like thermal to use
-    this.getOrCreateBuilder(TinkerTags.Items.SCYTHES).add(TinkerTools.kama.get(), TinkerTools.scythe.get());
+    this.tag(TinkerTags.Items.SCYTHES).add(TinkerTools.kama.get(), TinkerTools.scythe.get());
     // nothing to blacklist, just want the empty tag so it appears in datapacks
-    this.getOrCreateBuilder(TinkerTags.Items.AUTOSMELT_BLACKLIST);
+    this.tag(TinkerTags.Items.AUTOSMELT_BLACKLIST);
 
     // carrots and potatoes are not seeds in vanilla, so make a tag with them
-    this.getOrCreateBuilder(TinkerTags.Items.SEEDS)
+    this.tag(TinkerTags.Items.SEEDS)
         .addTag(Tags.Items.SEEDS)
         .add(Items.CARROT, Items.POTATO, Items.NETHER_WART);
 
     // tag for tool parts, mostly used by JEI right now
-    this.getOrCreateBuilder(TinkerTags.Items.TOOL_PARTS)
+    this.tag(TinkerTags.Items.TOOL_PARTS)
         .add(TinkerToolParts.pickaxeHead.get(), TinkerToolParts.hammerHead.get(),
 						 TinkerToolParts.smallAxeHead.get(), TinkerToolParts.broadAxeHead.get(),
 						 TinkerToolParts.smallBlade.get(), TinkerToolParts.broadBlade.get(),
@@ -222,11 +223,11 @@ public class ItemTagProvider extends ItemTagsProvider {
 						 TinkerToolParts.toolHandle.get(), TinkerToolParts.toughHandle.get(),
 						 TinkerToolParts.repairKit.get()); // repair kit is not strictly a tool part, but this list just helps out JEI
 
-    Builder<Item> slimySeeds = this.getOrCreateBuilder(TinkerTags.Items.SLIMY_SEEDS);
-    TinkerWorld.slimeGrassSeeds.forEach(slimySeeds::addItemEntry);
+    TagAppender<Item> slimySeeds = this.tag(TinkerTags.Items.SLIMY_SEEDS);
+    TinkerWorld.slimeGrassSeeds.forEach((Consumer<SlimeGrassSeedItem>) slimySeeds::add);
 
     // contains any ground stones
-    this.getOrCreateBuilder(TinkerTags.Items.STONESHIELDS)
+    this.tag(TinkerTags.Items.STONESHIELDS)
         .addTag(Tags.Items.STONE)
         .addTag(Tags.Items.COBBLESTONE)
         .addTag(Tags.Items.SANDSTONE)
@@ -242,11 +243,11 @@ public class ItemTagProvider extends ItemTagsProvider {
     this.copy(BlockTags.SOUL_FIRE_BASE_BLOCKS, ItemTags.SOUL_FIRE_BASE_BLOCKS);
 
     // tag each type of cast
-    TagsProvider.Builder<Item> goldCasts = this.getOrCreateBuilder(TinkerTags.Items.GOLD_CASTS);
-    TagsProvider.Builder<Item> sandCasts = this.getOrCreateBuilder(TinkerTags.Items.SAND_CASTS);
-    TagsProvider.Builder<Item> redSandCasts = this.getOrCreateBuilder(TinkerTags.Items.RED_SAND_CASTS);
-    TagsProvider.Builder<Item> singleUseCasts = this.getOrCreateBuilder(TinkerTags.Items.SINGLE_USE_CASTS);
-    TagsProvider.Builder<Item> multiUseCasts = this.getOrCreateBuilder(TinkerTags.Items.MULTI_USE_CASTS);
+    TagsProvider.TagAppender<Item> goldCasts = this.tag(TinkerTags.Items.GOLD_CASTS);
+    TagsProvider.TagAppender<Item> sandCasts = this.tag(TinkerTags.Items.SAND_CASTS);
+    TagsProvider.TagAppender<Item> redSandCasts = this.tag(TinkerTags.Items.RED_SAND_CASTS);
+    TagsProvider.TagAppender<Item> singleUseCasts = this.tag(TinkerTags.Items.SINGLE_USE_CASTS);
+    TagsProvider.TagAppender<Item> multiUseCasts = this.tag(TinkerTags.Items.MULTI_USE_CASTS);
     Consumer<CastItemObject> addCast = cast -> {
       // tag based on material
       goldCasts.add(cast.get());
@@ -254,9 +255,9 @@ public class ItemTagProvider extends ItemTagsProvider {
       redSandCasts.add(cast.getRedSand());
       // tag based on usage
       singleUseCasts.addTag(cast.getSingleUseTag());
-      this.getOrCreateBuilder(cast.getSingleUseTag()).add(cast.getSand(), cast.getRedSand());
+      this.tag(cast.getSingleUseTag()).add(cast.getSand(), cast.getRedSand());
       multiUseCasts.addTag(cast.getMultiUseTag());
-      this.getOrCreateBuilder(cast.getMultiUseTag()).add(cast.get());
+      this.tag(cast.getMultiUseTag()).add(cast.get());
     };
     // basic
     addCast.accept(TinkerSmeltery.blankCast);
@@ -286,17 +287,17 @@ public class ItemTagProvider extends ItemTagsProvider {
     addCast.accept(TinkerSmeltery.toughHandleCast);
 
     // add all casts to a common tag
-    this.getOrCreateBuilder(TinkerTags.Items.CASTS)
+    this.tag(TinkerTags.Items.CASTS)
         .addTag(TinkerTags.Items.GOLD_CASTS)
         .addTag(TinkerTags.Items.SAND_CASTS)
         .addTag(TinkerTags.Items.RED_SAND_CASTS);
 
-    this.getOrCreateBuilder(TinkerTags.Items.DUCT_CONTAINERS).add(Items.BUCKET, TinkerSmeltery.copperCan.get(), TinkerSmeltery.searedLantern.asItem(), TinkerSmeltery.scorchedLantern.asItem());
+    this.tag(TinkerTags.Items.DUCT_CONTAINERS).add(Items.BUCKET, TinkerSmeltery.copperCan.get(), TinkerSmeltery.searedLantern.asItem(), TinkerSmeltery.scorchedLantern.asItem());
 
     // tank tag
     this.copy(TinkerTags.Blocks.SEARED_TANKS, TinkerTags.Items.SEARED_TANKS);
     this.copy(TinkerTags.Blocks.SCORCHED_TANKS, TinkerTags.Items.SCORCHED_TANKS);
-    this.getOrCreateBuilder(TinkerTags.Items.TANKS)
+    this.tag(TinkerTags.Items.TANKS)
         .addTag(TinkerTags.Items.SEARED_TANKS)
         .addTag(TinkerTags.Items.SCORCHED_TANKS);
   }
@@ -312,18 +313,18 @@ public class ItemTagProvider extends ItemTagsProvider {
    * @param metal  Metal object
    */
   private void addMetalTags(MetalItemObject metal) {
-    this.getOrCreateBuilder(metal.getIngotTag()).add(metal.getIngot());
-    this.getOrCreateBuilder(Tags.Items.INGOTS).addTag(metal.getIngotTag());
-    this.getOrCreateBuilder(metal.getNuggetTag()).add(metal.getNugget());
-    this.getOrCreateBuilder(Tags.Items.NUGGETS).addTag(metal.getNuggetTag());
+    this.tag(metal.getIngotTag()).add(metal.getIngot());
+    this.tag(Tags.Items.INGOTS).addTag(metal.getIngotTag());
+    this.tag(metal.getNuggetTag()).add(metal.getNugget());
+    this.tag(Tags.Items.NUGGETS).addTag(metal.getNuggetTag());
     this.copy(metal.getBlockTag(), metal.getBlockItemTag());
   }
 
   @SafeVarargs
-  private final void addToolTags(IItemProvider tool, INamedTag<Item>... tags) {
+  private final void addToolTags(ItemLike tool, Named<Item>... tags) {
     Item item = tool.asItem();
-    for (INamedTag<Item> tag : tags) {
-      this.getOrCreateBuilder(tag).add(item);
+    for (Named<Item> tag : tags) {
+      this.tag(tag).add(item);
     }
   }
 }

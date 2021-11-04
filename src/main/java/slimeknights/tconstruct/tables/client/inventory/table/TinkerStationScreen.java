@@ -1,14 +1,17 @@
 package slimeknights.tconstruct.tables.client.inventory.table;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.inventory.container.InventoryMenu;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
@@ -17,6 +20,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+
 import org.lwjgl.glfw.GLFW;
 import slimeknights.mantle.client.screen.ElementScreen;
 import slimeknights.mantle.client.screen.ModuleScreen;
@@ -344,16 +351,16 @@ public class TinkerStationScreen extends BaseStationScreen<TinkerStationTileEnti
   }
 
   private static void renderPattern(MatrixStack matrices, Pattern pattern, int x, int y) {
-    TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager().getAtlasTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE).getSprite(pattern.getTexture());
+    TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager().getAtlasTexture(InventoryMenu.BLOCK_ATLAS).getSprite(pattern.getTexture());
     blit(matrices, x, y, 100, 16, 16, sprite);
   }
 
-  public static void renderIcon(MatrixStack matrices, LayoutIcon icon, int x, int y) {
+  public static void renderIcon(PoseStack matrices, LayoutIcon icon, int x, int y) {
     Pattern pattern = icon.getValue(Pattern.class);
     Minecraft minecraft = Minecraft.getInstance();
     if (pattern != null) {
       // draw pattern sprite
-      minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+      RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
       renderPattern(matrices, pattern, x, y);
       return;
     }
@@ -365,7 +372,7 @@ public class TinkerStationScreen extends BaseStationScreen<TinkerStationTileEnti
   }
 
   @Override
-  protected void drawGuiContainerBackgroundLayer(MatrixStack matrices, float partialTicks, int mouseX, int mouseY) {
+  protected void drawGuiContainerBackgroundLayer(PoseStack matrices, float partialTicks, int mouseX, int mouseY) {
     this.drawBackground(matrices, TINKER_STATION_TEXTURE);
 
     // looks like there's a weird case where this is called before init? Not reproducible but meh.
@@ -389,72 +396,72 @@ public class TinkerStationScreen extends BaseStationScreen<TinkerStationTileEnti
     final float yOff = 22f;
 
     // render the background icon
-    RenderSystem.translatef(xOff, yOff, 0.0F);
-    RenderSystem.scalef(scale, scale, 1.0f);
+    matrices.translate(xOff, yOff, 0.0F);
+    matrices.scale(scale, scale, 1.0f);
     int logoX = (int) (this.cornerX / scale);
     int logoY = (int) (this.cornerY / scale);
     renderIcon(matrices, currentLayout.getIcon(), logoX, logoY);
 
 
-    RenderSystem.scalef(1f / scale, 1f / scale, 1.0f);
-    RenderSystem.translatef(-xOff, -yOff, 0.0f);
+    matrices.scale(1f / scale, 1f / scale, 1.0f);
+    matrices.translate(-xOff, -yOff, 0.0f);
 
     // rebind gui texture since itemstack drawing sets it to something else
     assert this.minecraft != null;
-    this.minecraft.getTextureManager().bindTexture(TINKER_STATION_TEXTURE);
+    RenderSystem.setShaderTexture(0, TINKER_STATION_TEXTURE);
 
     RenderSystem.enableBlend();
-    RenderSystem.enableAlphaTest();
-    RenderHelper.disableStandardItemLighting();
+    //RenderSystem.enableAlphaTest();
+    //Lighting.turnOff();
     RenderSystem.disableDepthTest();
 
-    RenderSystem.color4f(1.0f, 1.0f, 1.0f, 0.82f);
+    RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 0.82f);
     ITEM_COVER.draw(matrices, this.cornerX + 7, this.cornerY + 18);
 
     // slot backgrounds, are transparent
-    RenderSystem.color4f(1.0f, 1.0f, 1.0f, 0.28f);
+    RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 0.28f);
     if (!this.currentLayout.getToolSlot().isHidden()) {
       Slot slot = this.container.getSlot(TINKER_SLOT);
-      SLOT_BACKGROUND.draw(matrices, x + this.cornerX + slot.xPos - 1, y + this.cornerY + slot.yPos - 1);
+      SLOT_BACKGROUND.draw(matrices, x + this.cornerX + slot.x - 1, y + this.cornerY + slot.y - 1);
     }
     for (int i = 0; i < this.activeInputs; i++) {
       Slot slot = this.container.getSlot(i + INPUT_SLOT);
-      SLOT_BACKGROUND.draw(matrices, x + this.cornerX + slot.xPos - 1, y + this.cornerY + slot.yPos - 1);
+      SLOT_BACKGROUND.draw(matrices, x + this.cornerX + slot.x - 1, y + this.cornerY + slot.y - 1);
     }
 
     // slot borders, are opaque
-    RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+    RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
     for (int i = 0; i <= maxInputs; i++) {
       Slot slot = this.container.getSlot(i);
-      if ((slot instanceof TinkerStationSlot && (!((TinkerStationSlot) slot).isDormant() || slot.getHasStack()))) {
-        SLOT_BORDER.draw(matrices, x + this.cornerX + slot.xPos - 1, y + this.cornerY + slot.yPos - 1);
+      if ((slot instanceof TinkerStationSlot && (!((TinkerStationSlot) slot).isDormant() || slot.hasItem()))) {
+        SLOT_BORDER.draw(matrices, x + this.cornerX + slot.x - 1, y + this.cornerY + slot.y - 1);
       }
     }
 
     // render slot background icons
-    this.minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+    RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
     for (int i = 0; i <= maxInputs; i++) {
       Slot slot = this.container.getSlot(i);
-      if (!slot.getHasStack()) {
+      if (!slot.hasItem()) {
         Pattern icon = currentLayout.getSlot(i).getIcon();
         if (icon != null) {
-          renderPattern(matrices, icon, x + this.cornerX + slot.xPos, y + this.cornerY + slot.yPos);
+          renderPattern(matrices, icon, x + this.cornerX + slot.x, y + this.cornerY + slot.y);
         }
       }
     }
 
     // sidebar beams
-    this.minecraft.getTextureManager().bindTexture(TINKER_STATION_TEXTURE);
-    x = this.buttonsScreen.guiLeft - this.leftBeam.w;
+    RenderSystem.setShaderTexture(0, TINKER_STATION_TEXTURE);
+    x = this.buttonsScreen.leftPos - this.leftBeam.w;
     y = this.cornerY;
     // draw the beams at the top
     x += this.leftBeam.draw(matrices, x, y);
-    x += this.centerBeam.drawScaledX(matrices, x, y, this.buttonsScreen.xSize);
+    x += this.centerBeam.drawScaledX(matrices, x, y, this.buttonsScreen.imageWidth);
     this.rightBeam.draw(matrices, x, y);
 
-    x = tinkerInfo.guiLeft - this.leftBeam.w;
+    x = tinkerInfo.leftPos - this.leftBeam.w;
     x += this.leftBeam.draw(matrices, x, y);
-    x += this.centerBeam.drawScaledX(matrices, x, y, this.tinkerInfo.xSize);
+    x += this.centerBeam.drawScaledX(matrices, x, y, this.tinkerInfo.imageWidth);
     this.rightBeam.draw(matrices, x, y);
 
     // draw the decoration for the buttons
@@ -471,9 +478,9 @@ public class TinkerStationScreen extends BaseStationScreen<TinkerStationTileEnti
     }
 
     // draw the decorations for the panels
-    this.panelDecorationL.draw(matrices, this.tinkerInfo.guiLeft + 5, this.tinkerInfo.guiTop - this.panelDecorationL.h);
+    this.panelDecorationL.draw(matrices, this.tinkerInfo.leftPos + 5, this.tinkerInfo.guiTop - this.panelDecorationL.h);
     this.panelDecorationR.draw(matrices, this.tinkerInfo.guiRight() - 5 - this.panelDecorationR.w, this.tinkerInfo.guiTop - this.panelDecorationR.h);
-    this.panelDecorationL.draw(matrices, this.modifierInfo.guiLeft + 5, this.modifierInfo.guiTop - this.panelDecorationL.h);
+    this.panelDecorationL.draw(matrices, this.modifierInfo.leftPos + 5, this.modifierInfo.guiTop - this.panelDecorationL.h);
     this.panelDecorationR.draw(matrices, this.modifierInfo.guiRight() - 5 - this.panelDecorationR.w, this.modifierInfo.guiTop - this.panelDecorationR.h);
 
     RenderSystem.enableDepthTest();
@@ -616,7 +623,7 @@ public class TinkerStationScreen extends BaseStationScreen<TinkerStationTileEnti
   @Override
   public void moveItems(MatrixStack matrixStack, Slot slotIn) {
     // don't draw dormant slots with no item
-    if (slotIn instanceof TinkerStationSlot && ((TinkerStationSlot) slotIn).isDormant() && !slotIn.getHasStack()) {
+    if (slotIn instanceof TinkerStationSlot && ((TinkerStationSlot) slotIn).isDormant() && !slotIn.hasItem()) {
       return;
     }
     super.moveItems(matrixStack, slotIn);
@@ -624,7 +631,7 @@ public class TinkerStationScreen extends BaseStationScreen<TinkerStationTileEnti
 
   @Override
   public boolean isSlotSelected(Slot slotIn, double mouseX, double mouseY) {
-    if (slotIn instanceof TinkerStationSlot && ((TinkerStationSlot) slotIn).isDormant() && !slotIn.getHasStack()) {
+    if (slotIn instanceof TinkerStationSlot && ((TinkerStationSlot) slotIn).isDormant() && !slotIn.hasItem()) {
       return false;
     }
     return super.isSlotSelected(slotIn, mouseX, mouseY);

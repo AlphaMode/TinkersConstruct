@@ -2,6 +2,7 @@ package slimeknights.tconstruct.tables.client.inventory.module;
 
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.network.chat.Component;
@@ -20,8 +21,8 @@ public class TinkerStationButtonsScreen extends SideButtonsScreen {
   private int style = 0;
 
   /** Logic to run when a button is pressed */
-  private final Button.IPressable ON_BUTTON_PRESSED = self -> {
-    for (Widget widget : TinkerStationButtonsScreen.this.buttons) {
+  private final Button.OnPress ON_BUTTON_PRESSED = self -> {
+    for (Widget widget : TinkerStationButtonsScreen.this.renderables) {
       if (widget instanceof SlotButtonItem) {
         ((SlotButtonItem) widget).pressed = false;
       }
@@ -77,7 +78,7 @@ public class TinkerStationButtonsScreen extends SideButtonsScreen {
   }
 
   public void shiftStyle(int style) {
-    for (Widget widget : this.buttons) {
+    for (Widget widget : this.renderables) {
       if (widget instanceof SlotButtonItem) {
         this.shiftButton((SlotButtonItem) widget, 0, -18);
       }
@@ -94,6 +95,6 @@ public class TinkerStationButtonsScreen extends SideButtonsScreen {
   }
 
   public List<Widget> getButtons() {
-    return this.buttons;
+    return this.renderables;
   }
 }

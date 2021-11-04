@@ -2,12 +2,12 @@ package slimeknights.tconstruct.common.multiblock;
 
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.common.extensions.IForgeTileEntity;
+import net.minecraftforge.common.extensions.IForgeBlockEntity;
 
 import javax.annotation.Nullable;
 
 // TODO: move back to Mantle after smeltery is updated
-public interface IServantLogic extends IForgeTileEntity {
+public interface IServantLogic extends IForgeBlockEntity {
   /**
    * Gets the position of the master block
    * @return  Master position, null if none is set

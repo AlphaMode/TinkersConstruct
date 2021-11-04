@@ -5,6 +5,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
@@ -34,8 +36,8 @@ public abstract class SmelteryInputOutputTileEntity<T> extends SmelteryComponent
   @Nullable
   private LazyOptional<T> capabilityHolder = null;
 
-  protected SmelteryInputOutputTileEntity(BlockEntityType<?> type, Capability<T> capability, T emptyInstance) {
-    super(type);
+  protected SmelteryInputOutputTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, Capability<T> capability, T emptyInstance) {
+    super(type, pos, state);
     this.capability = capability;
     this.emptyInstance = emptyInstance;
   }
@@ -49,7 +51,7 @@ public abstract class SmelteryInputOutputTileEntity<T> extends SmelteryComponent
   }
 
   @Override
-  protected void invalidateCaps() {
+  public void invalidateCaps() {
     super.invalidateCaps();
     clearHandler();
   }
@@ -116,8 +118,8 @@ public abstract class SmelteryInputOutputTileEntity<T> extends SmelteryComponent
 
   /** Fluid implementation of smeltery IO */
   public static abstract class SmelteryFluidIO extends SmelteryInputOutputTileEntity<IFluidHandler> {
-    protected SmelteryFluidIO(BlockEntityType<?> type) {
-      super(type, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, EmptyFluidHandler.INSTANCE);
+    protected SmelteryFluidIO(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+      super(type, pos, state, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, EmptyFluidHandler.INSTANCE);
     }
 
     /** Wraps the given capability */
@@ -141,12 +143,12 @@ public abstract class SmelteryInputOutputTileEntity<T> extends SmelteryComponent
 
   /** Item implementation of smeltery IO */
   public static class ChuteTileEntity extends SmelteryInputOutputTileEntity<IItemHandler> {
-    public ChuteTileEntity() {
-      this(TinkerSmeltery.chute.get());
+    public ChuteTileEntity(BlockPos pos, BlockState state) {
+      this(TinkerSmeltery.chute.get(), pos, state);
     }
 
-    protected ChuteTileEntity(BlockEntityType<?> type) {
-      super(type, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EmptyItemHandler.INSTANCE);
+    protected ChuteTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+      super(type, pos, state, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EmptyItemHandler.INSTANCE);
     }
   }
 

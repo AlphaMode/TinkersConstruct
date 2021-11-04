@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.plugin.jei.modifiers;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import mezz.jei.api.constants.VanillaTypes;
@@ -14,12 +15,13 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.inventory.container.InventoryMenu;
 import net.minecraft.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
@@ -121,16 +123,16 @@ public class ModifierRecipeCategory implements IRecipeCategory<IDisplayModifierR
         sprite = modelManager.getAtlasTexture(material.getAtlasLocation()).getSprite(material.getTextureLocation());
       } else {
         // failed to use the model, use missing texture
-        sprite = modelManager.getAtlasTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE).getSprite(MissingTextureSprite.getLocation());
+        sprite = modelManager.getAtlasTexture(InventoryMenu.BLOCK_ATLAS).getSprite(MissingTextureSprite.getLocation());
       }
       slotTypeSprites.put(slotType, sprite);
     }
-    minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+    RenderSystem(0, InventoryMenu.BLOCK_ATLAS);
     Screen.blit(matrices, x, y, 0, 16, 16, sprite);
   }
 
   @Override
-  public void draw(IDisplayModifierRecipe recipe, MatrixStack matrices, double mouseX, double mouseY) {
+  public void draw(IDisplayModifierRecipe recipe, PoseStack matrices, double mouseX, double mouseY) {
     List<List<ItemStack>> inputs = recipe.getDisplayItems();
     drawSlot(matrices, inputs, 1,  2, 32);
     drawSlot(matrices, inputs, 2, 24, 14);

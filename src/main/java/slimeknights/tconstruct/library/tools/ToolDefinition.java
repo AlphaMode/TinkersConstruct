@@ -5,9 +5,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.ItemLike;
+
+import net.minecraftforge.fmllegacy.RegistryObject;
 import slimeknights.mantle.registration.object.ItemObject;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.materials.IMaterialRegistry;
@@ -75,7 +76,7 @@ public class ToolDefinition {
    * @param item  Tool item
    * @return Definition builder
    */
-  public static ToolDefinition.Builder builder(RegistryObject<? extends IItemProvider> item) {
+  public static ToolDefinition.Builder builder(RegistryObject<? extends ItemLike> item) {
     return builder(item.getId());
   }
 
@@ -84,7 +85,7 @@ public class ToolDefinition {
    * @param item  Tool item
    * @return Definition builder
    */
-  public static ToolDefinition.Builder builder(ItemObject<? extends IItemProvider> item) {
+  public static ToolDefinition.Builder builder(ItemObject<? extends ItemLike> item) {
     return builder(item.getRegistryName());
   }
 

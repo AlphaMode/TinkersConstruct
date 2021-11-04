@@ -21,10 +21,9 @@ public class MelterBlock extends TinyMultiblockControllerBlock {
 
   @Nonnull
   @Override
-  public BlockEntity createTileEntity(BlockState blockState, BlockGetter iBlockReader) {
-    return new MelterTileEntity();
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new MelterTileEntity(pos, state);
   }
-
 
   /*
    * Display

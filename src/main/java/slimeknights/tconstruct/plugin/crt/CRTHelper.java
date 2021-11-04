@@ -5,9 +5,10 @@ import com.blamejared.crafttweaker.api.entity.CTEntityIngredient;
 import com.blamejared.crafttweaker.api.fluid.CTFluidIngredient;
 import com.blamejared.crafttweaker.impl.commands.CTCommandCollectionEvent;
 import com.blamejared.crafttweaker.impl_native.item.ExpandItem;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.ChatFormatting;
+import net.minecraft.resources.ResourceLocation;
+
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.recipe.EntityIngredient;

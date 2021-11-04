@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.tables.client.inventory.library;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -176,8 +177,7 @@ public class DynInventoryScreen extends ModuleScreen {
 
   @Override
   protected void renderBg(PoseStack matrices, float partialTicks, int mouseX, int mouseY) {
-    assert this.minecraft != null;
-    this.minecraft.getTextureManager().bind(GenericScreen.LOCATION);
+    RenderSystem.setShaderTexture(0, GenericScreen.LOCATION);
     if (!this.slider.isHidden()) {
       this.slider.draw(matrices);
 

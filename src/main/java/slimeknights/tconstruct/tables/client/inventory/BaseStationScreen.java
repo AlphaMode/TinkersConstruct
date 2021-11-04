@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.tables.client.inventory;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -71,7 +72,7 @@ public class BaseStationScreen<TILE extends BlockEntity, CONTAINER extends BaseS
   }
 
   protected void drawIcon(PoseStack matrices, Slot slot, ElementScreen element) {
-    this.minecraft.getTextureManager().bind(Icons.ICONS);
+    RenderSystem.setShaderTexture(0, Icons.ICONS);
     element.draw(matrices, slot.x + this.cornerX - 1, slot.y + this.cornerY - 1);
   }
 

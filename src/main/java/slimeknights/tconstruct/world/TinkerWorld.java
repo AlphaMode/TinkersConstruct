@@ -1,6 +1,12 @@
 package slimeknights.tconstruct.world;
 
 import com.google.common.collect.ImmutableSet;
+
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.item.StandingAndWallBlockItem;
+import net.minecraft.world.level.block.SkullBlock;
+import net.minecraft.world.level.block.WallSkullBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.block.Blocks;
@@ -17,7 +23,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.dispenser.IDispenseItemBehavior;
 import net.minecraft.dispenser.OptionalDispenseBehavior;
-import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.MobCategory;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.monster.MonsterEntity;
@@ -197,7 +203,7 @@ public final class TinkerWorld extends TinkerModule {
 
   // trees
   public static final EnumObject<SlimeType, Block> slimeSapling = Util.make(() -> {
-    Function<SlimeType,AbstractBlock.Properties> props = type -> builder(Material.PLANTS, type.getMapColor(), NO_TOOL, type.isNether() ? SoundType.FUNGUS : SoundType.PLANT).zeroHardnessAndResistance().doesNotBlockMovement();
+    Function<SlimeType,AbstractBlock.Properties> props = type -> builder(Material.PLANT, type.getMapColor(), NO_TOOL, type.isNether() ? SoundType.FUNGUS : SoundType.PLANT).zeroHardnessAndResistance().doesNotBlockMovement();
     return new EnumObject.Builder<SlimeType,Block>(SlimeType.class)
       .putAll(BLOCKS.registerEnum(SlimeType.OVERWORLD, "slime_sapling", (type) -> new SlimeSaplingBlock(new SlimeTree(type), type, props.apply(type).tickRandomly()), TOOLTIP_BLOCK_ITEM))
       .put(SlimeType.BLOOD, BLOCKS.register("blood_slime_sapling", () -> new SlimeFungusBlock(props.apply(SlimeType.BLOOD), () -> TinkerStructures.BLOOD_SLIME_FUNGUS), TOOLTIP_BLOCK_ITEM))
@@ -220,34 +226,34 @@ public final class TinkerWorld extends TinkerModule {
   }
 
   // heads
-  public static final EnumObject<TinkerHeadType,SkullBlock>     heads     = BLOCKS.registerEnumNoItem(TinkerHeadType.values(), "head", type -> new SkullBlock(type, AbstractBlock.Properties.create(Material.MISCELLANEOUS).hardnessAndResistance(1.0F)));
-  public static final EnumObject<TinkerHeadType,WallSkullBlock> wallHeads = BLOCKS.registerEnumNoItem(TinkerHeadType.values(), "wall_head", type -> new WallSkullBlock(type, AbstractBlock.Properties.create(Material.MISCELLANEOUS).hardnessAndResistance(1.0F).lootFrom(() -> heads.get(type))));
-  public static final EnumObject<TinkerHeadType,WallOrFloorItem> headItems = ITEMS.registerEnum(TinkerHeadType.values(), "head", type -> new WallOrFloorItem(heads.get(type), wallHeads.get(type), HEAD_PROPS));
+  public static final EnumObject<TinkerHeadType, SkullBlock>     heads     = BLOCKS.registerEnumNoItem(TinkerHeadType.values(), "head", type -> new SkullBlock(type, AbstractBlock.Properties.create(Material.MISCELLANEOUS).hardnessAndResistance(1.0F)));
+  public static final EnumObject<TinkerHeadType, WallSkullBlock> wallHeads = BLOCKS.registerEnumNoItem(TinkerHeadType.values(), "wall_head", type -> new WallSkullBlock(type, AbstractBlock.Properties.create(Material.MISCELLANEOUS).hardnessAndResistance(1.0F).lootFrom(() -> heads.get(type))));
+  public static final EnumObject<TinkerHeadType, StandingAndWallBlockItem> headItems = ITEMS.registerEnum(TinkerHeadType.values(), "head", type -> new WallOrFloorItem(heads.get(type), wallHeads.get(type), HEAD_PROPS));
 
   /*
    * Entities
    */
   // our own copy of the slime to make spawning a bit easier
   public static final RegistryObject<EntityType<EarthSlimeEntity>> earthSlimeEntity = ENTITIES.register("earth_slime", () ->
-    EntityType.Builder.create(EarthSlimeEntity::new, EntityClassification.MONSTER)
+    EntityType.Builder.of(EarthSlimeEntity::new, MobCategory.MONSTER)
                       .setShouldReceiveVelocityUpdates(true)
                       .setTrackingRange(10)
-                      .size(2.04F, 2.04F)
+                      .sized(2.04F, 2.04F)
                       .setCustomClientFactory((spawnEntity, world) -> TinkerWorld.earthSlimeEntity.get().create(world)));
   public static final RegistryObject<EntityType<SkySlimeEntity>> skySlimeEntity = ENTITIES.registerWithEgg("sky_slime", () ->
-    EntityType.Builder.create(SkySlimeEntity::new, EntityClassification.MONSTER)
+    EntityType.Builder.of(SkySlimeEntity::new, MobCategory.MONSTER)
                       .setShouldReceiveVelocityUpdates(true)
                       .setTrackingRange(20)
                       .size(2.04F, 2.04F)
                       .setCustomClientFactory((spawnEntity, world) -> TinkerWorld.skySlimeEntity.get().create(world)), 0x47eff5, 0xacfff4);
   public static final RegistryObject<EntityType<EnderSlimeEntity>> enderSlimeEntity = ENTITIES.registerWithEgg("ender_slime", () ->
-    EntityType.Builder.create(EnderSlimeEntity::new, EntityClassification.MONSTER)
+    EntityType.Builder.create(EnderSlimeEntity::new, MobCategory.MONSTER)
                       .setShouldReceiveVelocityUpdates(true)
                       .setTrackingRange(32)
                       .size(2.04F, 2.04F)
                       .setCustomClientFactory((spawnEntity, world) -> TinkerWorld.enderSlimeEntity.get().create(world)), 0x6300B0, 0xD37CFF);
   public static final RegistryObject<EntityType<TerracubeEntity>> terracubeEntity = ENTITIES.registerWithEgg("terracube", () ->
-    EntityType.Builder.create(TerracubeEntity::new, EntityClassification.MONSTER)
+    EntityType.Builder.create(TerracubeEntity::new, MobCategory.MONSTER)
                       .setShouldReceiveVelocityUpdates(true)
                       .setTrackingRange(8)
                       .size(2.04F, 2.04F)

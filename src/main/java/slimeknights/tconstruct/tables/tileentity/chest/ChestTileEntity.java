@@ -1,6 +1,8 @@
 package slimeknights.tconstruct.tables.tileentity.chest;
 
 import lombok.Getter;
+
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
@@ -28,8 +30,8 @@ public abstract class ChestTileEntity extends NamableTileEntity {
   @Getter
   private final ItemStackHandler itemHandler;
   private final LazyOptional<IItemHandler> capability;
-  protected ChestTileEntity(BlockEntityType<?> BlockEntityTypeIn, String name, ItemStackHandler itemHandler) {
-    super(BlockEntityTypeIn, new TranslatableComponent(name));
+  protected ChestTileEntity(BlockEntityType<?> BlockEntityTypeIn, BlockPos pos, BlockState state, String name, ItemStackHandler itemHandler) {
+    super(BlockEntityTypeIn, pos, state, new TranslatableComponent(name));
     this.itemHandler = itemHandler;
     this.capability = LazyOptional.of(() -> itemHandler);
   }
@@ -43,7 +45,7 @@ public abstract class ChestTileEntity extends NamableTileEntity {
   }
 
   @Override
-  protected void invalidateCaps() {
+  public void invalidateCaps() {
     super.invalidateCaps();
     capability.invalidate();
   }
@@ -83,8 +85,8 @@ public abstract class ChestTileEntity extends NamableTileEntity {
   }
 
   @Override
-  public void load(BlockState blockState, CompoundTag tags) {
-    super.load(blockState, tags);
+  public void load(CompoundTag tags) {
+    super.load(tags);
     readInventory(tags);
   }
 }

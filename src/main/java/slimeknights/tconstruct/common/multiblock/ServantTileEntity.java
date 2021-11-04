@@ -1,6 +1,8 @@
 package slimeknights.tconstruct.common.multiblock;
 
 import lombok.Getter;
+
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundTag;
@@ -27,8 +29,8 @@ public class ServantTileEntity extends MantleTileEntity implements IServantLogic
   private BlockPos masterPos;
   @Nullable
   private Block masterBlock;
-  public ServantTileEntity(BlockEntityType<?> BlockEntityTypeIn) {
-    super(BlockEntityTypeIn);
+  public ServantTileEntity(BlockEntityType<?> BlockEntityTypeIn, BlockPos pos, BlockState state) {
+    super(BlockEntityTypeIn, pos, state);
   }
 
   /** Checks if this servant has a master */
@@ -70,7 +72,7 @@ public class ServantTileEntity extends MantleTileEntity implements IServantLogic
   public boolean isValidMaster(IMasterLogic master) {
     // if we have a valid master, the passed master is only valid if its our current master
     if (validateMaster()) {
-      return master.getTileEntity().getBlockPos().equals(this.masterPos);
+      return master.getBlockEntity().getBlockPos().equals(this.masterPos);
     }
     // otherwise, we are happy with any master
     return true;
@@ -86,7 +88,7 @@ public class ServantTileEntity extends MantleTileEntity implements IServantLogic
 
   @Override
   public void setPotentialMaster(IMasterLogic master) {
-    BlockEntity masterTE = master.getTileEntity();
+    BlockEntity masterTE = master.getBlockEntity();
     BlockPos newMaster = masterTE.getBlockPos();
     // if this is our current master, simply update the master block
     if (newMaster.equals(this.masterPos)) {
@@ -100,7 +102,7 @@ public class ServantTileEntity extends MantleTileEntity implements IServantLogic
 
   @Override
   public void removeMaster(IMasterLogic master) {
-    if (masterPos != null && masterPos.equals(master.getTileEntity().getBlockPos())) {
+    if (masterPos != null && masterPos.equals(master.getBlockEntity().getBlockPos())) {
       setMaster(null, null);
     }
   }
@@ -130,8 +132,8 @@ public class ServantTileEntity extends MantleTileEntity implements IServantLogic
   }
 
   @Override
-  public void load(BlockState blockState, CompoundTag tags) {
-    super.load(blockState, tags);
+  public void load(CompoundTag tags) {
+    super.load(tags);
     readMaster(tags);
   }
 
@@ -141,7 +143,7 @@ public class ServantTileEntity extends MantleTileEntity implements IServantLogic
    */
   protected CompoundTag writeMaster(CompoundTag tags) {
     if (masterPos != null && masterBlock != null) {
-      tags.put(TAG_MASTER_POS, TagUtil.writePos(masterPos));
+      tags.put(TAG_MASTER_POS, NbtUtils.writeBlockPos(masterPos));
       tags.putString(TAG_MASTER_BLOCK, Objects.requireNonNull(masterBlock.getRegistryName()).toString());
     }
     return tags;

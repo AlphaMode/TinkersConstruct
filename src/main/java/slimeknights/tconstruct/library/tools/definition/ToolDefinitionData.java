@@ -3,7 +3,7 @@ package slimeknights.tconstruct.library.tools.definition;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.SlotType;
 import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
@@ -128,7 +128,7 @@ public class ToolDefinitionData {
   /* Packet buffers */
 
   /** Writes a tool definition stat object to a packet buffer */
-  public void write(PacketBuffer buffer) {
+  public void write(FriendlyByteBuf buffer) {
     List<PartRequirement> parts = getParts();
     buffer.writeVarInt(parts.size());
     for (PartRequirement part : parts) {
@@ -146,7 +146,7 @@ public class ToolDefinitionData {
   }
 
   /** Reads a tool definition stat object from a packet buffer */
-  public static ToolDefinitionData read(PacketBuffer buffer) {
+  public static ToolDefinitionData read(FriendlyByteBuf buffer) {
     int size = buffer.readVarInt();
     ImmutableList.Builder<PartRequirement> parts = ImmutableList.builder();
     for (int i = 0; i < size; i++) {

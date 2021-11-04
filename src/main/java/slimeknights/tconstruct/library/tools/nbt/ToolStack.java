@@ -4,12 +4,13 @@ import com.google.common.collect.ImmutableSet;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.entity.player.PlayerEntity;
+
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
@@ -646,7 +647,7 @@ public class ToolStack implements IModifierToolStack {
   }
 
   /**
-   * Ensures the given item stack is initialized. Intended to be called in {@link Item#onCreated(ItemStack, World, PlayerEntity)}
+   * Ensures the given item stack is initialized. Intended to be called in {@link Item#onCraftedBy(ItemStack, Level, Player)}
    * @param stack           ItemStack to initialize
    * @param toolDefinition  Tool definition
    */

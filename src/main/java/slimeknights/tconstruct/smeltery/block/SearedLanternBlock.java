@@ -1,8 +1,10 @@
 package slimeknights.tconstruct.smeltery.block;
 
 import lombok.Getter;
+
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Lantern;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -22,9 +24,7 @@ import slimeknights.tconstruct.smeltery.tileentity.component.TankTileEntity.ITan
 
 import javax.annotation.Nullable;
 
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
-
-public class SearedLanternBlock extends Lantern implements ITankBlock {
+public class SearedLanternBlock extends LanternBlock implements ITankBlock, EntityBlock {
   @Getter
   private final int capacity;
   public SearedLanternBlock(Properties properties, int capacity) {
@@ -33,17 +33,12 @@ public class SearedLanternBlock extends Lantern implements ITankBlock {
   }
 
   @Override
-  public boolean hasTileEntity(BlockState state) {
-    return true;
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new LanternTileEntity(this, pos, state);
   }
 
   @Override
-  public BlockEntity createTileEntity(BlockState state, BlockGetter worldIn) {
-    return new LanternTileEntity(this);
-  }
-
-  @Override
-  public int getLightValue(BlockState state, BlockGetter world, BlockPos pos) {
+  public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
     BlockEntity te = world.getBlockEntity(pos);
     if (te instanceof TankTileEntity) {
       FluidStack fluid = ((TankTileEntity) te).getTank().getFluid();

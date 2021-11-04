@@ -5,11 +5,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import lombok.extern.log4j.Log4j2;
-import net.minecraft.client.resources.JsonReloadListener;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.OnDatapackSyncEvent;
@@ -78,7 +77,7 @@ public class ToolDefinitionLoader extends JsonReloadListener {
   }
 
   @Override
-  protected void apply(Map<ResourceLocation,JsonElement> splashList, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+  protected void apply(Map<ResourceLocation,JsonElement> splashList, ResourceManager resourceManagerIn, IProfiler profilerIn) {
     ImmutableMap.Builder<ResourceLocation, ToolDefinitionData> builder = ImmutableMap.builder();
     for (Entry<ResourceLocation,ToolDefinition> entry : definitions.entrySet()) {
       ResourceLocation key = entry.getKey();
@@ -91,7 +90,7 @@ public class ToolDefinitionLoader extends JsonReloadListener {
         continue;
       }
       try {
-        ToolDefinitionData data = GSON.fromJson(JSONUtils.getJsonObject(element, "tool_definition"), ToolDefinitionData.class);
+        ToolDefinitionData data = GSON.fromJson(GsonHelper.convertToJsonObject(element, "tool_definition"), ToolDefinitionData.class);
         definition.validate(data);
         builder.put(key, data);
         definition.setData(data);

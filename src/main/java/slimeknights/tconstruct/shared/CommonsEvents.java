@@ -2,11 +2,12 @@ package slimeknights.tconstruct.shared;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -58,11 +59,11 @@ public class CommonsEvents {
   static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
     if (Config.COMMON.shouldSpawnWithTinkersBook.get()) {
       CompoundTag playerData = event.getPlayer().getPersistentData();
-      CompoundTag data = playerData.getCompound(PlayerEntity.PERSISTED_NBT_TAG);
+      CompoundTag data = playerData.getCompound(Player.PERSISTED_NBT_TAG);
       if (!data.getBoolean(TAG_PLAYER_HAS_BOOK)) {
         ItemHandlerHelper.giveItemToPlayer(event.getPlayer(), new ItemStack(TinkerCommons.materialsAndYou.get()));
         data.putBoolean(TAG_PLAYER_HAS_BOOK, true);
-        playerData.put(PlayerEntity.PERSISTED_NBT_TAG, data);
+        playerData.put(Player.PERSISTED_NBT_TAG, data);
       }
     }
   }

@@ -2,6 +2,8 @@ package slimeknights.tconstruct.smeltery.tileentity.component;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.BlockItem;
@@ -68,19 +70,19 @@ public class TankTileEntity extends SmelteryComponentTileEntity implements ITank
   @Getter @Setter
   private int lastStrength = -1;
 
-  public TankTileEntity() {
-    this(TinkerSmeltery.searedTank.get(TankType.FUEL_TANK));
+  public TankTileEntity(BlockPos pos, BlockState state) {
+    this(TinkerSmeltery.searedTank.get(TankType.FUEL_TANK), pos, state);
   }
 
   /** Main constructor */
-  public TankTileEntity(ITankBlock block) {
-    this(TinkerSmeltery.tank.get(), block);
+  public TankTileEntity(ITankBlock block, BlockPos pos, BlockState state) {
+    this(TinkerSmeltery.tank.get(), pos, state, block);
   }
 
   /** Extendable constructor */
   @SuppressWarnings("WeakerAccess")
-  protected TankTileEntity(BlockEntityType<?> type, ITankBlock block) {
-    super(type);
+  protected TankTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, ITankBlock block) {
+    super(type, pos, state);
     tank = new FluidTankAnimated(block.getCapacity(), this);
     holder = LazyOptional.of(() -> tank);
     modelData = new SinglePropertyData<>(ModelProperties.FLUID_TANK, tank);
@@ -101,7 +103,7 @@ public class TankTileEntity extends SmelteryComponentTileEntity implements ITank
   }
 
   @Override
-  protected void invalidateCaps() {
+  public void invalidateCaps() {
     super.invalidateCaps();
     holder.invalidate();
   }
@@ -162,10 +164,10 @@ public class TankTileEntity extends SmelteryComponentTileEntity implements ITank
   }
 
   @Override
-  public void load(BlockState state, CompoundTag tag) {
-    tank.setCapacity(getCapacity(state.getBlock()));
+  public void load(CompoundTag tag) {
+    tank.setCapacity(getCapacity(getBlockState().getBlock()));
     updateTank(tag.getCompound(NBTTags.TANK));
-    super.load(state, tag);
+    super.load(tag);
   }
 
   @Override

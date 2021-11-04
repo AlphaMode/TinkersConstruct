@@ -3,6 +3,7 @@ package slimeknights.tconstruct.smeltery.tileentity.multiblock;
 import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -156,7 +157,7 @@ public class MultiblockStructureData {
 
   /**
    * Iterates over each position contained in this structure
-   * @param consumer  Position consumer, note the position is mutable, so call {@link BlockPos#toImmutable()} if you have to store it
+   * @param consumer  Position consumer, note the position is mutable, so call {@link BlockPos#immutable()} if you have to store it
    */
   protected void forEachContained(Consumer<BlockPos.MutableBlockPos> consumer) {
     BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
@@ -185,7 +186,7 @@ public class MultiblockStructureData {
       shouldUpdate = pos -> !oldStructure.contains(pos);
     }
 
-    Level world = master.getTileEntity().getLevel();
+    Level world = master.getBlockEntity().getLevel();
     assert world != null;
 
 
@@ -211,7 +212,7 @@ public class MultiblockStructureData {
    * @param master  Master to remove
    */
   public void clearMaster(IMasterLogic master) {
-    Level world = master.getTileEntity().getLevel();
+    Level world = master.getBlockEntity().getLevel();
     assert world != null;
     forEachContained(pos -> {
       if (world.hasChunkAt(pos)) {
@@ -226,8 +227,8 @@ public class MultiblockStructureData {
    */
   public CompoundTag writeClientNBT() {
     CompoundTag nbt = new CompoundTag();
-    nbt.put(TAG_MIN, TagUtil.writePos(minPos));
-    nbt.put(TAG_MAX, TagUtil.writePos(maxPos));
+    nbt.put(TAG_MIN, NbtUtils.writeBlockPos(minPos));
+    nbt.put(TAG_MAX, NbtUtils.writeBlockPos(maxPos));
     return nbt;
   }
 
@@ -251,7 +252,7 @@ public class MultiblockStructureData {
   protected static ListTag writePosList(Collection<BlockPos> collection) {
     ListTag list = new ListTag();
     for (BlockPos pos : collection) {
-      list.add(TagUtil.writePos(pos));
+      list.add(NbtUtils.writeBlockPos(pos));
     }
     return list;
   }

@@ -37,7 +37,7 @@ public class CastingTableBlock extends AbstractCastingBlock {
 
   @Nonnull
   @Override
-  public BlockEntity createTileEntity(BlockState blockState, BlockGetter iBlockReader) {
-    return new CastingTileEntity.Table();
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new CastingTileEntity.Table(pos, state);
   }
 }

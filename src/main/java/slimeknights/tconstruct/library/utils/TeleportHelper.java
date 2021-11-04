@@ -1,10 +1,11 @@
 package slimeknights.tconstruct.library.utils;
 
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
+
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 import slimeknights.tconstruct.common.Sounds;
 
 public class TeleportHelper {
@@ -26,7 +27,7 @@ public class TeleportHelper {
       EntityTeleportEvent event = factory.create(living, x, y, z);
       if (!event.isCanceled() && living.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), true)) {
         SoundEvent soundevent = Sounds.SLIME_TELEPORT.getSound();
-        living.getEntityWorld().playSound(null, posX, posY, posZ, soundevent, SoundCategory.PLAYERS, 1.0F, 1.0F);
+        living.getCommandSenderWorld().playSound(null, posX, posY, posZ, soundevent, SoundSource.PLAYERS, 1.0F, 1.0F);
         living.playSound(soundevent, 1.0F, 1.0F);
         break;
       }

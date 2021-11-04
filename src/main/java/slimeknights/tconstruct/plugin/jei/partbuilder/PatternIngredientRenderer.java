@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.plugin.jei.partbuilder;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.NoArgsConstructor;
 import mezz.jei.api.ingredients.IIngredientRenderer;
@@ -23,7 +24,7 @@ public class PatternIngredientRenderer implements IIngredientRenderer<Pattern> {
   public void render(PoseStack matrices, int x, int y, @Nullable Pattern pattern) {
     if (pattern != null) {
       TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(pattern.getTexture());
-      Minecraft.getInstance().getTextureManager().bind(InventoryMenu.BLOCK_ATLAS);
+      RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
       Screen.blit(matrices, x, y, 100, 16, 16, sprite);
     }
   }

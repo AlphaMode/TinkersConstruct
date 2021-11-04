@@ -9,7 +9,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.client.model.data.IModelData;
@@ -22,6 +21,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.mantle.tileentity.NamableTileEntity;
+import slimeknights.mantle.util.TickableBlockEntity;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.common.config.Config;
@@ -40,7 +40,7 @@ import slimeknights.tconstruct.smeltery.tileentity.module.MeltingModuleInventory
 import javax.annotation.Nullable;
 import java.util.Collections;
 
-public class MelterTileEntity extends NamableTileEntity implements ITankTileEntity, TickingBlockEntity {
+public class MelterTileEntity extends NamableTileEntity implements ITankTileEntity, TickableBlockEntity {
   /** Max capacity for the tank */
   private static final int TANK_CAPACITY = FluidValues.METAL_BLOCK;
   /* tags */
@@ -76,14 +76,14 @@ public class MelterTileEntity extends NamableTileEntity implements ITankTileEnti
   private final FuelModule fuelModule = new FuelModule(this, () -> Collections.singletonList(this.worldPosition.below()));
 
   /** Main constructor */
-  public MelterTileEntity() {
-    this(TinkerSmeltery.melter.get());
+  public MelterTileEntity(BlockPos pos, BlockState state) {
+    this(TinkerSmeltery.melter.get(), pos, state);
   }
 
   /** Extendable constructor */
   @SuppressWarnings("WeakerAccess")
-  protected MelterTileEntity(BlockEntityType<? extends MelterTileEntity> type) {
-    super(type, TConstruct.makeTranslation("gui", "melter"));
+  protected MelterTileEntity(BlockEntityType<? extends MelterTileEntity> type, BlockPos pos, BlockState state) {
+    super(type, pos, state, TConstruct.makeTranslation("gui", "melter"));
   }
 
   @Nullable
@@ -108,7 +108,7 @@ public class MelterTileEntity extends NamableTileEntity implements ITankTileEnti
   }
 
   @Override
-  protected void invalidateCaps() {
+  public void invalidateCaps() {
     super.invalidateCaps();
     this.tankHolder.invalidate();
     this.inventoryHolder.invalidate();
@@ -150,7 +150,7 @@ public class MelterTileEntity extends NamableTileEntity implements ITankTileEnti
             // update the heater below
             BlockPos down = worldPosition.below();
             BlockState downState = level.getBlockState(down);
-            if (TinkerTags.Blocks.FUEL_TANKS.contains(downState.getBlock()) && downState.hasProperty(ControllerBlock.ACTIVE) && downState.get(ControllerBlock.ACTIVE) != hasFuel) {
+            if (TinkerTags.Blocks.FUEL_TANKS.contains(downState.getBlock()) && downState.hasProperty(ControllerBlock.ACTIVE) && downState.getValue(ControllerBlock.ACTIVE) != hasFuel) {
               level.setBlockAndUpdate(down, downState.setValue(ControllerBlock.ACTIVE, hasFuel));
             }
           }

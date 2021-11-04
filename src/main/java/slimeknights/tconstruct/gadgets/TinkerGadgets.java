@@ -14,6 +14,7 @@ import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -166,6 +167,11 @@ public final class TinkerGadgets extends TinkerModule {
       cake.forEach(block -> ComposterBlock.add(1.0f, block));
       ComposterBlock.add(1.0f, magmaCake.get());
     });
+  }
+
+  @SubscribeEvent
+  void registerCapabilites(RegisterCapabilitiesEvent event) {
+    PiggybackCapability.register();
   }
 
   @SubscribeEvent

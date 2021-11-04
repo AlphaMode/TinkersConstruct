@@ -6,13 +6,14 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
+
 import slimeknights.mantle.util.LogicHelper;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.recipe.partbuilder.Pattern;
@@ -92,9 +93,9 @@ public class StationSlotLayout {
   /* Buffers */
 
   /** Reads a slot from the packet buffer */
-  public static StationSlotLayout read(PacketBuffer buffer) {
+  public static StationSlotLayout read(FriendlyByteBuf buffer) {
     ResourceLocation name = buffer.readResourceLocation();
-    String translationKey = buffer.readString(Short.MAX_VALUE);
+    String translationKey = buffer.readUtf(Short.MAX_VALUE);
     LayoutIcon icon = LayoutIcon.read(buffer);
     Integer sortIndex = null;
     if (buffer.readBoolean()) {
@@ -112,9 +113,9 @@ public class StationSlotLayout {
   }
 
   /** Writes a slot to the packet buffer */
-  public void write(PacketBuffer buffer) {
+  public void write(FriendlyByteBuf buffer) {
     buffer.writeResourceLocation(name);
-    buffer.writeString(getTranslationKey());
+    buffer.writeUtf(getTranslationKey());
     icon.write(buffer);
     if (sortIndex != null) {
       buffer.writeBoolean(true);
@@ -139,22 +140,22 @@ public class StationSlotLayout {
   }
 
   /** Cache of display name */
-  private transient ITextComponent displayName = null;
+  private transient Component displayName = null;
   /** Cache of display name */
-  private transient ITextComponent description = null;
+  private transient Component description = null;
 
   /** Gets the display name from the unlocalized name of {@link #getTranslationKey()} */
-  public ITextComponent getDisplayName() {
+  public Component getDisplayName() {
     if (displayName == null) {
-      displayName = new TranslationTextComponent(getTranslationKey());
+      displayName = new TranslatableComponent(getTranslationKey());
     }
     return displayName;
   }
 
   /** Gets the description from the unlocalized name of {@link #getTranslationKey()} */
-  public ITextComponent getDescription() {
+  public Component getDescription() {
     if (description == null) {
-      description = new TranslationTextComponent(getTranslationKey() + ".description");
+      description = new TranslatableComponent(getTranslationKey() + ".description");
     }
     return description;
   }
@@ -183,7 +184,7 @@ public class StationSlotLayout {
     /** Sets the given item as both the name and icon */
     public Builder item(ItemStack stack) {
       icon(stack);
-      translationKey = stack.getTranslationKey();
+      translationKey = stack.getDescriptionId();
       return this;
     }
 
@@ -235,12 +236,12 @@ public class StationSlotLayout {
     }
 
     /** Adds an input as the given item */
-    public Builder addInputItem(Pattern icon, IItemProvider item, int x, int y) {
-      return addInputSlot(icon, item.asItem().getTranslationKey(), x, y, Ingredient.fromItems(item));
+    public Builder addInputItem(Pattern icon, ItemLike item, int x, int y) {
+      return addInputSlot(icon, item.asItem().getDescriptionId(), x, y, Ingredient.of(item));
     }
 
     /** Adds an input as the given item */
-    public Builder addInputItem(IItemProvider item, int x, int y) {
+    public Builder addInputItem(ItemLike item, int x, int y) {
       return addInputItem(new Pattern(Objects.requireNonNull(item.asItem().getRegistryName())), item, x, y);
     }
 

@@ -2,9 +2,10 @@ package slimeknights.tconstruct.library.tools.stat;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.util.text.ITextComponent;
 import slimeknights.tconstruct.library.tools.stat.FloatToolStat.FloatBuilder;
 import slimeknights.tconstruct.library.utils.Util;
 
@@ -79,7 +80,7 @@ public class FloatToolStat implements IToolStat<FloatBuilder> {
   }
 
   @Override
-  public ITextComponent formatValue(float number) {
+  public Component formatValue(float number) {
     return IToolStat.formatNumber(Util.makeTranslationKey("tool_stat", getName()), getColor(), number);
   }
 

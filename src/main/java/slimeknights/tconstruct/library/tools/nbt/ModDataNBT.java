@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.tconstruct.library.tools.SlotType;
 
 import java.util.function.BiFunction;
@@ -70,7 +70,7 @@ public class ModDataNBT implements IModDataReadOnly {
    * @param name  Key name
    * @param nbt   NBT value
    */
-  public void put(ResourceLocation name, INBT nbt) {
+  public void put(ResourceLocation name, Tag nbt) {
     data.put(name.toString(), nbt);
   }
 

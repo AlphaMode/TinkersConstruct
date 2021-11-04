@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.common.network;
 
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.server.management.PlayerList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.server.level.ServerLevel;
@@ -100,7 +100,7 @@ public class TinkerNetwork extends NetworkWrapper {
   }
 
   /**
-   * Same as {@link #sendToClientsAround(Object, ServerWorld, BlockPos)}, but checks that the world is a serverworld
+   * Same as {@link #sendToClientsAround(Object, ServerLevel, BlockPos)}, but checks that the world is a serverworld
    * @param msg       Packet to send
    * @param world     World instance
    * @param position  Target position
@@ -137,11 +137,11 @@ public class TinkerNetwork extends NetworkWrapper {
    * @param playerList      Player list to use if main player is null
    * @param msg             Message to send
    */
-  public void sendToPlayerList(@Nullable ServerPlayerEntity targetedPlayer, PlayerList playerList, Object msg) {
+  public void sendToPlayerList(@Nullable ServerPlayer targetedPlayer, PlayerList playerList, Object msg) {
     if (targetedPlayer != null) {
       sendTo(msg, targetedPlayer);
     } else {
-      for (ServerPlayerEntity player : playerList.getPlayers()) {
+      for (ServerPlayer player : playerList.getPlayers()) {
         sendTo(msg, player);
       }
     }

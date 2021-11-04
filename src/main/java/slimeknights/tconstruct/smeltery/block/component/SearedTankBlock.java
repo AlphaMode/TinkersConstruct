@@ -48,13 +48,8 @@ public class SearedTankBlock extends SearedBlock implements ITankBlock {
   }
 
   @Override
-  public boolean hasTileEntity(BlockState state) {
-    return true;
-  }
-
-  @Override
-  public BlockEntity createTileEntity(BlockState state, BlockGetter worldIn) {
-    return new TankTileEntity(this);
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new TankTileEntity(this, pos, state);
   }
 
   @Deprecated
@@ -67,13 +62,13 @@ public class SearedTankBlock extends SearedBlock implements ITankBlock {
   }
 
   @Override
-  public int getLightValue(BlockState state, BlockGetter world, BlockPos pos) {
+  public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
     BlockEntity te = world.getBlockEntity(pos);
     if (te instanceof TankTileEntity) {
       FluidStack fluid = ((TankTileEntity) te).getTank().getFluid();
       return fluid.getFluid().getAttributes().getLuminosity(fluid);
     }
-    return super.getLightValue(state, world, pos);
+    return super.getLightEmission(state, world, pos);
   }
 
   @Override

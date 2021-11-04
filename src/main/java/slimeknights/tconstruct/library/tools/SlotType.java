@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -186,7 +186,7 @@ public final class SlotType {
     }
 
     /** Writes this to the packet buffer */
-    public static void write(@Nullable SlotCount slots, PacketBuffer buffer) {
+    public static void write(@Nullable SlotCount slots, FriendlyByteBuf buffer) {
       if (slots == null) {
         buffer.writeVarInt(0);
       } else {

@@ -2,7 +2,11 @@ package slimeknights.tconstruct.smeltery.block;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -25,6 +29,8 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
+
+import com.mojang.math.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import slimeknights.mantle.util.TileEntityHelper;
@@ -35,9 +41,7 @@ import java.util.EnumMap;
 import java.util.Optional;
 import java.util.Random;
 
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
-
-public class FaucetBlock extends Block {
+public class FaucetBlock extends Block implements EntityBlock {
   public static final DirectionProperty FACING = BlockStateProperties.FACING_HOPPER;
   private static final EnumMap<Direction,VoxelShape> SHAPES = Maps.newEnumMap(ImmutableMap.of(
     Direction.DOWN,  Shapes.join(box( 4, 10,  4, 12, 16, 12), box( 6, 10,  6, 10, 16, 10), BooleanOp.ONLY_FIRST),
@@ -84,13 +88,8 @@ public class FaucetBlock extends Block {
   /* Tile entity */
 
   @Override
-  public boolean hasTileEntity(BlockState state) {
-    return true;
-  }
-
-  @Override
-  public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
-    return new FaucetTileEntity();
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new FaucetTileEntity(pos, state);
   }
 
   @SuppressWarnings("deprecation")
@@ -147,7 +146,7 @@ public class FaucetBlock extends Block {
     double x = (double)pos.getX() + 0.5D - 0.3D * (double)direction.getStepX();
     double y = (double)pos.getY() + 0.5D - 0.3D * (double)direction.getStepY();
     double z = (double)pos.getZ() + 0.5D - 0.3D * (double)direction.getStepZ();
-    worldIn.addParticle(new DustParticleOptions(1.0F, 0.0F, 0.0F, 0.5f), x, y, z, 0.0D, 0.0D, 0.0D);
+    worldIn.addParticle(new DustParticleOptions(new Vector3f(1.0F, 0.0F, 0.0F), 0.5f), x, y, z, 0.0D, 0.0D, 0.0D);
   }
 
   @Override
@@ -158,5 +157,11 @@ public class FaucetBlock extends Block {
         addParticles(stateIn, worldIn, pos);
       }
     });
+  }
+
+  @Nullable
+  @Override
+  public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> blockEntityType) {
+    return TickableBlockEntity::tickBlockEntity;
   }
 }

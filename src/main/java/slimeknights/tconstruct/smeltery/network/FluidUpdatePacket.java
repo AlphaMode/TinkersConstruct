@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.fmllegacy.network.NetworkEvent.Context;
 import slimeknights.mantle.network.packet.IThreadsafePacket;
 import slimeknights.mantle.util.TileEntityHelper;
 

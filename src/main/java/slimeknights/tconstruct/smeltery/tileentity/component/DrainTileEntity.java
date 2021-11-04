@@ -28,12 +28,12 @@ public class DrainTileEntity extends SmelteryFluidIO implements IDisplayFluidLis
   @Getter
   private Fluid displayFluid = Fluids.EMPTY;
 
-  public DrainTileEntity() {
-    super(TinkerSmeltery.drain.get());
+  public DrainTileEntity(BlockPos pos, BlockState state) {
+    super(TinkerSmeltery.drain.get(), pos, state);
   }
 
-  protected DrainTileEntity(BlockEntityType<?> type) {
-    super(type);
+  protected DrainTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    super(type, pos, state);
   }
 
   @Override
@@ -73,8 +73,8 @@ public class DrainTileEntity extends SmelteryFluidIO implements IDisplayFluidLis
   }
 
   @Override
-  public void handleUpdateTag(BlockState state, CompoundTag tag) {
-    super.handleUpdateTag(state, tag);
+  public void handleUpdateTag(CompoundTag tag) {
+    super.handleUpdateTag(tag);
     attachFluidListener();
   }
 

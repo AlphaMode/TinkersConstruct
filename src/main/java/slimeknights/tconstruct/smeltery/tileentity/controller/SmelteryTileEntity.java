@@ -2,7 +2,10 @@ package slimeknights.tconstruct.smeltery.tileentity.controller;
 
 import lombok.Getter;
 import net.minecraft.block.BlockState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.world.level.block.state.BlockState;
+
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.config.Config;
 import slimeknights.tconstruct.library.recipe.FluidValues;
@@ -28,8 +31,8 @@ public class SmelteryTileEntity extends HeatingStructureTileEntity {
   @Getter
   private final MultiAlloyingModule alloyingModule = new MultiAlloyingModule(this, alloyTank);
 
-  public SmelteryTileEntity() {
-    super(TinkerSmeltery.smeltery.get(), TConstruct.makeTranslation("gui", "smeltery"));
+  public SmelteryTileEntity(BlockPos pos, BlockState state) {
+    super(TinkerSmeltery.smeltery.get(), pos, state, TConstruct.makeTranslation("gui", "smeltery"));
   }
 
   @Override

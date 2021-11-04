@@ -4,9 +4,10 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+
 import slimeknights.mantle.util.LogicHelper;
 import slimeknights.tconstruct.library.recipe.partbuilder.Pattern;
 
@@ -54,35 +55,35 @@ public class LayoutSlot {
   /* Buffers */
 
   /** Reads a slot from the packet buffer */
-  public static LayoutSlot read(PacketBuffer buffer) {
+  public static LayoutSlot read(FriendlyByteBuf buffer) {
     Pattern pattern = null;
     if (buffer.readBoolean()) {
       pattern = new Pattern(buffer.readResourceLocation());
     }
-    String name = buffer.readString(Short.MAX_VALUE);
+    String name = buffer.readUtf(Short.MAX_VALUE);
     int x = buffer.readVarInt();
     int y = buffer.readVarInt();
     Ingredient ingredient = null;
     if (buffer.readBoolean()) {
-      ingredient = Ingredient.read(buffer);
+      ingredient = Ingredient.fromNetwork(buffer);
     }
     return new LayoutSlot(pattern, name, x, y, ingredient);
   }
 
   /** Writes a slot to the packet buffer */
-  public void write(PacketBuffer buffer) {
+  public void write(FriendlyByteBuf buffer) {
     if (icon != null) {
       buffer.writeBoolean(true);
       buffer.writeResourceLocation(icon);
     } else {
       buffer.writeBoolean(false);
     }
-    buffer.writeString(getTranslationKey());
+    buffer.writeUtf(getTranslationKey());
     buffer.writeVarInt(x);
     buffer.writeVarInt(y);
     if (filter != null) {
       buffer.writeBoolean(true);
-      filter.write(buffer);
+      filter.toNetwork(buffer);
     } else {
       buffer.writeBoolean(false);
     }

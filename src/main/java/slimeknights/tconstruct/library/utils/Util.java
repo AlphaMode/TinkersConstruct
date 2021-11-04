@@ -7,7 +7,7 @@ package slimeknights.tconstruct.library.utils;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.fml.ForgeI18n;
+import net.minecraftforge.fmllegacy.ForgeI18n;
 import net.minecraftforge.fml.ModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,14 +69,14 @@ public class Util {
   }
 
   /**
-   * Same as {@link net.minecraft.util.Util#make(Supplier)}
+   * Same as {@link net.minecraft.Util#make(Supplier)}
    */
   public static <T> T make(Supplier<T> supplier) {
     return supplier.get();
   }
 
   /**
-   * Same as {@link net.minecraft.util.Util#make(Object, Consumer)}
+   * Same as {@link net.minecraft.Util#make(Object, Consumer)}
    */
   public static <T> T make(T object, Consumer<T> consumer) {
     consumer.accept(object);

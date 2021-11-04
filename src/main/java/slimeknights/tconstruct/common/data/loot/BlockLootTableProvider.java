@@ -8,7 +8,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.data.loot.BlockLoot;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.storage.loot.ConstantIntValue;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.LootPool;

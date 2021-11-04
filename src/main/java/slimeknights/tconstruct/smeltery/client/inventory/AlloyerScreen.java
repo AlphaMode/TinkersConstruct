@@ -6,6 +6,8 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
+
+import com.mojang.blaze3d.vertex.PoseStack;
 import slimeknights.mantle.client.screen.ElementScreen;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.GuiUtil;
@@ -69,21 +71,21 @@ public class AlloyerScreen extends AbstractContainerScreen<AlloyerContainer> imp
   }
 
   @Override
-  public void render(MatrixStack matrices, int x, int y, float partialTicks) {
+  public void render(PoseStack matrices, int x, int y, float partialTicks) {
     this.renderBackground(matrices);
     super.render(matrices, x, y, partialTicks);
     this.renderHoveredTooltip(matrices, x, y);
   }
 
   @Override
-  protected void drawGuiContainerBackgroundLayer(MatrixStack matrices, float partialTicks, int mouseX, int mouseY) {
+  protected void drawGuiContainerBackgroundLayer(PoseStack matrices, float partialTicks, int mouseX, int mouseY) {
     GuiUtil.drawBackground(matrices, this, BACKGROUND);
 
     // fluids
     if (outputTank != null) outputTank.draw(matrices);
 
     // draw tank backgrounds first, then draw tank contents, less binding
-    getMinecraft().getTextureManager().bindTexture(BACKGROUND);
+    RenderSystem.setShaderTexture(0, BACKGROUND);
     for (GuiTankModule tankModule : inputTanks) {
       INPUT_TANK.draw(matrices, tankModule.getX() - 1 + this.guiLeft, tankModule.getY() - 1 + this.guiTop);
     }
@@ -93,7 +95,7 @@ public class AlloyerScreen extends AbstractContainerScreen<AlloyerContainer> imp
 
     // fuel
     if (fuel != null) {
-      getMinecraft().getTextureManager().bindTexture(BACKGROUND);
+      RenderSystem.setShaderColor(0, BACKGROUND);
       // draw the correct background for the fuel type
       if (container.isHasFuelSlot()) {
         FUEL_SLOT.draw(matrices, guiLeft + 150, guiTop + 31);
@@ -105,7 +107,7 @@ public class AlloyerScreen extends AbstractContainerScreen<AlloyerContainer> imp
   }
 
   @Override
-  protected void drawGuiContainerForegroundLayer(MatrixStack matrices, int mouseX, int mouseY) {
+  protected void drawGuiContainerForegroundLayer(PoseStack matrices, int mouseX, int mouseY) {
     GuiUtil.drawContainerNames(matrices, this, this.font, this.playerInventory);
     int checkX = mouseX - this.guiLeft;
     int checkY = mouseY - this.guiTop;
@@ -120,14 +122,13 @@ public class AlloyerScreen extends AbstractContainerScreen<AlloyerContainer> imp
     if (fuel != null) fuel.renderHighlight(matrices, checkX, checkY);
 
     // scala
-    assert minecraft != null;
-    minecraft.getTextureManager().bindTexture(BACKGROUND);
-    RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+    RenderSystem.setShaderTexture(0, BACKGROUND);
+    RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
     SCALA.draw(matrices, 114, 16);
   }
 
   @Override
-  protected void renderHoveredTooltip(MatrixStack matrices, int mouseX, int mouseY) {
+  protected void renderHoveredTooltip(PoseStack matrices, int mouseX, int mouseY) {
     super.renderHoveredTooltip(matrices, mouseX, mouseY);
 
     // tank tooltip

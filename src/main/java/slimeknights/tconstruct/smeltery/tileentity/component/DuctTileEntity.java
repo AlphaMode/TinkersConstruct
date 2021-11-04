@@ -1,6 +1,8 @@
 package slimeknights.tconstruct.smeltery.tileentity.component;
 
 import lombok.Getter;
+
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
@@ -42,12 +44,12 @@ public class DuctTileEntity extends SmelteryFluidIO implements MenuProvider {
   @Getter
   private final IModelData modelData = new SinglePropertyData<>(IDisplayFluidListener.PROPERTY);
 
-  public DuctTileEntity() {
-    this(TinkerSmeltery.duct.get());
+  public DuctTileEntity(BlockPos pos, BlockState state) {
+    this(TinkerSmeltery.duct.get(), pos, state);
   }
 
-  protected DuctTileEntity(BlockEntityType<?> type) {
-    super(type);
+  protected DuctTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    super(type, pos, state);
   }
 
 
@@ -76,7 +78,7 @@ public class DuctTileEntity extends SmelteryFluidIO implements MenuProvider {
   }
 
   @Override
-  protected void invalidateCaps() {
+  public void invalidateCaps() {
     super.invalidateCaps();
     itemCapability.invalidate();
   }
@@ -105,16 +107,16 @@ public class DuctTileEntity extends SmelteryFluidIO implements MenuProvider {
   }
 
   @Override
-  public void load(BlockState state, CompoundTag tags) {
-    super.load(state, tags);
+  public void load(CompoundTag tags) {
+    super.load(tags);
     if (tags.contains(TAG_ITEM, NBT.TAG_COMPOUND)) {
       itemHandler.readFromNBT(tags.getCompound(TAG_ITEM));
     }
   }
 
   @Override
-  public void handleUpdateTag(BlockState state, CompoundTag tag) {
-    super.handleUpdateTag(state, tag);
+  public void handleUpdateTag(CompoundTag tag) {
+    super.handleUpdateTag(tag);
     if (level != null && level.isClientSide) {
       updateFluid();
     }

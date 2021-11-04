@@ -9,13 +9,15 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import slimeknights.tconstruct.TConstruct;
 
 import javax.annotation.Nullable;
 
 /** Capability logic */
-public class PiggybackCapability implements Capability.IStorage<PiggybackHandler> {
+public class PiggybackCapability {
   private static final ResourceLocation ID = TConstruct.getResource("piggyback");
   @CapabilityInject(PiggybackHandler.class)
   public static Capability<PiggybackHandler> PIGGYBACK = null;
@@ -26,19 +28,10 @@ public class PiggybackCapability implements Capability.IStorage<PiggybackHandler
   }
 
   /** Registers this capability */
-  public static void register() {
-    CapabilityManager.INSTANCE.register(PiggybackHandler.class, INSTANCE, () -> new PiggybackHandler(null));
+  public static void register(RegisterCapabilitiesEvent event) {
+    event.register(PiggybackHandler.class);
     MinecraftForge.EVENT_BUS.addGenericListener(Entity.class, PiggybackCapability::attachCapability);
   }
-
-  @Nullable
-  @Override
-  public Tag writeNBT(Capability<PiggybackHandler> capability, PiggybackHandler instance, Direction side) {
-    return null;
-  }
-
-  @Override
-  public void readNBT(Capability<PiggybackHandler> capability, PiggybackHandler instance, Direction side, Tag nbt) {}
 
   /** Event listener to attach the capability */
   private static void attachCapability(AttachCapabilitiesEvent<Entity> event) {

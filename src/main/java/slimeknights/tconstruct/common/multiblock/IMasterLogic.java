@@ -1,5 +1,6 @@
 package slimeknights.tconstruct.common.multiblock;
 
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.common.extensions.IForgeBlockEntity;
@@ -15,4 +16,11 @@ public interface IMasterLogic extends IForgeBlockEntity {
    * @param state    State that changed. May not be the servant state
    */
   void notifyChange(IServantLogic servant, BlockPos pos, BlockState state);
+
+  /**
+   * @return The block entity this is attached to
+   */
+  default BlockEntity getBlockEntity() {
+    return (BlockEntity) this;
+  }
 }

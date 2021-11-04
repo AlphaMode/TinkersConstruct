@@ -3,6 +3,7 @@ package slimeknights.tconstruct.library.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.client.gui.GuiComponent;
@@ -31,8 +32,8 @@ public final class GuiUtil {
    * @param background  Background location
    */
   public static void drawBackground(PoseStack matrices, AbstractContainerScreen<?> screen, ResourceLocation background) {
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-    screen.getMinecraft().getTextureManager().bind(background);
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    RenderSystem.setShaderTexture(0, background);
     screen.blit(matrices, screen.leftPos, screen.topPos, 0, 0, screen.imageWidth, screen.imageHeight);
   }
 
@@ -135,7 +136,7 @@ public final class GuiUtil {
       TextureAtlasSprite fluidSprite = screen.getMinecraft().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(stack.getFluid().getAttributes().getStillTexture(stack));
       RenderUtils.setColorRGBA(stack.getFluid().getAttributes().getColor(stack));
       renderTiledTextureAtlas(matrices, screen, fluidSprite, x, y, width, height, depth, stack.getFluid().getAttributes().isGaseous(stack));
-      GlStateManager._color4f(1.0f, 1.0f, 1.0f, 1.0f);
+      RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
   }
 
@@ -153,9 +154,9 @@ public final class GuiUtil {
    */
   public static void renderTiledTextureAtlas(PoseStack matrices, AbstractContainerScreen<?> screen, TextureAtlasSprite sprite, int x, int y, int width, int height, int depth, boolean upsideDown) {
     // start drawing sprites
-    screen.getMinecraft().getTextureManager().bind(sprite.atlas().location());
+    RenderSystem.setShaderTexture(0, sprite.atlas().location());
     BufferBuilder builder = Tesselator.getInstance().getBuilder();
-    builder.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX);
+    builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 
     // tile vertically
     float u1 = sprite.getU0();
@@ -193,7 +194,7 @@ public final class GuiUtil {
 
     // finish drawing sprites
     builder.end();
-    RenderSystem.enableAlphaTest();
+    //RenderSystem.enableAlphaTest();
     BufferUploader.end(builder);
   }
 

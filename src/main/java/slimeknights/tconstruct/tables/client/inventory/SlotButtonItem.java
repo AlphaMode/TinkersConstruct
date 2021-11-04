@@ -30,7 +30,7 @@ public class SlotButtonItem extends Button {
   private ElementScreen hoverGui = BUTTON_HOVER_GUI;
   private ResourceLocation backgroundLocation = Icons.ICONS;
 
-  public SlotButtonItem(int buttonId, int x, int y, StationSlotLayout layout, IPressable onPress) {
+  public SlotButtonItem(int buttonId, int x, int y, StationSlotLayout layout, OnPress onPress) {
     super(x, y, 18, 18, layout.getDisplayName(), onPress);
     this.layout = layout;
     this.buttonId = buttonId;
@@ -47,8 +47,8 @@ public class SlotButtonItem extends Button {
 
   @Override
   public void renderButton(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-    Minecraft.getInstance().getTextureManager().bind(this.backgroundLocation);
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    RenderSystem.setShaderTexture(0, this.backgroundLocation);
 
     if (this.visible) {
       this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;

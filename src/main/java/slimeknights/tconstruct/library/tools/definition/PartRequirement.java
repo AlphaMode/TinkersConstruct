@@ -9,10 +9,11 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
 import lombok.Data;
-import net.minecraft.item.Item;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+
 import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.recipe.RecipeHelper;
 import slimeknights.mantle.util.JsonHelper;
@@ -36,13 +37,13 @@ public class PartRequirement {
   /* Packet buffers */
 
   /** Writes a tool definition stat object to a packet buffer */
-  public void write(PacketBuffer buffer) {
+  public void write(FriendlyByteBuf buffer) {
     RecipeHelper.writeItem(buffer, part);
     buffer.writeVarInt(weight);
   }
 
   /** Reads a tool definition stat object from a packet buffer */
-  public static PartRequirement read(PacketBuffer buffer) {
+  public static PartRequirement read(FriendlyByteBuf buffer) {
     IToolPart part = RecipeHelper.readItem(buffer, IToolPart.class);
     int weight = buffer.readVarInt();
     return new PartRequirement(part, weight);
@@ -57,7 +58,7 @@ public class PartRequirement {
   protected static class Serializer implements JsonDeserializer<PartRequirement>, JsonSerializer<PartRequirement> {
     @Override
     public PartRequirement deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-      JsonObject jsonObject = JSONUtils.getJsonObject(json, "part");
+      JsonObject jsonObject = GsonHelper.convertToJsonObject(json, "part");
       ResourceLocation name = JsonHelper.getResourceLocation(jsonObject, "item");
       if (!ForgeRegistries.ITEMS.containsKey(name)) {
         throw new JsonSyntaxException("Invalid item '" + name + "' for tool part, does not exist");
@@ -66,7 +67,7 @@ public class PartRequirement {
       if (!(item instanceof IToolPart)) {
         throw new JsonSyntaxException("Invalid item '" + name + "' for tool part, must implement IToolPart");
       }
-      int weight = JSONUtils.getInt(jsonObject, "weight", 1);
+      int weight = GsonHelper.getAsInt(jsonObject, "weight", 1);
       return new PartRequirement((IToolPart) item, weight);
     }
 

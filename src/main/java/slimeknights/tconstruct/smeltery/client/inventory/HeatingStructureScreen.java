@@ -72,7 +72,7 @@ public class HeatingStructureScreen extends MultiModuleScreen<HeatingStructureCo
 
     // fuel
     if (fuel != null) {
-      getMinecraft().getTextureManager().bindTexture(BACKGROUND);
+      RenderSystem.setShaderTexture(0, BACKGROUND);
       fuel.draw(matrices);
     }
   }
@@ -82,7 +82,7 @@ public class HeatingStructureScreen extends MultiModuleScreen<HeatingStructureCo
     super.drawGuiContainerForegroundLayer(matrices, mouseX, mouseY);
 
     assert minecraft != null;
-    minecraft.getTextureManager().bindTexture(BACKGROUND);
+    RenderSystem.setShaderTexture(0, BACKGROUND);
     RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
     SCALA.draw(matrices, 8, 16);
 

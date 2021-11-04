@@ -257,8 +257,8 @@ public class SideInventoryScreen<P extends MultiModuleScreen<?>, C extends Abstr
     this.leftPos += this.border.w;
     this.topPos += this.border.h;
 
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-    this.minecraft.getTextureManager().bind(GENERIC_INVENTORY);
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    RenderSystem.setShaderTexture(0, GENERIC_INVENTORY);
 
     int x = this.leftPos;
     int y = this.topPos;
@@ -271,7 +271,7 @@ public class SideInventoryScreen<P extends MultiModuleScreen<?>, C extends Abstr
       y += this.textBackground.h;
     }
 
-    this.minecraft.getTextureManager().bind(GENERIC_INVENTORY);
+    RenderSystem.setShaderTexture(0, GENERIC_INVENTORY);
     this.drawSlots(matrices, x, y);
 
     // slider

@@ -40,7 +40,7 @@ public class CastingBasinBlock extends AbstractCastingBlock {
 
   @Nonnull
   @Override
-  public BlockEntity createTileEntity(BlockState blockState, BlockGetter iBlockReader) {
-    return new CastingTileEntity.Basin();
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new CastingTileEntity.Basin(pos, state);
   }
 }

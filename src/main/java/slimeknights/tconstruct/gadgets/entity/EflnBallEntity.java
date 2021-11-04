@@ -11,8 +11,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 import slimeknights.tconstruct.gadgets.Exploder;
 import slimeknights.tconstruct.gadgets.TinkerGadgets;
 

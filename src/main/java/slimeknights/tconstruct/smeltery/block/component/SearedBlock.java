@@ -1,6 +1,7 @@
 package slimeknights.tconstruct.smeltery.block.component;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -17,7 +18,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
-public class SearedBlock extends Block {
+public class SearedBlock extends Block implements EntityBlock {
   public static final BooleanProperty IN_STRUCTURE = BooleanProperty.create("in_structure");
 
   public SearedBlock(Properties properties) {
@@ -31,13 +32,8 @@ public class SearedBlock extends Block {
   }
 
   @Override
-  public boolean hasTileEntity(BlockState state) {
-    return true;
-  }
-
-  @Override
-  public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
-    return new SmelteryComponentTileEntity();
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new SmelteryComponentTileEntity(pos, state);
   }
 
   @Override

@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.inventory.container.InventoryMenu;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -54,7 +54,7 @@ public class FaucetTileEntityRenderer extends BlockEntityRenderer<FaucetTileEnti
       // fluid props
       FluidAttributes attributes = renderFluid.getFluid().getAttributes();
       int color = attributes.getColor(renderFluid);
-      Function<ResourceLocation, TextureAtlasSprite> spriteGetter = Minecraft.getInstance().getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+      Function<ResourceLocation, TextureAtlasSprite> spriteGetter = Minecraft.getInstance().getAtlasSpriteGetter(InventoryMenu.BLOCK_ATLAS);
       TextureAtlasSprite still = spriteGetter.apply(attributes.getStillTexture(renderFluid));
       TextureAtlasSprite flowing = spriteGetter.apply(attributes.getFlowingTexture(renderFluid));
       boolean isGas = attributes.isGaseous(renderFluid);

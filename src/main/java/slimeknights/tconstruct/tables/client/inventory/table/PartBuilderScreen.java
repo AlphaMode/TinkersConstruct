@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.inventory.container.InventoryMenu;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
@@ -15,6 +15,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.materials.MaterialRegistry;
 import slimeknights.tconstruct.library.utils.Util;
@@ -66,7 +69,7 @@ public class PartBuilderScreen extends BaseStationScreen<PartBuilderTileEntity, 
   }
 
   @Override
-  protected void drawGuiContainerBackgroundLayer(MatrixStack matrices, float partialTicks, int mouseX, int mouseY) {
+  protected void drawGuiContainerBackgroundLayer(PoseStack matrices, float partialTicks, int mouseX, int mouseY) {
     this.drawBackground(matrices, BACKGROUND);
 
     // draw slot icons
@@ -74,8 +77,7 @@ public class PartBuilderScreen extends BaseStationScreen<PartBuilderTileEntity, 
     this.drawIconEmpty(matrices, this.container.getInputSlot(), Icons.INGOT);
 
     // draw scrollbar
-    assert this.minecraft != null;
-    this.minecraft.getTextureManager().bindTexture(BACKGROUND);
+    RenderSystem.setShaderTexture(0, BACKGROUND);
     this.blit(matrices, this.cornerX + 126, this.cornerY + 15 + (int) (41.0F * this.sliderProgress), 176 + (this.canScroll() ? 0 : 12), 0, 12, 15);
     this.drawRecipesBackground(matrices, mouseX, mouseY, this.cornerX + 51, this.cornerY + 15);
     this.drawRecipesItems(matrices, this.cornerX + 51, this.cornerY + 15);
@@ -139,11 +141,11 @@ public class PartBuilderScreen extends BaseStationScreen<PartBuilderTileEntity, 
   }
 
   /** Draw slot icons for all patterns */
-  private void drawRecipesItems(MatrixStack matrices, int left, int top) {
+  private void drawRecipesItems(PoseStack matrices, int left, int top) {
     // use block texture list
     assert this.minecraft != null;
-    this.minecraft.getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
-    Function<ResourceLocation, TextureAtlasSprite> spriteGetter = this.minecraft.getAtlasSpriteGetter(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+    RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+    Function<ResourceLocation, TextureAtlasSprite> spriteGetter = this.minecraft.getAtlasSpriteGetter(InventoryMenu.BLOCK_ATLAS);
     // iterate all recipes
     List<Pattern> list = this.tile.getSortedButtons();
     int max = Math.min(this.recipeIndexOffset + 12, this.getPartRecipeCount());
