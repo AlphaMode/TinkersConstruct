@@ -146,7 +146,7 @@ public abstract class ModifierMatch implements Predicate<List<ModifierEntry>> {
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
       buffer.writeVarInt(1);
       entry.write(buffer);
     }
@@ -212,7 +212,7 @@ public abstract class ModifierMatch implements Predicate<List<ModifierEntry>> {
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
       if (options.size() == 1) {
         options.get(0).write(buffer);
       } else {

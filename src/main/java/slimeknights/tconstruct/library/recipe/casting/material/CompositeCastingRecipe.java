@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.RecipeHelper;
@@ -102,15 +102,15 @@ public abstract class CompositeCastingRecipe extends MaterialCastingRecipe {
 
     @Override
     public T read(ResourceLocation id, JsonObject json) {
-      String group = JSONUtils.getString(json, "group", "");
-      IMaterialItem result = RecipeHelper.deserializeItem(JSONUtils.getString(json, "result"), "result", IMaterialItem.class);
-      int itemCost = JSONUtils.getInt(json, "item_cost");
+      String group = GsonHelper.getString(json, "group", "");
+      IMaterialItem result = RecipeHelper.deserializeItem(GsonHelper.getString(json, "result"), "result", IMaterialItem.class);
+      int itemCost = GsonHelper.getInt(json, "item_cost");
       return factory.create(id, group, result, itemCost);
     }
 
     @Nullable
     @Override
-    protected T readSafe(ResourceLocation id, PacketBuffer buffer) {
+    protected T readSafe(ResourceLocation id, FriendlyByteBuf buffer) {
       String group = buffer.readString(Short.MAX_VALUE);
       IMaterialItem result = RecipeHelper.readItem(buffer, IMaterialItem.class);
       int itemCost = buffer.readVarInt();
@@ -118,7 +118,7 @@ public abstract class CompositeCastingRecipe extends MaterialCastingRecipe {
     }
 
     @Override
-    protected void writeSafe(PacketBuffer buffer, T recipe) {
+    protected void writeSafe(FriendlyByteBuf buffer, T recipe) {
       buffer.writeString(recipe.group);
       RecipeHelper.writeItem(buffer, recipe.result);
       buffer.writeVarInt(recipe.itemCost);

@@ -116,7 +116,7 @@ public class GuiFuelModule {
             // no invalid fuel, we assume the slot is validated (hasFuelSlot is only true for the heater which validates)
             int temperature = fuelModule.getTemperature();
             if (temperature > 0) {
-              tooltip = Arrays.asList(TOOLTIP_SOLID_FUEL, new TranslationTextComponent(TOOLTIP_TEMPERATURE, temperature).mergeStyle(TextFormatting.GRAY, TextFormatting.ITALIC));
+              tooltip = Arrays.asList(TOOLTIP_SOLID_FUEL, new TranslationTextComponent(TOOLTIP_TEMPERATURE, temperature).mergeStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
             } else {
               tooltip = TOOLTIP_NO_FUEL;
             }
@@ -131,7 +131,7 @@ public class GuiFuelModule {
         tooltip = FluidTooltipHandler.getFluidTooltip(fluid, fuelInfo.getTotalAmount());
         int temperature = fuelInfo.getTemperature();
         if (temperature > 0) {
-          tooltip.add(1, new TranslationTextComponent(TOOLTIP_TEMPERATURE, temperature).mergeStyle(TextFormatting.GRAY, TextFormatting.ITALIC));
+          tooltip.add(1, new TranslationTextComponent(TOOLTIP_TEMPERATURE, temperature).mergeStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         } else {
           tooltip.add(1, TOOLTIP_INVALID_FUEL);
         }

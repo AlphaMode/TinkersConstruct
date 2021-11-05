@@ -1,10 +1,10 @@
 package slimeknights.tconstruct.library.tools.nbt;
 
-
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tags.Tag;
+import net.minecraft.world.item.ItemStack;
+
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;

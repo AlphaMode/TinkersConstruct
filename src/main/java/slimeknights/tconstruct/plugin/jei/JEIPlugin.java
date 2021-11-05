@@ -30,7 +30,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagCollectionManager;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.resources.ResourceLocation;
@@ -290,8 +290,8 @@ public class JEIPlugin implements IModPlugin {
    * @param item     Cast instance
    * @param tagName  Tag to check
    */
-  private static void optionalItem(IIngredientManager manager, IItemProvider item, String tagName) {
-    ITag<Item> tag = TagCollectionManager.getManager().getItemTags().get(new ResourceLocation("forge", tagName));
+  private static void optionalItem(IIngredientManager manager, ItemLike item, String tagName) {
+    Tag<Item> tag = TagCollectionManager.getManager().getItemTags().get(new ResourceLocation("forge", tagName));
     if (tag == null || tag.getAllElements().isEmpty()) {
       manager.removeIngredientsAtRuntime(VanillaTypes.ITEM, Collections.singletonList(new ItemStack(item)));
     }
@@ -303,7 +303,7 @@ public class JEIPlugin implements IModPlugin {
    * @param cast     Cast instance
    */
   private static void optionalCast(IIngredientManager manager, CastItemObject cast) {
-    ITag<Item> tag = TagCollectionManager.getManager().getItemTags().get(new ResourceLocation("forge", cast.getName().getPath() + "s"));
+    Tag<Item> tag = TagCollectionManager.getManager().getItemTags().get(new ResourceLocation("forge", cast.getName().getPath() + "s"));
     if (tag == null || tag.getAllElements().isEmpty()) {
       manager.removeIngredientsAtRuntime(VanillaTypes.ITEM, cast.values().stream().map(ItemStack::new).collect(Collectors.toList()));
     }
@@ -318,7 +318,7 @@ public class JEIPlugin implements IModPlugin {
     removeFluid(manager, TinkerFluids.moltenKnightslime.get(), TinkerFluids.moltenKnightslime.asItem());
     // hide compat that is not present
     for (SmelteryCompat compat : SmelteryCompat.values()) {
-      ITag<Item> ingot = TagCollectionManager.getManager().getItemTags().get(new ResourceLocation("forge", "ingots/" + compat.getName()));
+      Tag<Item> ingot = TagCollectionManager.getManager().getItemTags().get(new ResourceLocation("forge", "ingots/" + compat.getName()));
       if (ingot == null || ingot.getAllElements().isEmpty()) {
         removeFluid(manager, compat.getFluid().get(), compat.getBucket());
       }

@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tables.tileentity.table;
 
 import lombok.Getter;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.entity.player.ServerPlayerEntity;

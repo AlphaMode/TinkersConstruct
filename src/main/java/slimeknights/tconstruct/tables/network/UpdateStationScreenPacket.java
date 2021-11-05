@@ -13,7 +13,7 @@ public class UpdateStationScreenPacket implements IThreadsafePacket {
   public UpdateStationScreenPacket(FriendlyByteBuf buffer) {}
 
   @Override
-  public void encode(FriendlyByteBuf packetBuffer) {}
+  public void encode(FriendlyByteBuf FriendlyByteBuf) {}
 
   @Override
   public void handleThreadsafe(NetworkEvent.Context context) {

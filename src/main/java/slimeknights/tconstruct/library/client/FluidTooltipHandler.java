@@ -5,9 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.item.Item;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -196,12 +196,12 @@ public class FluidTooltipHandler {
         if (cast == Ingredient.EMPTY) {
           // skip pane and slimeball for metals, some metals like gold have an empty table casting recipe
           if (!TinkerTags.Fluids.METAL_LIKE.contains(fluid)) {
-            FluidGuiEntry entry = fluid.isIn(TinkerTags.Fluids.SLIMELIKE) ? SLIMEBALL : PANE;
+            FluidGuiEntry entry = fluid.is(TinkerTags.Fluids.SLIMELIKE) ? SLIMEBALL : PANE;
             list.add(entry.withAmount(ingredient.getAmount(fluid)));
           }
         } else {
           // if a cast, check for a matching item in the map
-          Arrays.stream(recipe.getCast().getMatchingStacks())
+          Arrays.stream(recipe.getCast().getItems())
                 .map(stack -> TOOLTIP_OPTIONS.get(stack.getItem()))
                 .filter(Objects::nonNull)
                 .findFirst()
@@ -279,10 +279,10 @@ public class FluidTooltipHandler {
      * Gets the display text for this fluid entry
      * @return  Display text
      */
-    private int getText(List<ITextComponent> tooltip, int amount) {
+    private int getText(List<Component> tooltip, int amount) {
       int full = amount / needed;
       if (full > 0) {
-        tooltip.add(new TranslationTextComponent(translationKey, full).mergeStyle(TextFormatting.GRAY));
+        tooltip.add(new TranslatableComponent(translationKey, full).withStyle(ChatFormatting.GRAY));
       }
       return amount % needed;
     }

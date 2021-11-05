@@ -13,9 +13,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.util.IItemProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.ItemLike;
+
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.crafting.IShapedRecipe;
@@ -155,7 +156,7 @@ public class ContentTool extends TinkerPage {
         ImmutableList.Builder<ItemStackList> partBuilder = ImmutableList.builder();
         for (int i = 0; i < required.size(); i++) {
           // mark the part as display to suppress the invalid material tooltip
-          ItemStack stack = required.get(i).getPart().withMaterialForDisplay(ToolBuildHandler.getRenderMaterial(i));
+          ItemStack stack = required.get(i).getPart().withMaterialForDisplay(ToolBuildHandler.getMaterial(i));
           stack.getOrCreateTag().putBoolean(TooltipUtil.KEY_DISPLAY, true);
           partBuilder.add(ItemStackList.of(stack));
         }
@@ -255,7 +256,7 @@ public class ContentTool extends TinkerPage {
     @Getter
     private final ItemStack renderTool;
 
-    private Fallback(IItemProvider item) {
+    private Fallback(ItemLike item) {
       this.item = item.asItem();
       this.renderTool = new ItemStack(item);
     }

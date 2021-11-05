@@ -128,7 +128,7 @@ public class CRTHelper {
         builder.append("\n}");
         CraftTweakerAPI.logDump(builder.toString());
       });
-      final StringTextComponent message = new StringTextComponent(TextFormatting.GREEN + "Modifier list written to the log" + TextFormatting.RESET);
+      final StringTextComponent message = new StringTextComponent(ChatFormatting.GREEN + "Modifier list written to the log" + ChatFormatting.RESET);
       commandContext.getSource().sendFeedback(message, true);
       return 0;
     });
@@ -140,7 +140,7 @@ public class CRTHelper {
       ForgeRegistries.ITEMS.getValues().stream().filter(item -> item instanceof IModifiable).forEach(item -> {
         CraftTweakerAPI.logDump(ExpandItem.getDefaultInstance(item).getCommandString());
       });
-      final StringTextComponent message = new StringTextComponent(TextFormatting.GREEN + "Tool Core Items written to the log" + TextFormatting.RESET);
+      final StringTextComponent message = new StringTextComponent(ChatFormatting.GREEN + "Tool Core Items written to the log" + ChatFormatting.RESET);
       commandContext.getSource().sendFeedback(message, true);
       return 0;
     });
@@ -178,7 +178,7 @@ public class CRTHelper {
   public static EntityIngredient mapEntityIngredient(CTEntityIngredient ingredient) {
 
     Supplier<IllegalArgumentException> errorException = () -> new IllegalArgumentException("Error while mapping Compound Entity Ingredients!");
-    return ingredient.mapTo(EntityIngredient::of, (entityTypeITag, integer) -> EntityIngredient.of(entityTypeITag), stream -> stream.reduce(EntityIngredient::of).orElseThrow(errorException));
+    return ingredient.mapTo(EntityIngredient::of, (entityTypeTag, integer) -> EntityIngredient.of(entityTypeTag), stream -> stream.reduce(EntityIngredient::of).orElseThrow(errorException));
   }
 
 

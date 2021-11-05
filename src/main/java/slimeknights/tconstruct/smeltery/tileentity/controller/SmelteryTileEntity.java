@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.smeltery.tileentity.controller;
 
 import lombok.Getter;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.world.level.block.state.BlockState;

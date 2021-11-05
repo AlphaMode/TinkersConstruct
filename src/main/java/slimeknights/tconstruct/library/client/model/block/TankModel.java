@@ -9,8 +9,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.model.BakedQuad;
+
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelState;
@@ -22,13 +22,15 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.SimpleBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.Direction;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.core.Direction;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
+
 import net.minecraftforge.client.model.BakedModelWrapper;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.IModelLoader;
@@ -94,7 +96,7 @@ public class TankModel implements IModelGeometry<TankModel> {
     if (gui != null) {
       bakedGui = gui.bakeModel(owner, transform, overrides, spriteGetter, location);
     }
-    return new BakedModel<>(owner, transform, baked, bakedGui, this);
+    return new TankBakedModel<>(owner, transform, baked, bakedGui, this);
   }
 
   /** Override to add the fluid part to the item model */
@@ -103,7 +105,7 @@ public class TankModel implements IModelGeometry<TankModel> {
     public static final FluidPartOverride INSTANCE = new FluidPartOverride();
 
     @Override
-    public BakedModel resolve(BakedModel model, ItemStack stack, @Nullable ClientLevel world, @Nullable LivingEntity entity) {
+    public BakedModel resolve(BakedModel model, ItemStack stack, @Nullable ClientLevel world, @Nullable LivingEntity entity, int i) {
       // ensure we have a fluid
       if (stack.isEmpty() || !stack.hasTag()) {
         return model;
@@ -114,7 +116,7 @@ public class TankModel implements IModelGeometry<TankModel> {
         return model;
       }
       // always baked model as this override is only used in our model
-      return ((BakedModel<?>)model).getCachedModel(tank.getFluid(), tank.getCapacity());
+      return ((TankBakedModel<?>)model).getCachedModel(tank.getFluid(), tank.getCapacity());
     }
   }
 
@@ -148,7 +150,7 @@ public class TankModel implements IModelGeometry<TankModel> {
    * Baked variant to load in the custom overrides
    * @param <T>  Parent model type, used to make this easier to extend
    */
-  public static class BakedModel<T extends TankModel> extends BakedGuiUniqueModel {
+  public static class TankBakedModel<T extends TankModel> extends BakedGuiUniqueModel {
     private final IModelConfiguration owner;
     private final ModelState originalTransforms;
     @SuppressWarnings("WeakerAccess")
@@ -159,7 +161,7 @@ public class TankModel implements IModelGeometry<TankModel> {
       .build();
 
     @SuppressWarnings("WeakerAccess")
-    protected BakedModel(IModelConfiguration owner, ModelState transforms, BakedModel baked, BakedModel gui, T original) {
+    protected TankBakedModel(IModelConfiguration owner, ModelState transforms, BakedModel baked, BakedModel gui, T original) {
       super(baked, gui);
       this.owner = owner;
       this.originalTransforms = transforms;
@@ -244,9 +246,9 @@ public class TankModel implements IModelGeometry<TankModel> {
      * @param capacity  Tank capacity
      * @return  Cached model
      */
-    private IBakedModel getCachedModel(FluidStack fluid, int capacity) {
+    private BakedModel getCachedModel(FluidStack fluid, int capacity) {
       int increments = original.fluid.getIncrements();
-      return getCachedModel(new FluidStack(fluid.getFluid(), MathHelper.clamp(fluid.getAmount() * increments / capacity, 1, increments)));
+      return getCachedModel(new FluidStack(fluid.getFluid(), Mth.clamp(fluid.getAmount() * increments / capacity, 1, increments)));
     }
 
     @Nonnull
@@ -273,17 +275,17 @@ public class TankModel implements IModelGeometry<TankModel> {
   /** Loader for this model */
   public static class Loader implements IModelLoader<TankModel> {
     @Override
-    public void onResourceManagerReload(IResourceManager resourceManager) {}
+    public void onResourceManagerReload(ResourceManager resourceManager) {}
 
     @Override
     public TankModel read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
       SimpleBlockModel model = SimpleBlockModel.deserialize(deserializationContext, modelContents);
       SimpleBlockModel gui = null;
       if (modelContents.has("gui")) {
-        gui = SimpleBlockModel.deserialize(deserializationContext, JSONUtils.getJsonObject(modelContents, "gui"));
+        gui = SimpleBlockModel.deserialize(deserializationContext, GsonHelper.getAsJsonObject(modelContents, "gui"));
       }
-      IncrementalFluidCuboid fluid = IncrementalFluidCuboid.fromJson(JSONUtils.getJsonObject(modelContents, "fluid"));
-      boolean forceModelFluid = JSONUtils.getBoolean(modelContents, "render_fluid_in_model", false);
+      IncrementalFluidCuboid fluid = IncrementalFluidCuboid.fromJson(GsonHelper.getAsJsonObject(modelContents, "fluid"));
+      boolean forceModelFluid = GsonHelper.getAsBoolean(modelContents, "render_fluid_in_model", false);
       return new TankModel(model, gui, fluid, forceModelFluid);
     }
   }

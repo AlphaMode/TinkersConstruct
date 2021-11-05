@@ -94,8 +94,8 @@ public class TinkerNetwork extends NetworkWrapper {
    * @param packet  Packet
    */
   public void sendVanillaPacket(Entity player, Packet<?> packet) {
-    if (player instanceof ServerPlayer && ((ServerPlayer) player).connection != null) {
-      ((ServerPlayer) player).connection.send(packet);
+    if (player instanceof ServerPlayer serverPlayer && serverPlayer.connection != null) {
+      serverPlayer.connection.send(packet);
     }
   }
 

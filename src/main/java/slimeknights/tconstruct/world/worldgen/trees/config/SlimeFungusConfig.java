@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
@@ -24,8 +24,8 @@ public class SlimeFungusConfig extends HugeFungusConfiguration {
     Codec.BOOL.fieldOf("planted").orElse(false).forGetter(config -> config.planted)
   ).apply(instance, SlimeFungusConfig::new));
   @Getter
-  private final ITag<Block> groundTag;
-  public SlimeFungusConfig(ITag<Block> groundTag, BlockState stem, BlockState hat, BlockState decor, boolean planted) {
+  private final Tag<Block> groundTag;
+  public SlimeFungusConfig(Tag<Block> groundTag, BlockState stem, BlockState hat, BlockState decor, boolean planted) {
     super(Blocks.AIR.getDefaultState(), stem, hat, decor, planted);
     this.groundTag = groundTag;
   }

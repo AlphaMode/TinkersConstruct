@@ -51,7 +51,7 @@ public class TankModifierModel extends FluidModifierModel {
 
   @Override
   @Nullable
-  protected RenderMaterial getTemplate(TankModifier tank, IModifierToolStack tool, FluidStack fluid, boolean isLarge) {
+  protected Material getTemplate(TankModifier tank, IModifierToolStack tool, FluidStack fluid, boolean isLarge) {
     boolean isFull = fluid.getAmount() == tank.getCapacity(tool);
     return fluidTextures[(isFull ? 2 : 0) | (isLarge ? 1 : 0)];
   }

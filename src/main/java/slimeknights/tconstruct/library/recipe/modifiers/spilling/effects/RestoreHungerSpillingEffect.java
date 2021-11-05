@@ -4,8 +4,8 @@ import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.tconstruct.library.tools.context.ToolAttackContext;
 
@@ -36,8 +36,8 @@ public class RestoreHungerSpillingEffect implements ISpillingEffect {
   private static class Loader implements ISpillingEffectLoader<RestoreHungerSpillingEffect> {
     @Override
     public RestoreHungerSpillingEffect deserialize(JsonObject json) {
-      int hunger = JSONUtils.getInt(json, "hunger");
-      float saturation = JSONUtils.getFloat(json, "saturation");
+      int hunger = GsonHelper.getInt(json, "hunger");
+      float saturation = GsonHelper.getFloat(json, "saturation");
       return new RestoreHungerSpillingEffect(hunger, saturation);
     }
 
@@ -48,14 +48,14 @@ public class RestoreHungerSpillingEffect implements ISpillingEffect {
     }
 
     @Override
-    public RestoreHungerSpillingEffect read(PacketBuffer buffer) {
+    public RestoreHungerSpillingEffect read(FriendlyByteBuf buffer) {
       int hunger = buffer.readVarInt();
       float saturation = buffer.readFloat();
       return new RestoreHungerSpillingEffect(hunger, saturation);
     }
 
     @Override
-    public void write(RestoreHungerSpillingEffect effect, PacketBuffer buffer) {
+    public void write(RestoreHungerSpillingEffect effect, FriendlyByteBuf buffer) {
       buffer.writeVarInt(effect.hunger);
       buffer.writeFloat(effect.saturation);
     }

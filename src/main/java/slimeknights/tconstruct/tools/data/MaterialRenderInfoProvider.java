@@ -73,7 +73,7 @@ public class MaterialRenderInfoProvider extends AbstractMaterialRenderInfoProvid
 
   /** Adds an internal render material */
   protected void buildInternalMaterial(int index, int color, String... fallbacks) {
-    buildRenderInfo(ToolBuildHandler.getRenderMaterial(index)).color(color).fallbacks(fallbacks).skipUniqueTexture(true);
+    buildRenderInfo(ToolBuildHandler.getMaterial(index)).color(color).fallbacks(fallbacks).skipUniqueTexture(true);
   }
 
   @Override

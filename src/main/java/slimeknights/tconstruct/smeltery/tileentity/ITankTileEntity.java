@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -89,7 +88,7 @@ public interface ITankTileEntity extends IFluidTankUpdater, FluidUpdatePacket.IF
       if (isFluidInModel()) {
         // if the amount change is bigger than a single increment, or we changed whether we have a fluid, update the world renderer
         BlockEntity be = getBE();
-        TankModel.BakedModel<?> model = ModelHelper.getBakedModel(be.getBlockState(), TankModel.BakedModel.class);
+        TankModel.TankBakedModel<?> model = ModelHelper.getBakedModel(be.getBlockState(), TankModel.TankBakedModel.class);
         if (model != null && (Math.abs(newAmount - oldAmount) >= (tank.getCapacity() / model.getFluid().getIncrements()) || (oldAmount == 0) != (newAmount == 0))) {
           //this.requestModelDataUpdate();
           Minecraft.getInstance().levelRenderer.blockChanged(null, be.getBlockPos(), null, null, 3);

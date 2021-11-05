@@ -3,7 +3,7 @@ package slimeknights.tconstruct.library.tools.stat;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.util.GsonHelper;
 import slimeknights.tconstruct.library.tools.nbt.StatsNBT;
 
 import java.util.function.Predicate;
@@ -59,12 +59,12 @@ public class StatPredicate implements Predicate<StatsNBT> {
    * @return  Predicate
    */
   public static StatPredicate deserialize(JsonObject json) {
-    ToolStatId id = new ToolStatId(JSONUtils.getString(json, "stat"));
+    ToolStatId id = new ToolStatId(GsonHelper.getString(json, "stat"));
     IToolStat<?> stat = ToolStats.getToolStat(id);
     if (stat == null) {
       throw new JsonSyntaxException("Unknown tool stat '" + id + "'");
     }
-    return new StatPredicate(stat, JSONUtils.getFloat(json, "min", Float.NEGATIVE_INFINITY), JSONUtils.getFloat(json, "max", Float.NEGATIVE_INFINITY));
+    return new StatPredicate(stat, GsonHelper.getFloat(json, "min", Float.NEGATIVE_INFINITY), GsonHelper.getFloat(json, "max", Float.NEGATIVE_INFINITY));
   }
 
   /** Serializes this to JSON */

@@ -2,7 +2,7 @@ package slimeknights.tconstruct.library.recipe.modifiers.spilling.effects;
 
 import com.google.gson.JsonObject;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.tconstruct.library.events.teleport.SpillingTeleportEvent;
 import slimeknights.tconstruct.library.tools.context.ToolAttackContext;
@@ -37,7 +37,7 @@ public class TeleportSpillingEffect implements ISpillingEffect {
     }
 
     @Override
-    public TeleportSpillingEffect read(PacketBuffer buffer) {
+    public TeleportSpillingEffect read(FriendlyByteBuf buffer) {
       return INSTANCE;
     }
   }

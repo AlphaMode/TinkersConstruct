@@ -3,7 +3,7 @@ package slimeknights.tconstruct.library.data.tinkering;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
 import net.minecraft.resources.ResourcePackType;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.util.ItemLike;
 import net.minecraft.util.ResourceLocation;
 import slimeknights.tconstruct.library.data.GenericDataProvider;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
@@ -41,7 +41,7 @@ public abstract class AbstractToolDefinitionDataProvider extends GenericDataProv
   }
 
   /** Defines the given ID as a tool definition */
-  protected ToolDefinitionDataBuilder define(IItemProvider item) {
+  protected ToolDefinitionDataBuilder define(ItemLike item) {
     return define(Objects.requireNonNull(item.asItem().getRegistryName()));
   }
 

@@ -17,7 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -106,7 +105,7 @@ public abstract class TinkerModule {
   }
 
   /** Constant to use for blocks with no tool for more readable code */
-  protected static final ToolType NO_TOOL = null;
+  //protected static final ToolType NO_TOOL = null;
 
   /**
    * We use this builder to ensure that our blocks all have the most important properties set.
@@ -114,32 +113,32 @@ public abstract class TinkerModule {
    * It may be a bit less clear at first, since the actual builder methods tell you what each value means,
    * but as long as we don't statically import the enums it should be just as readable.
    */
-  protected static BlockBehaviour.Properties builder(Material material, @Nullable ToolType toolType, SoundType soundType) {
+  protected static BlockBehaviour.Properties builder(Material material, SoundType soundType) {
     //noinspection ConstantConditions
-    return Block.Properties.of(material).harvestTool(toolType).sound(soundType);
+    return Block.Properties.of(material).sound(soundType);
   }
 
   /** Same as above, but with a color */
-  protected static BlockBehaviour.Properties builder(Material material, MaterialColor color, @Nullable ToolType toolType, SoundType soundType) {
+  protected static BlockBehaviour.Properties builder(Material material, MaterialColor color, SoundType soundType) {
     //noinspection ConstantConditions
-    return Block.Properties.of(material, color).harvestTool(toolType).sound(soundType);
+    return Block.Properties.of(material, color).sound(soundType);
   }
 
   /** Builder that pre-supplies metal properties */
   protected static BlockBehaviour.Properties metalBuilder(MaterialColor color) {
-    return builder(Material.METAL, color, ToolType.PICKAXE, SoundType.METAL).requiresCorrectToolForDrops().strength(5.0f);
+    return builder(Material.METAL, color, SoundType.METAL).requiresCorrectToolForDrops().strength(5.0f);
   }
 
   /** Builder that pre-supplies glass properties */
   protected static BlockBehaviour.Properties glassBuilder(MaterialColor color) {
-    return builder(Material.GLASS, ToolType.PICKAXE, SoundType.GLASS)
+    return builder(Material.GLASS, SoundType.GLASS)
       .requiresCorrectToolForDrops().strength(0.3F).noOcclusion().isValidSpawn(Blocks::never)
       .isRedstoneConductor(Blocks::never).isSuffocating(Blocks::never).isViewBlocking(Blocks::never);
   }
 
   /** Builder that pre-supplies glass properties */
   protected static BlockBehaviour.Properties woodBuilder(MaterialColor color) {
-    return builder(Material.WOOD, color, ToolType.AXE, SoundType.WOOD).requiresCorrectToolForDrops().strength(2.0F, 7.0F);
+    return builder(Material.WOOD, color, SoundType.WOOD).requiresCorrectToolForDrops().strength(2.0F, 7.0F);
   }
 
   /**

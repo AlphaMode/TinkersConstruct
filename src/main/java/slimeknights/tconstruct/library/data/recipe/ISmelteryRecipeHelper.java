@@ -2,10 +2,9 @@ package slimeknights.tconstruct.library.data.recipe;
 
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.tags.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.ConditionalRecipe;
 import net.minecraftforge.common.crafting.conditions.TrueCondition;
@@ -184,7 +183,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param output    Recipe output
    * @param location  Recipe base
    */
-  default void castingWithCast(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, int amount, CastItemObject cast, IItemProvider output, String location) {
+  default void castingWithCast(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, int amount, CastItemObject cast, ItemLike output, String location) {
     castingWithCast(consumer, fluid, forgeTag, amount, cast, ItemOutput.fromItem(output), location);
   }
 
@@ -197,7 +196,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param output    Recipe output
    * @param location  Recipe base
    */
-  default void castingWithCast(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, int amount, CastItemObject cast, IItemProvider output, String location) {
+  default void castingWithCast(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, int amount, CastItemObject cast, ItemLike output, String location) {
     castingWithCast(consumer, fluid, amount, cast, ItemOutput.fromItem(output), location);
   }
 
@@ -243,7 +242,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param ingot     Ingot output
    * @param location  Recipe base
    */
-  default void ingotCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, int amount, IItemProvider ingot, String location) {
+  default void ingotCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, int amount, ItemLike ingot, String location) {
     castingWithCast(consumer, fluid, forgeTag, amount, TinkerSmeltery.ingotCast, ingot, location);
   }
 
@@ -255,7 +254,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param ingot     Ingot output
    * @param location  Recipe base
    */
-  default void ingotCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, IItemProvider ingot, String location) {
+  default void ingotCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, ItemLike ingot, String location) {
     ingotCasting(consumer, fluid, forgeTag, FluidValues.INGOT, ingot, location);
   }
 
@@ -267,7 +266,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param ingot     Ingot output
    * @param location  Recipe base
    */
-  default void ingotCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, int amount, IItemProvider ingot, String location) {
+  default void ingotCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, int amount, ItemLike ingot, String location) {
     ingotCasting(consumer, fluid, false, amount, ingot, location);
   }
 
@@ -278,7 +277,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param ingot     Ingot output
    * @param location  Recipe base
    */
-  default void ingotCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, IItemProvider ingot, String location) {
+  default void ingotCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, ItemLike ingot, String location) {
     ingotCasting(consumer, fluid, FluidValues.INGOT, ingot, location);
   }
 
@@ -289,7 +288,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param gem       Gem output
    * @param location  Recipe base
    */
-  default void gemCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, IItemProvider gem, String location) {
+  default void gemCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, ItemLike gem, String location) {
     castingWithCast(consumer, fluid, FluidValues.GEM, TinkerSmeltery.gemCast, gem, location);
   }
 
@@ -301,7 +300,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param nugget    Nugget output
    * @param location  Recipe base
    */
-  default void nuggetCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, IItemProvider nugget, String location) {
+  default void nuggetCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, ItemLike nugget, String location) {
     castingWithCast(consumer, fluid, forgeTag, FluidValues.NUGGET, TinkerSmeltery.nuggetCast, nugget, location);
   }
 
@@ -312,7 +311,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param nugget    Nugget output
    * @param location  Recipe base
    */
-  default void nuggetCastingRecipe(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, IItemProvider nugget, String location) {
+  default void nuggetCastingRecipe(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, ItemLike nugget, String location) {
     nuggetCasting(consumer, fluid, false, nugget, location);
   }
 
@@ -326,7 +325,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param nugget    Nugget result
    * @param folder    Output folder
    */
-  default void metalCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, @Nullable IItemProvider block, @Nullable IItemProvider ingot, @Nullable IItemProvider nugget, String folder, String metal) {
+  default void metalCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, boolean forgeTag, @Nullable ItemLike block, @Nullable ItemLike ingot, @Nullable ItemLike nugget, String folder, String metal) {
     String metalFolder = folder + metal + "/";
     if (block != null) {
       ItemCastingRecipeBuilder.basinRecipe(block)
@@ -356,7 +355,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
    * @param nugget    Nugget result
    * @param folder    Output folder
    */
-  default void metalCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, @Nullable IItemProvider block, @Nullable IItemProvider ingot, @Nullable IItemProvider nugget, String folder, String metal) {
+  default void metalCasting(Consumer<IFinishedRecipe> consumer, FluidObject<?> fluid, @Nullable ItemLike block, @Nullable ItemLike ingot, @Nullable ItemLike nugget, String folder, String metal) {
     metalCasting(consumer, fluid, false, block, ingot, nugget, folder, metal);
   }
 
@@ -389,7 +388,7 @@ public interface ISmelteryRecipeHelper extends ICastCreationHelper {
     tagCasting(consumer, fluid, true, FluidValues.INGOT / 2, TinkerSmeltery.rodCast, "rods/" + name, folder + name + "/rod", true);
     tagCasting(consumer, fluid, true, FluidValues.INGOT / 2, TinkerSmeltery.wireCast, "wires/" + name, folder + name + "/wire", true);
     // block
-    ITag<Item> block = getTag("forge", "storage_blocks/" + name);
+    Tag<Item> block = getTag("forge", "storage_blocks/" + name);
     Consumer<IFinishedRecipe> wrapped = forceStandard ? consumer : withCondition(consumer, tagCondition("storage_blocks/" + name));
     ItemCastingRecipeBuilder.basinRecipe(block)
                             .setFluidAndTime(fluid, true, FluidValues.METAL_BLOCK)

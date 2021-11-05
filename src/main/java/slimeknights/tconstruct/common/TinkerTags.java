@@ -282,7 +282,7 @@ public class TinkerTags {
     public static final IOptionalNamedTag<BlockEntityType<?>> CRAFTING_STATION_BLACKLIST = tag("crafting_station_blacklist");
 
     private static IOptionalNamedTag<BlockEntityType<?>> tag(String name) {
-      return ForgeTagHandler.createOptionalTag(ForgeRegistries.TILE_ENTITIES, TConstruct.getResource(name));
+      return ForgeTagHandler.createOptionalTag(ForgeRegistries.BLOCK_ENTITIES, TConstruct.getResource(name));
     }
   }
 }

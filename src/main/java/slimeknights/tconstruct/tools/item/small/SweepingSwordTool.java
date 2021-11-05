@@ -5,7 +5,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.entity.item.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
 import slimeknights.tconstruct.library.tools.context.ToolAttackContext;
 import slimeknights.tconstruct.library.tools.helper.ToolAttackUtil;
@@ -43,7 +43,7 @@ public class SweepingSwordTool extends SwordTool {
       for (LivingEntity aoeTarget : attacker.getEntityWorld().getEntitiesWithinAABB(LivingEntity.class, target.getBoundingBox().grow(range, 0.25D, range))) {
         if (aoeTarget != attacker && aoeTarget != target && !attacker.isOnSameTeam(aoeTarget)
             && (!(aoeTarget instanceof ArmorStandEntity) || !((ArmorStandEntity) aoeTarget).hasMarker()) && attacker.getDistanceSq(aoeTarget) < 10.0D + range) {
-          aoeTarget.applyKnockback(0.4F, MathHelper.sin(attacker.rotationYaw * ((float) Math.PI / 180F)), -MathHelper.cos(attacker.rotationYaw * ((float) Math.PI / 180F)));
+          aoeTarget.applyKnockback(0.4F, Mth.sin(attacker.rotationYaw * ((float) Math.PI / 180F)), -Mth.cos(attacker.rotationYaw * ((float) Math.PI / 180F)));
           ToolAttackUtil.dealDefaultDamage(attacker, aoeTarget, sweepDamage);
         }
       }

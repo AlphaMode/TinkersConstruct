@@ -9,16 +9,16 @@ import com.google.gson.JsonParseException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.resources.IResourceManager;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModLoader;
-import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
+import net.minecraftforge.fml.event.IModBusEvent;
 import slimeknights.tconstruct.common.config.Config;
 import slimeknights.tconstruct.library.TinkerRegistries;
 import slimeknights.tconstruct.library.client.model.tools.MaterialModel;
@@ -101,7 +101,7 @@ public class ModifierModelManager implements IEarlySafeManagerReloadListener {
   @Nullable
   private static IUnbakedModifierModel getLoader(String key, String name) {
     // find a model name
-    ResourceLocation loader = ResourceLocation.tryCreate(name);
+    ResourceLocation loader = ResourceLocation.tryParse(name);
     if (loader == null) {
       log.error("Skipping modifier " + key + " as " + name + " is an invalid loader name");
     } else {
@@ -117,7 +117,7 @@ public class ModifierModelManager implements IEarlySafeManagerReloadListener {
   }
 
   @Override
-  public void onReloadSafe(IResourceManager manager) {
+  public void onReloadSafe(ResourceManager manager) {
     // fire an event so people can register loaders, was the easiest way to do so after modifiers are registered but before models load
     if (!eventFired) {
       ModLoader.get().postEvent(new ModifierModelRegistrationEvent());
@@ -128,11 +128,11 @@ public class ModifierModelManager implements IEarlySafeManagerReloadListener {
     Map<Modifier,IUnbakedModifierModel> models = new HashMap<>();
 
     // get a list of files from all namespaces
-    List<JsonObject> jsonFiles = manager.getResourceNamespaces().stream()
+    List<JsonObject> jsonFiles = manager.getNamespaces().stream()
                                         .flatMap(namespace -> {
                                           ResourceLocation location = new ResourceLocation(namespace, VISIBLE_MODIFIERS);
                                           try {
-                                            return manager.getAllResources(location).stream();
+                                            return manager.getResources(location).stream();
                                           } catch (FileNotFoundException e) {
                                             // suppress, the above method throws instead of returning empty
                                           } catch (IOException e) {
@@ -150,7 +150,7 @@ public class ModifierModelManager implements IEarlySafeManagerReloadListener {
       for (Entry<String,JsonElement> entry : json.entrySet()) {
         // get a valid name
         String key = entry.getKey();
-        ResourceLocation name = ResourceLocation.tryCreate(key);
+        ResourceLocation name = ResourceLocation.tryParse(key);
         if (name == null) {
           log.error("Skipping invalid modifier key " + key + " as it is not a valid resource location");
         } else {
@@ -166,7 +166,7 @@ public class ModifierModelManager implements IEarlySafeManagerReloadListener {
               // object means we configure the unbaked model
             } else if (element.isJsonObject()) {
               JsonObject object = element.getAsJsonObject();
-              IUnbakedModifierModel model = getLoader(key, JSONUtils.getString(object, "type"));
+              IUnbakedModifierModel model = getLoader(key, GsonHelper.getAsString(object, "type"));
               // configure the model with the given JSON data
               if (model != null) {
                 models.put(modifier, model.configure(object));
@@ -194,7 +194,7 @@ public class ModifierModelManager implements IEarlySafeManagerReloadListener {
    * @param modifierId    Specific modifier ID
    * @return  Path to the modifier
    */
-  private static RenderMaterial getModifierTexture(ResourceLocation modifierRoot, ResourceLocation modifierId, String suffix) {
+  private static Material getModifierTexture(ResourceLocation modifierRoot, ResourceLocation modifierId, String suffix) {
     return ForgeHooksClient.getBlockMaterial(new ResourceLocation(modifierRoot.getNamespace(), modifierRoot.getPath() + modifierId.getNamespace() + "_" + modifierId.getPath() + suffix));
   }
 
@@ -207,14 +207,14 @@ public class ModifierModelManager implements IEarlySafeManagerReloadListener {
    * @return  Texture, or null if missing
    */
   @Nullable
-  private static RenderMaterial getTexture(List<ResourceLocation> modifierRoots, @Nullable Predicate<RenderMaterial> textureAdder, ResourceLocation modifier, String suffix) {
+  private static Material getTexture(List<ResourceLocation> modifierRoots, @Nullable Predicate<Material> textureAdder, ResourceLocation modifier, String suffix) {
     if (textureAdder == null) {
       return null;
     }
 
     // try the non-logging ones first
     for (ResourceLocation root : modifierRoots) {
-      RenderMaterial texture = getModifierTexture(root, modifier, suffix);
+      Material texture = getModifierTexture(root, modifier, suffix);
       if (textureAdder.test(texture)) {
         return texture;
       }
@@ -230,7 +230,7 @@ public class ModifierModelManager implements IEarlySafeManagerReloadListener {
    * @param largeModifierRoots  List of modifier roots for large tools, null if the tool is not large
    * @return  Map of models
    */
-  public static Map<Modifier,IBakedModifierModel> getModelsForTool(List<ResourceLocation> smallModifierRoots, List<ResourceLocation> largeModifierRoots, Collection<RenderMaterial> textures) {
+  public static Map<Modifier,IBakedModifierModel> getModelsForTool(List<ResourceLocation> smallModifierRoots, List<ResourceLocation> largeModifierRoots, Collection<Material> textures) {
     // if we have no modifier models, or both lists of modifier roots are empty, nothing to do
     if (modifierModels.isEmpty() || (smallModifierRoots.isEmpty() && largeModifierRoots.isEmpty())) {
       return Collections.emptyMap();
@@ -240,9 +240,9 @@ public class ModifierModelManager implements IEarlySafeManagerReloadListener {
     ImmutableMap.Builder<Modifier,IBakedModifierModel> modelMap = ImmutableMap.builder();
 
     // create two texture adders, so we only log on the final option if missing
-    Predicate<RenderMaterial> smallTextureAdder = smallModifierRoots.isEmpty() ? null
+    Predicate<Material> smallTextureAdder = smallModifierRoots.isEmpty() ? null
                                                   : MaterialModel.getTextureAdder(smallModifierRoots.get(0), textures, Config.CLIENT.logMissingModifierTextures.get());
-    Predicate<RenderMaterial> largeTextureAdder = largeModifierRoots.isEmpty() ? null
+    Predicate<Material> largeTextureAdder = largeModifierRoots.isEmpty() ? null
                                                   : MaterialModel.getTextureAdder(largeModifierRoots.get(0), textures, Config.CLIENT.logMissingModifierTextures.get());
 
     // load each modifier

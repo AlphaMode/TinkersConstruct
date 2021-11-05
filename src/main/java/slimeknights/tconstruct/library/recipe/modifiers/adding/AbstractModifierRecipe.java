@@ -6,8 +6,8 @@ import com.google.gson.JsonSyntaxException;
 import lombok.Getter;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 import slimeknights.tconstruct.TConstruct;
@@ -256,7 +256,7 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
      * Reads any remaining data from the modifier recipe
      * @return  Full recipe instance
      */
-    public T read(ResourceLocation id, PacketBuffer buffer, Ingredient toolRequirement, ModifierMatch requirements,
+    public T read(ResourceLocation id, FriendlyByteBuf buffer, Ingredient toolRequirement, ModifierMatch requirements,
                   String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots) {
       int upgradeSlots = SlotCount.get(slots, SlotType.UPGRADE);
       int abilitySlots = SlotCount.get(slots, SlotType.ABILITY);
@@ -268,29 +268,29 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
     public abstract T read(ResourceLocation id, JsonObject json, Ingredient toolRequirement, ModifierMatch requirements,
                            String requirementsError, ModifierEntry result, int maxLevel, int upgradeSlots, int abilitySlots);
 
-    /** @deprecated use {@link #read(ResourceLocation, PacketBuffer, Ingredient, ModifierMatch, String, ModifierEntry, int, SlotCount)} */
+    /** @deprecated use {@link #read(ResourceLocation, FriendlyByteBuf, Ingredient, ModifierMatch, String, ModifierEntry, int, SlotCount)} */
     @Deprecated
-    public abstract T read(ResourceLocation id, PacketBuffer buffer, Ingredient toolRequirement, ModifierMatch requirements,
+    public abstract T read(ResourceLocation id, FriendlyByteBuf buffer, Ingredient toolRequirement, ModifierMatch requirements,
                            String requirementsError, ModifierEntry result, int maxLevel, int upgradeSlots, int abilitySlots);
 
     @Override
-    public final T read(ResourceLocation id, JsonObject json) {
-      Ingredient toolRequirement = Ingredient.deserialize(json.get("tools"));
+    public final T fromJson(ResourceLocation id, JsonObject json) {
+      Ingredient toolRequirement = Ingredient.fromJson(json.get("tools"));
       ModifierMatch requirements = ModifierMatch.ALWAYS;
       String requirementsError = "";
       if (json.has("requirements")) {
-        JsonObject reqJson = JSONUtils.getJsonObject(json, "requirements");
+        JsonObject reqJson = GsonHelper.getAsJsonObject(json, "requirements");
         requirements = ModifierMatch.deserialize(reqJson);
-        requirementsError = JSONUtils.getString(reqJson, "error", "");
+        requirementsError = GsonHelper.getAsString(reqJson, "error", "");
       }
-      ModifierEntry result = ModifierEntry.fromJson(JSONUtils.getJsonObject(json, "result"));
-      int maxLevel = JSONUtils.getInt(json, "max_level", 0);
+      ModifierEntry result = ModifierEntry.fromJson(GsonHelper.getAsJsonObject(json, "result"));
+      int maxLevel = GsonHelper.getAsInt(json, "max_level", 0);
       if (maxLevel < 0) {
         throw new JsonSyntaxException("max must be non-negative");
       }
       SlotCount slots = null;
       if (json.has("slots")) {
-        slots = SlotCount.fromJson(JSONUtils.getJsonObject(json, "slots"));
+        slots = SlotCount.fromJson(GsonHelper.getAsJsonObject(json, "slots"));
       } else {
         // legacy support
         if (json.has("upgrade_slots") && json.has("ability_slots")) {
@@ -308,22 +308,22 @@ public abstract class AbstractModifierRecipe implements ITinkerStationRecipe, ID
     }
 
     @Override
-    protected final T readSafe(ResourceLocation id, PacketBuffer buffer) {
-      Ingredient toolRequirement = Ingredient.read(buffer);
+    protected final T readSafe(ResourceLocation id, FriendlyByteBuf buffer) {
+      Ingredient toolRequirement = Ingredient.fromNetwork(buffer);
       ModifierMatch requirements = ModifierMatch.read(buffer);
-      String requirementsError = buffer.readString(Short.MAX_VALUE);
+      String requirementsError = buffer.readUtf(Short.MAX_VALUE);
       ModifierEntry result = ModifierEntry.read(buffer);
       int maxLevel = buffer.readVarInt();
       SlotCount slots = SlotCount.read(buffer);
       return read(id, buffer, toolRequirement, requirements, requirementsError, result, maxLevel, slots);
     }
 
-    /** Writes relevant packet data. When overriding, call super first for consistency with {@link #read(ResourceLocation, PacketBuffer)} */
+    /** Writes relevant packet data. When overriding, call super first for consistency with {@link #fromNetwork(ResourceLocation, FriendlyByteBuf)} */
     @Override
-    protected void writeSafe(PacketBuffer buffer, T recipe) {
-      recipe.toolRequirement.write(buffer);
+    protected void writeSafe(FriendlyByteBuf buffer, T recipe) {
+      recipe.toolRequirement.toNetwork(buffer);
       recipe.requirements.write(buffer);
-      buffer.writeString(recipe.requirementsError);
+      buffer.writeUtf(recipe.requirementsError);
       recipe.result.write(buffer);
       buffer.writeVarInt(recipe.getMaxLevel());
       SlotCount.write(recipe.getSlots(), buffer);

@@ -2,9 +2,9 @@ package slimeknights.tconstruct.smeltery.inventory;
 
 import lombok.Getter;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.level.Level;
@@ -59,7 +59,7 @@ public class AlloyerContainer extends TriggeringBaseContainer<AlloyerTileEntity>
     }
   }
 
-  public AlloyerContainer(int id, PlayerInventory inv, PacketBuffer buf) {
+  public AlloyerContainer(int id, PlayerInventory inv, FriendlyByteBuf buf) {
     this(id, inv, getTileEntityFromBuf(buf, AlloyerTileEntity.class));
   }
 }

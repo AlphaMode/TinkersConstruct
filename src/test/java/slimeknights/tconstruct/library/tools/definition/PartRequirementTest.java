@@ -5,8 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import io.netty.buffer.Unpooled;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import slimeknights.tconstruct.fixture.MaterialItemFixture;
@@ -27,7 +27,7 @@ class PartRequirementTest extends BaseMcTest {
   @Test
   void bufferReadWrite() {
     PartRequirement requirement = new PartRequirement(MaterialItemFixture.MATERIAL_ITEM, 5);
-    PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+    FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
     requirement.write(buffer);
 
     PartRequirement decoded = PartRequirement.read(buffer);
@@ -41,15 +41,15 @@ class PartRequirementTest extends BaseMcTest {
     JsonElement json = PartRequirement.SERIALIZER.serialize(requirement, PartRequirement.class, null);
     assertThat(json.isJsonObject()).isTrue();
     JsonObject object = json.getAsJsonObject();
-    assertThat(JSONUtils.getString(object, "item")).isEqualTo(Objects.requireNonNull(MaterialItemFixture.MATERIAL_ITEM_2.getRegistryName()).toString());
-    assertThat(JSONUtils.getInt(object, "weight")).isEqualTo(5);
+    assertThat(GsonHelper.getString(object, "item")).isEqualTo(Objects.requireNonNull(MaterialItemFixture.MATERIAL_ITEM_2.getRegistryName()).toString());
+    assertThat(GsonHelper.getInt(object, "weight")).isEqualTo(5);
 
     // weight is optional if 1
     requirement = new PartRequirement(MaterialItemFixture.MATERIAL_ITEM, 1);
     json = PartRequirement.SERIALIZER.serialize(requirement, PartRequirement.class, mock(JsonSerializationContext.class));
     assertThat(json.isJsonObject()).isTrue();
     object = json.getAsJsonObject();
-    assertThat(JSONUtils.getString(object, "item")).isEqualTo(Objects.requireNonNull(MaterialItemFixture.MATERIAL_ITEM.getRegistryName()).toString());
+    assertThat(GsonHelper.getString(object, "item")).isEqualTo(Objects.requireNonNull(MaterialItemFixture.MATERIAL_ITEM.getRegistryName()).toString());
     assertThat(object.has("weight")).isFalse();
   }
 

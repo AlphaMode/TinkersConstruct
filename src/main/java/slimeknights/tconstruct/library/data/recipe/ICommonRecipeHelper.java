@@ -105,7 +105,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
     Item item = building.asItem();
     ICriterionInstance hasBlock = RecipeProvider.hasItem(item);
     // slab
-    IItemProvider slab = building.getSlab();
+    ItemLike slab = building.getSlab();
     ShapedRecipeBuilder.shapedRecipe(slab, 6)
                        .key('B', item)
                        .patternLine("BBB")
@@ -113,7 +113,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
                        .setGroup(Objects.requireNonNull(slab.asItem().getRegistryName()).toString())
                        .build(consumer, wrap(item, folder, "_slab"));
     // stairs
-    IItemProvider stairs = building.getStairs();
+    ItemLike stairs = building.getStairs();
     ShapedRecipeBuilder.shapedRecipe(stairs, 4)
                        .key('B', item)
                        .patternLine("B  ")
@@ -145,7 +145,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
     // wall
     Item item = building.asItem();
     ICriterionInstance hasBlock = RecipeProvider.hasItem(item);
-    IItemProvider wall = building.getWall();
+    ItemLike wall = building.getWall();
     ShapedRecipeBuilder.shapedRecipe(wall, 6)
                        .key('B', item)
                        .patternLine("BBB")
@@ -177,7 +177,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
                           .addCriterion("has_log", RecipeProvider.hasItem(ItemPredicate.Builder.create().tag(wood.getLogItemTag()).build()))
                           .build(consumer, modResource(folder + "planks"));
     // slab
-    IItemProvider slab = wood.getSlab();
+    ItemLike slab = wood.getSlab();
     ShapedRecipeBuilder.shapedRecipe(slab, 6)
                        .key('#', wood)
                        .patternLine("###")
@@ -185,7 +185,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
                        .setGroup("wooden_slab")
                        .build(consumer, modResource(folder + "slab"));
     // stairs
-    IItemProvider stairs = wood.getStairs();
+    ItemLike stairs = wood.getStairs();
     ShapedRecipeBuilder.shapedRecipe(stairs, 4)
                        .key('#', wood)
                        .patternLine("#  ")

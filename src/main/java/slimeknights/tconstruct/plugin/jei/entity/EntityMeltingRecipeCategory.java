@@ -26,7 +26,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.ForgeI18n;
+import net.minecraftforge.fmllegacy.ForgeI18n;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.FluidTooltipHandler;
 import slimeknights.tconstruct.library.recipe.FluidValues;
@@ -148,7 +148,7 @@ public class EntityMeltingRecipeCategory implements IRecipeCategory<EntityMeltin
         if (damage == 2) {
           list.add(TOOLTIP_PER_HEART);
         } else {
-          list.add(new TranslationTextComponent(KEY_PER_HEARTS, damage / 2f).mergeStyle(TextFormatting.GRAY));
+          list.add(new TranslationTextComponent(KEY_PER_HEARTS, damage / 2f).mergeStyle(ChatFormatting.GRAY));
         }
       }
       list.add(modId);

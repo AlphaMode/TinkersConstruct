@@ -5,12 +5,12 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.ChatFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.ForgeI18n;
+import net.minecraftforge.fmllegacy.ForgeI18n;
 import slimeknights.mantle.util.TranslationHelper;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.config.Config;
@@ -85,7 +85,7 @@ public class ToolPartItem extends MaterialItem implements IToolPart {
       List<ITextComponent> text = stat.getLocalizedInfo();
       if (!text.isEmpty()) {
         tooltip.add(new StringTextComponent(""));
-        tooltip.add(stat.getLocalizedName().mergeStyle(TextFormatting.WHITE, TextFormatting.UNDERLINE));
+        tooltip.add(stat.getLocalizedName().mergeStyle(ChatFormatting.WHITE, ChatFormatting.UNDERLINE));
         tooltip.addAll(stat.getLocalizedInfo());
       }
     });

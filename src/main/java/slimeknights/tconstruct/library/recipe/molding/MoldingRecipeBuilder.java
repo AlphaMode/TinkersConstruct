@@ -6,7 +6,7 @@ import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.util.ResourceLocation;
 import slimeknights.mantle.recipe.ItemOutput;
@@ -39,7 +39,7 @@ public class MoldingRecipeBuilder extends AbstractRecipeBuilder<MoldingRecipeBui
    * @param item  Item output
    * @return  Recipe
    */
-  public static MoldingRecipeBuilder moldingBasin(IItemProvider item) {
+  public static MoldingRecipeBuilder moldingBasin(ItemLike item) {
     return molding(ItemOutput.fromItem(item), TinkerSmeltery.moldingBasinSerializer.get());
   }
 
@@ -52,12 +52,12 @@ public class MoldingRecipeBuilder extends AbstractRecipeBuilder<MoldingRecipeBui
   }
 
   /** Sets the material item, on the table */
-  public MoldingRecipeBuilder setMaterial(IItemProvider item) {
+  public MoldingRecipeBuilder setMaterial(ItemLike item) {
     return setMaterial(Ingredient.fromItems(item));
   }
 
   /** Sets the material item, on the table */
-  public MoldingRecipeBuilder setMaterial(ITag<Item> tag) {
+  public MoldingRecipeBuilder setMaterial(Tag<Item> tag) {
     return setMaterial(Ingredient.fromTag(tag));
   }
 
@@ -69,12 +69,12 @@ public class MoldingRecipeBuilder extends AbstractRecipeBuilder<MoldingRecipeBui
   }
 
   /** Sets the mold item, in the players hand */
-  public MoldingRecipeBuilder setPattern(IItemProvider item, boolean consumed) {
+  public MoldingRecipeBuilder setPattern(ItemLike item, boolean consumed) {
     return setPattern(Ingredient.fromItems(item), consumed);
   }
 
   /** Sets the mold item, in the players hand */
-  public MoldingRecipeBuilder setPattern(ITag<Item> tag, boolean consumed) {
+  public MoldingRecipeBuilder setPattern(Tag<Item> tag, boolean consumed) {
     return setPattern(Ingredient.fromTag(tag), consumed);
   }
 

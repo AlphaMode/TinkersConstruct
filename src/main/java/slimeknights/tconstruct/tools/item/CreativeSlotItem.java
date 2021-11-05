@@ -63,7 +63,7 @@ public class CreativeSlotItem extends Item {
   public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
     SlotType slot = getSlot(stack);
     if (slot != null) {
-      tooltip.add(new TranslationTextComponent(TOOLTIP, slot.getDisplayName()).mergeStyle(TextFormatting.GRAY));
+      tooltip.add(new TranslationTextComponent(TOOLTIP, slot.getDisplayName()).mergeStyle(ChatFormatting.GRAY));
     } else {
       tooltip.add(TOOLTIP_MISSING);
     }

@@ -90,7 +90,7 @@ class StationSlotLayoutLoaderTest extends BaseMcTest {
 
   /** Checks the given ingredient is just the given item */
   private static void ingredientIsItem(Ingredient ingredient, Item item) {
-    ItemStack[] stacks = ingredient.getMatchingStacks();
+    ItemStack[] stacks = ingredient.getItems();
     assertThat(stacks).hasSize(1);
     assertThat(stacks[0].getItem()).isEqualTo(item);
     assertThat(stacks[0].getTag()).isNull();

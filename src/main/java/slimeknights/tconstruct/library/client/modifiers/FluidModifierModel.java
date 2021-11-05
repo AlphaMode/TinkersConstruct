@@ -1,13 +1,15 @@
 package slimeknights.tconstruct.library.client.modifiers;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.math.Transformation;
 import lombok.Data;
-import net.minecraft.client.renderer.model.BakedQuad;
+
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.vector.TransformationMatrix;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.material.Fluid;
+
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.model.ItemTextureQuadConverter;
 import net.minecraftforge.fluids.FluidAttributes;
@@ -65,12 +67,12 @@ public class FluidModifierModel extends NormalModifierModel {
   }
 
   @Nullable
-  protected RenderMaterial getTemplate(TankModifier tank, IModifierToolStack tool, FluidStack fluid, boolean isLarge) {
+  protected Material getTemplate(TankModifier tank, IModifierToolStack tool, FluidStack fluid, boolean isLarge) {
     return fluidTextures[(isLarge ? 1 : 0)];
   }
 
   @Override
-  public ImmutableList<BakedQuad> getQuads(IModifierToolStack tool, ModifierEntry entry, Function<RenderMaterial,TextureAtlasSprite> spriteGetter, TransformationMatrix transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
+  public ImmutableList<BakedQuad> getQuads(IModifierToolStack tool, ModifierEntry entry, Function<Material,TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
     // first, determine stored fluid
     ImmutableList<BakedQuad> quads = super.getQuads(tool, entry, spriteGetter, transforms, isLarge, startTintIndex, pixels);
     // modifier must be tank
@@ -81,7 +83,7 @@ public class FluidModifierModel extends NormalModifierModel {
       // must have fluid
       if (!fluid.isEmpty()) {
         // must have texture for the proper state
-        RenderMaterial template = getTemplate(tank, tool, fluid, isLarge);
+        Material template = getTemplate(tank, tool, fluid, isLarge);
         if (template != null) {
           // finally, build (mostly based on bucket model)
           ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();

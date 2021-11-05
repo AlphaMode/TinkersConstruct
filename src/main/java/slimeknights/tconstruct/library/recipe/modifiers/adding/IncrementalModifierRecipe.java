@@ -6,8 +6,8 @@ import com.google.gson.JsonSyntaxException;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -168,7 +168,7 @@ public class IncrementalModifierRecipe extends AbstractModifierRecipe {
   @Override
   protected void addIngredients(Consumer<List<ItemStack>> builder) {
     // fill extra item slots
-    List<ItemStack> items = Arrays.asList(input.getMatchingStacks());
+    List<ItemStack> items = Arrays.asList(input.getItems());
     int maxStackSize = items.stream().mapToInt(ItemStack::getMaxStackSize).min().orElse(64);
 
     // split the stacks out if we need more than 1
@@ -276,9 +276,9 @@ public class IncrementalModifierRecipe extends AbstractModifierRecipe {
   public static ItemStack deseralizeResultItem(JsonObject parent, String name) {
     JsonElement element = JsonHelper.getElement(parent, name);
     if (element.isJsonPrimitive()) {
-      return new ItemStack(JSONUtils.getItem(element, name));
+      return new ItemStack(GsonHelper.getItem(element, name));
     } else {
-      return CraftingHelper.getItemStack(JSONUtils.getJsonObject(element, name), true);
+      return CraftingHelper.getItemStack(GsonHelper.getJsonObject(element, name), true);
     }
   }
 
@@ -287,11 +287,11 @@ public class IncrementalModifierRecipe extends AbstractModifierRecipe {
     public IncrementalModifierRecipe read(ResourceLocation id, JsonObject json, Ingredient toolRequirement, ModifierMatch requirements,
                                           String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots) {
       Ingredient input = Ingredient.deserialize(JsonHelper.getElement(json, "input"));
-      int amountPerInput = JSONUtils.getInt(json, "amount_per_item", 1);
+      int amountPerInput = GsonHelper.getInt(json, "amount_per_item", 1);
       if (amountPerInput < 1) {
         throw new JsonSyntaxException("amount_per_item must be positive");
       }
-      int neededPerLevel = JSONUtils.getInt(json, "needed_per_level");
+      int neededPerLevel = GsonHelper.getInt(json, "needed_per_level");
       if (neededPerLevel <= amountPerInput) {
         throw new JsonSyntaxException("needed_per_level must be greater than amount_per_item");
       }
@@ -303,7 +303,7 @@ public class IncrementalModifierRecipe extends AbstractModifierRecipe {
     }
 
     @Override
-    public IncrementalModifierRecipe read(ResourceLocation id, PacketBuffer buffer, Ingredient toolRequirement, ModifierMatch requirements,
+    public IncrementalModifierRecipe read(ResourceLocation id, FriendlyByteBuf buffer, Ingredient toolRequirement, ModifierMatch requirements,
                                           String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots) {
       Ingredient input = Ingredient.read(buffer);
       int amountPerInput = buffer.readVarInt();
@@ -319,13 +319,13 @@ public class IncrementalModifierRecipe extends AbstractModifierRecipe {
     }
 
     @Override
-    public IncrementalModifierRecipe read(ResourceLocation id, PacketBuffer buffer, Ingredient toolRequirement, ModifierMatch requirements,
+    public IncrementalModifierRecipe read(ResourceLocation id, FriendlyByteBuf buffer, Ingredient toolRequirement, ModifierMatch requirements,
                                           String requirementsError, ModifierEntry result, int maxLevel, int upgradeSlots, int abilitySlots) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    protected void writeSafe(PacketBuffer buffer, IncrementalModifierRecipe recipe) {
+    protected void writeSafe(FriendlyByteBuf buffer, IncrementalModifierRecipe recipe) {
       super.writeSafe(buffer, recipe);
       recipe.input.write(buffer);
       buffer.writeVarInt(recipe.amountPerInput);

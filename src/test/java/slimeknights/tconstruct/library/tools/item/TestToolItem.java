@@ -1,6 +1,6 @@
 package slimeknights.tconstruct.library.tools.item;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.block.Blocks;
 import slimeknights.tconstruct.library.tools.ToolDefinition;
 

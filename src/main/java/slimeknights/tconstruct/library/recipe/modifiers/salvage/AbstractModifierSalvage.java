@@ -6,12 +6,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
+
 import slimeknights.mantle.recipe.ICustomOutputRecipe;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.tconstruct.common.recipe.LoggingRecipeSerializer;
@@ -76,14 +77,14 @@ public abstract class AbstractModifierSalvage implements ICustomOutputRecipe<Con
   public abstract void acceptItems(IModifierToolStack tool, Consumer<ItemStack> stackConsumer, Random random);
 
   @Override
-  public IRecipeType<?> getType() {
+  public RecipeType<?> getType() {
     return RecipeTypes.DATA;
   }
 
   /** @deprecated Use {@link #matches(ItemStack, IModifierToolStack, int)} */
   @Deprecated
   @Override
-  public boolean matches(IInventory inv, World worldIn) {
+  public boolean matches(Container inv, Level worldIn) {
     return false;
   }
 
@@ -95,28 +96,28 @@ public abstract class AbstractModifierSalvage implements ICustomOutputRecipe<Con
     protected abstract T read(ResourceLocation id, JsonObject json, Ingredient toolIngredient, Modifier modifier, int minLevel, int maxLevel, @Nullable SlotCount slots);
 
     /** Finishes reading the recipe from the packet buffer */
-    protected abstract T read(ResourceLocation id, PacketBuffer buffer, Ingredient toolIngredient, Modifier modifier, int minLevel, int maxLevel, @Nullable SlotCount slots);
+    protected abstract T read(ResourceLocation id, FriendlyByteBuf buffer, Ingredient toolIngredient, Modifier modifier, int minLevel, int maxLevel, @Nullable SlotCount slots);
 
     @Override
-    public T read(ResourceLocation id, JsonObject json) {
-      Ingredient toolIngredient = Ingredient.deserialize(JsonHelper.getElement(json, "tools"));
+    public T fromJson(ResourceLocation id, JsonObject json) {
+      Ingredient toolIngredient = Ingredient.fromJson(JsonHelper.getElement(json, "tools"));
       Modifier modifier = ModifierEntry.deserializeModifier(json, "modifier");
       int minLevel = JsonUtils.getIntMin(json, "min_level", 1);
-      int maxLevel = JSONUtils.getInt(json, "max_level", Integer.MAX_VALUE);
+      int maxLevel = GsonHelper.getAsInt(json, "max_level", Integer.MAX_VALUE);
       if (maxLevel < minLevel) {
         throw new JsonSyntaxException("Max level must be greater than or equal to min level");
       }
       SlotCount slots = null;
       if (json.has("slots")) {
-        slots = SlotCount.fromJson(JSONUtils.getJsonObject(json, "slots"));
+        slots = SlotCount.fromJson(GsonHelper.getAsJsonObject(json, "slots"));
       }
       return read(id, json, toolIngredient, modifier, minLevel, maxLevel, slots);
     }
 
     @Nullable
     @Override
-    protected T readSafe(ResourceLocation id, PacketBuffer buffer) {
-      Ingredient toolIngredient = Ingredient.read(buffer);
+    protected T readSafe(ResourceLocation id, FriendlyByteBuf buffer) {
+      Ingredient toolIngredient = Ingredient.fromNetwork(buffer);
       Modifier modifier = buffer.readRegistryIdUnsafe(TinkerRegistries.MODIFIERS);
       int minLevel = buffer.readVarInt();
       int maxLevel = buffer.readVarInt();
@@ -125,8 +126,8 @@ public abstract class AbstractModifierSalvage implements ICustomOutputRecipe<Con
     }
 
     @Override
-    protected void writeSafe(PacketBuffer buffer, T recipe) {
-      recipe.toolIngredient.write(buffer);
+    protected void writeSafe(FriendlyByteBuf buffer, T recipe) {
+      recipe.toolIngredient.toNetwork(buffer);
       buffer.writeRegistryIdUnsafe(TinkerRegistries.MODIFIERS, recipe.modifier);
       buffer.writeVarInt(recipe.minLevel);
       buffer.writeVarInt(recipe.maxLevel);

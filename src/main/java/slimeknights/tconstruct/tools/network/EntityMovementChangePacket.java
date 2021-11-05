@@ -34,13 +34,13 @@ public class EntityMovementChangePacket implements IThreadsafePacket {
   }
 
   @Override
-  public void encode(FriendlyByteBuf packetBuffer) {
-    packetBuffer.writeInt(this.entityID);
-    packetBuffer.writeDouble(this.x);
-    packetBuffer.writeDouble(this.y);
-    packetBuffer.writeDouble(this.z);
-    packetBuffer.writeFloat(this.yaw);
-    packetBuffer.writeFloat(this.pitch);
+  public void encode(FriendlyByteBuf FriendlyByteBuf) {
+    FriendlyByteBuf.writeInt(this.entityID);
+    FriendlyByteBuf.writeDouble(this.x);
+    FriendlyByteBuf.writeDouble(this.y);
+    FriendlyByteBuf.writeDouble(this.z);
+    FriendlyByteBuf.writeFloat(this.yaw);
+    FriendlyByteBuf.writeFloat(this.pitch);
   }
 
   @Override

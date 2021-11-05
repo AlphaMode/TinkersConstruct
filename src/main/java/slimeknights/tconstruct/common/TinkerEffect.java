@@ -20,20 +20,20 @@ public class TinkerEffect extends MobEffect {
 
   /* Visibility */
 
-  @Override
-  public boolean shouldRender(MobEffectInstance effect) {
-    return this.show;
-  }
-
-  @Override
-  public boolean shouldRenderInvText(MobEffectInstance effect) {
-    return this.show;
-  }
-
-  @Override
-  public boolean shouldRenderHUD(MobEffectInstance effect) {
-    return this.show;
-  }
+//  @Override
+//  public boolean shouldRender(MobEffectInstance effect) {
+//    return this.show;
+//  }
+//
+//  @Override
+//  public boolean shouldRenderInvText(MobEffectInstance effect) {
+//    return this.show;
+//  }
+//
+//  @Override
+//  public boolean shouldRenderHUD(MobEffectInstance effect) {
+//    return this.show;
+//  }
 
 
   /* Helpers */

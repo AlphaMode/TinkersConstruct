@@ -5,7 +5,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import slimeknights.tconstruct.tables.TinkerTables;
 import slimeknights.tconstruct.tables.inventory.BaseStationContainer;
 import slimeknights.tconstruct.tables.tileentity.table.CraftingStationTileEntity;
@@ -53,7 +53,7 @@ public class CraftingStationContainer extends BaseStationContainer<CraftingStati
    * @param inv  Player inventory
    * @param buf  Buffer for fetching tile
    */
-  public CraftingStationContainer(int id, PlayerInventory inv, PacketBuffer buf) {
+  public CraftingStationContainer(int id, PlayerInventory inv, FriendlyByteBuf buf) {
     this(id, inv, getTileEntityFromBuf(buf, CraftingStationTileEntity.class));
   }
 

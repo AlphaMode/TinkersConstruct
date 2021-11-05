@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import slimeknights.mantle.client.book.action.StringActionProcessor;
@@ -38,7 +37,7 @@ public class PageIconLinkElement extends SizedBookElement {
   @Override
   public void draw(PoseStack matrices, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
     boolean hover = this.isHovered(mouseX, mouseY);
-    RenderSystem.color4f(1F, 1F, 1F, hover ? 1F : 0.5F);
+    RenderSystem.setShaderColor(1F, 1F, 1F, hover ? 1F : 0.5F);
 
     if (this.isHovered(mouseX, mouseY)) {
       fill(matrices, this.x, this.y, this.x + this.width, this.y + this.height, this.parent.book.appearance.hoverColor | (0x77 << 24));

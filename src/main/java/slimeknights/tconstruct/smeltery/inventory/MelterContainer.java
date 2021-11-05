@@ -3,7 +3,7 @@ package slimeknights.tconstruct.smeltery.inventory;
 import lombok.Getter;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.math.BlockPos;
@@ -61,7 +61,7 @@ public class MelterContainer extends BaseContainer<MelterTileEntity> {
     }
   }
 
-  public MelterContainer(int id, PlayerInventory inv, PacketBuffer buf) {
+  public MelterContainer(int id, PlayerInventory inv, FriendlyByteBuf buf) {
     this(id, inv, getTileEntityFromBuf(buf, MelterTileEntity.class));
   }
 }

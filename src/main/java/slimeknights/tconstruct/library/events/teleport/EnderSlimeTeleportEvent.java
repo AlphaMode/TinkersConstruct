@@ -2,7 +2,7 @@ package slimeknights.tconstruct.library.events.teleport;
 
 import lombok.Getter;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 import slimeknights.tconstruct.world.entity.EnderSlimeEntity;
 

@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import slimeknights.mantle.util.sync.LambdaIntReference;
 import slimeknights.tconstruct.tables.TinkerTables;
 import slimeknights.tconstruct.tables.inventory.BaseStationContainer;
@@ -53,7 +53,7 @@ public class PartBuilderContainer extends BaseStationContainer<PartBuilderTileEn
     }
   }
 
-  public PartBuilderContainer(int id, PlayerInventory inv, PacketBuffer buf) {
+  public PartBuilderContainer(int id, PlayerInventory inv, FriendlyByteBuf buf) {
     this(id, inv, getTileEntityFromBuf(buf, PartBuilderTileEntity.class));
   }
 

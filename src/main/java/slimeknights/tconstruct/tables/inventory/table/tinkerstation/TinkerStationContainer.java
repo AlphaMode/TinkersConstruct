@@ -4,7 +4,7 @@ import lombok.Getter;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import slimeknights.tconstruct.library.tools.layout.LayoutSlot;
 import slimeknights.tconstruct.library.tools.layout.StationSlotLayout;
 import slimeknights.tconstruct.library.tools.layout.StationSlotLayoutLoader;
@@ -66,7 +66,7 @@ public class TinkerStationContainer extends BaseStationContainer<TinkerStationTi
    * @param inv  Player inventory
    * @param buf  Buffer for fetching tile
    */
-  public TinkerStationContainer(int id, PlayerInventory inv, PacketBuffer buf) {
+  public TinkerStationContainer(int id, PlayerInventory inv, FriendlyByteBuf buf) {
     this(id, inv, getTileEntityFromBuf(buf, TinkerStationTileEntity.class));
   }
 

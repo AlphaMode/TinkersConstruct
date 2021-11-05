@@ -14,7 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagCollectionManager;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import slimeknights.mantle.recipe.RecipeHelper;
@@ -140,12 +140,12 @@ public class ToolPredicate extends ItemPredicate {
     // item
     Item item = null;
     if (json.has("item")) {
-      item = RecipeHelper.deserializeItem(JSONUtils.getString(json, "item"), "item", Item.class);
+      item = RecipeHelper.deserializeItem(GsonHelper.getString(json, "item"), "item", Item.class);
     }
     // tag
-    ITag<Item> tag = null;
+    Tag<Item> tag = null;
     if (json.has("tag")) {
-      ResourceLocation tagName = new ResourceLocation(JSONUtils.getString(json, "tag"));
+      ResourceLocation tagName = new ResourceLocation(GsonHelper.getString(json, "tag"));
       tag = TagCollectionManager.getManager().getItemTags().get(tagName);
       if (tag == null) {
         throw new JsonSyntaxException("Unknown item tag '" + tagName + "'");
@@ -154,18 +154,18 @@ public class ToolPredicate extends ItemPredicate {
     // materials
     List<MaterialId> materials = Collections.emptyList();
     if (json.has("materials")) {
-      materials = JsonHelper.parseList(json, "materials", (element, key) -> new MaterialId(JSONUtils.getString(element, key)));
+      materials = JsonHelper.parseList(json, "materials", (element, key) -> new MaterialId(GsonHelper.getString(element, key)));
     }
     // upgrades
-    boolean hasUpgrades = JSONUtils.getBoolean(json, "has_upgrades", false);
+    boolean hasUpgrades = GsonHelper.getBoolean(json, "has_upgrades", false);
     ModifierMatch upgrades = ModifierMatch.ALWAYS;
     if (json.has("upgrades")) {
-      upgrades = ModifierMatch.deserialize(JSONUtils.getJsonObject(json, "upgrades"));
+      upgrades = ModifierMatch.deserialize(GsonHelper.getJsonObject(json, "upgrades"));
     }
     // modifiers
     ModifierMatch modifiers = ModifierMatch.ALWAYS;
     if (json.has("modifiers")) {
-      modifiers = ModifierMatch.deserialize(JSONUtils.getJsonObject(json, "modifiers"));
+      modifiers = ModifierMatch.deserialize(GsonHelper.getJsonObject(json, "modifiers"));
     }
     // stats
     List<StatPredicate> stats = Collections.emptyList();
@@ -181,7 +181,7 @@ public class ToolPredicate extends ItemPredicate {
   }
 
   /** Creates a new builder instance for a tag */
-  public static Builder builder(ITag<Item> tag) {
+  public static Builder builder(Tag<Item> tag) {
     return new Builder(null, tag);
   }
 
@@ -198,7 +198,7 @@ public class ToolPredicate extends ItemPredicate {
     protected final Item item;
     /** Tag that must match */
     @Nullable
-    protected final ITag<Item> tag;
+    protected final Tag<Item> tag;
     /** Materials that must be contained in the tool */
     protected final List<MaterialId> materials = new ArrayList<>();
     /** If true, the tool must have at least 1 upgrade */
@@ -209,7 +209,7 @@ public class ToolPredicate extends ItemPredicate {
     protected ModifierMatch modifiers = ModifierMatch.ALWAYS;
     protected final List<StatPredicate> stats = new ArrayList<>();
 
-    protected Builder(@Nullable Item item, @Nullable ITag<Item> tag) {
+    protected Builder(@Nullable Item item, @Nullable Tag<Item> tag) {
       this.item = item;
       this.tag = tag;
     }

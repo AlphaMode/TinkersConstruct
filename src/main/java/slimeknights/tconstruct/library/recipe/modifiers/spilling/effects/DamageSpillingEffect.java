@@ -10,9 +10,9 @@ import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.util.GsonHelper;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.EntityIngredient;
 import slimeknights.mantle.util.JsonHelper;
@@ -189,17 +189,17 @@ public class DamageSpillingEffect implements ISpillingEffect {
           entity = EntityIngredient.deserialize(element);
         }
       }
-      String typeName = JSONUtils.getString(json, "damage_type");
+      String typeName = GsonHelper.getString(json, "damage_type");
       DamageType type = DamageType.byName(typeName);
       if (type == null) {
         throw new JsonSyntaxException("Unknown damage type '" + typeName + "'");
       }
-      float damage = JSONUtils.getFloat(json, "damage_amount");
+      float damage = GsonHelper.getFloat(json, "damage_amount");
       return new DamageSpillingEffect(entity, predicate, type, damage);
     }
 
     @Override
-    public DamageSpillingEffect read(PacketBuffer buffer) {
+    public DamageSpillingEffect read(FriendlyByteBuf buffer) {
       EntityIngredient entity = null;
       if (buffer.readBoolean()) {
         entity = EntityIngredient.read(buffer);
@@ -222,7 +222,7 @@ public class DamageSpillingEffect implements ISpillingEffect {
     }
 
     @Override
-    public void write(DamageSpillingEffect effect, PacketBuffer buffer) {
+    public void write(DamageSpillingEffect effect, FriendlyByteBuf buffer) {
       if (effect.entity != null) {
         buffer.writeBoolean(true);
         effect.entity.write(buffer);

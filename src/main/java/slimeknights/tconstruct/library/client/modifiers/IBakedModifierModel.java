@@ -1,11 +1,14 @@
 package slimeknights.tconstruct.library.client.modifiers;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.RenderMaterial;
+
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.math.vector.TransformationMatrix;
+import net.minecraft.client.resources.model.Material;
+
+import com.mojang.math.Transformation;
 import slimeknights.mantle.util.ItemLayerPixels;
+import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 
@@ -28,13 +31,13 @@ public interface IBakedModifierModel {
     return modifier.getModifier();
   }
 
-  /** @deprecated Use {@link #getQuads(IModifierToolStack, ModifierEntry, Function, TransformationMatrix, boolean, int, ItemLayerPixels)} */
+  /** @deprecated Use {@link #getQuads(IModifierToolStack, ModifierEntry, Function, Transformation, boolean, int, ItemLayerPixels)} */
   @Deprecated
-  ImmutableList<BakedQuad> getQuads(IModifierToolStack tool, ModifierEntry modifier, Function<RenderMaterial,TextureAtlasSprite> spriteGetter, TransformationMatrix transforms, boolean isLarge);
+  ImmutableList<BakedQuad> getQuads(IModifierToolStack tool, ModifierEntry modifier, Function<Material,TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge);
 
-  /** @deprecated Use {@link #getQuads(IModifierToolStack, ModifierEntry, Function, TransformationMatrix, boolean, int, ItemLayerPixels)} */
+  /** @deprecated Use {@link #getQuads(IModifierToolStack, ModifierEntry, Function, Transformation, boolean, int, ItemLayerPixels)} */
   @Deprecated
-  default ImmutableList<BakedQuad> getQuads(IModifierToolStack tool, ModifierEntry modifier, Function<RenderMaterial,TextureAtlasSprite> spriteGetter, TransformationMatrix transforms, boolean isLarge, int startTintIndex) {
+  default ImmutableList<BakedQuad> getQuads(IModifierToolStack tool, ModifierEntry modifier, Function<Material,TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge, int startTintIndex) {
     return getQuads(tool, modifier, spriteGetter, transforms, isLarge);
   }
 
@@ -49,7 +52,7 @@ public interface IBakedModifierModel {
    * @param pixels           Item layer pixels to reduce z-fighting. Pass into methods from {@link slimeknights.mantle.client.model.util.MantleItemLayerModel}
    * @return  List of baked quads
    */
-  default ImmutableList<BakedQuad> getQuads(IModifierToolStack tool, ModifierEntry modifier, Function<RenderMaterial,TextureAtlasSprite> spriteGetter, TransformationMatrix transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
+  default ImmutableList<BakedQuad> getQuads(IModifierToolStack tool, ModifierEntry modifier, Function<Material,TextureAtlasSprite> spriteGetter, Transformation transforms, boolean isLarge, int startTintIndex, @Nullable ItemLayerPixels pixels) {
     return getQuads(tool, modifier, spriteGetter, transforms, isLarge, startTintIndex);
   }
 

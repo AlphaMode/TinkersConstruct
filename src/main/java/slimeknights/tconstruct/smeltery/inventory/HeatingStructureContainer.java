@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.world.inventory.DataSlot;
 

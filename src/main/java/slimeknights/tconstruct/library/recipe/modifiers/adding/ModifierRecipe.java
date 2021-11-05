@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import slimeknights.mantle.recipe.SizedIngredient;
@@ -190,7 +190,7 @@ public class ModifierRecipe extends AbstractModifierRecipe {
   @Override
   protected void addIngredients(Consumer<List<ItemStack>> builder) {
     for (SizedIngredient ingredient : inputs) {
-      builder.accept(ingredient.getMatchingStacks());
+      builder.accept(ingredient.getItems());
     }
   }
 
@@ -203,7 +203,7 @@ public class ModifierRecipe extends AbstractModifierRecipe {
     }
 
     @Override
-    public ModifierRecipe read(ResourceLocation id, PacketBuffer buffer, Ingredient toolRequirement, ModifierMatch requirements,
+    public ModifierRecipe read(ResourceLocation id, FriendlyByteBuf buffer, Ingredient toolRequirement, ModifierMatch requirements,
                                String requirementsError, ModifierEntry result, int maxLevel, @Nullable SlotCount slots) {
       int size = buffer.readVarInt();
       ImmutableList.Builder<SizedIngredient> builder = ImmutableList.builder();
@@ -220,13 +220,13 @@ public class ModifierRecipe extends AbstractModifierRecipe {
     }
 
     @Override
-    public ModifierRecipe read(ResourceLocation id, PacketBuffer buffer, Ingredient toolRequirement, ModifierMatch requirements,
+    public ModifierRecipe read(ResourceLocation id, FriendlyByteBuf buffer, Ingredient toolRequirement, ModifierMatch requirements,
                                String requirementsError, ModifierEntry result, int maxLevel, int upgradeSlots, int abilitySlots) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    protected void writeSafe(PacketBuffer buffer, ModifierRecipe recipe) {
+    protected void writeSafe(FriendlyByteBuf buffer, ModifierRecipe recipe) {
       super.writeSafe(buffer, recipe);
       buffer.writeVarInt(recipe.inputs.size());
       for (SizedIngredient ingredient : recipe.inputs) {

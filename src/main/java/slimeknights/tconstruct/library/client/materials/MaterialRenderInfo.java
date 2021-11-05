@@ -76,12 +76,12 @@ public class MaterialRenderInfo {
    * @param textures  Texture consumer
    * @param base      Base texture, will be used to generate texture names
    */
-  public void getTextureDependencies(Predicate<RenderMaterial> textures, RenderMaterial base) {
+  public void getTextureDependencies(Predicate<Material> textures, Material base) {
     if (texture != null) {
-      textures.test(getMaterial(base.getTextureLocation(), getSuffix(texture)));
+      textures.test(getMaterial(base.texture(), getSuffix(texture)));
     }
     for (String fallback : fallbacks) {
-      textures.test(getMaterial(base.getTextureLocation(), fallback));
+      textures.test(getMaterial(base.texture(), fallback));
     }
   }
 
@@ -104,7 +104,7 @@ public class MaterialRenderInfo {
    * @param suffix    Material or fallback suffix name
    * @return  Material instance
    */
-  private static RenderMaterial getMaterial(ResourceLocation texture, String suffix) {
+  private static Material getMaterial(ResourceLocation texture, String suffix) {
     return ModelLoaderRegistry.blockMaterial(new ResourceLocation(texture.getNamespace(), texture.getPath() + "_" + suffix));
   }
 

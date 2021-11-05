@@ -5,8 +5,8 @@ import com.google.gson.JsonObject;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -75,20 +75,20 @@ public class IncrementalModifierSalvage extends AbstractModifierSalvage {
       ItemOutput result = ItemOutput.fromJson(salvageElement);
       boolean fullSalvage = false;
       if (salvageElement.isJsonObject()) {
-        fullSalvage = JSONUtils.getBoolean(salvageElement.getAsJsonObject(), "full", false);
+        fullSalvage = GsonHelper.getBoolean(salvageElement.getAsJsonObject(), "full", false);
       }
       return new IncrementalModifierSalvage(id, toolIngredient, modifier, minLevel, maxLevel, result, fullSalvage, slots);
     }
 
     @Override
-    protected IncrementalModifierSalvage read(ResourceLocation id, PacketBuffer buffer, Ingredient toolIngredient, Modifier modifier, int minLevel, int maxLevel, @Nullable SlotCount slots) {
+    protected IncrementalModifierSalvage read(ResourceLocation id, FriendlyByteBuf buffer, Ingredient toolIngredient, Modifier modifier, int minLevel, int maxLevel, @Nullable SlotCount slots) {
       ItemOutput result = ItemOutput.read(buffer);
       boolean fullSalvage = buffer.readBoolean();
       return new IncrementalModifierSalvage(id, toolIngredient, modifier, minLevel, maxLevel, result, fullSalvage, slots);
     }
 
     @Override
-    protected void writeSafe(PacketBuffer buffer, IncrementalModifierSalvage recipe) {
+    protected void writeSafe(FriendlyByteBuf buffer, IncrementalModifierSalvage recipe) {
       super.writeSafe(buffer, recipe);
       recipe.result.write(buffer);
       buffer.writeBoolean(recipe.fullSalvage);

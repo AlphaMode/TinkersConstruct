@@ -7,7 +7,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.network.chat.Component;
@@ -70,7 +70,7 @@ public class Pattern extends ResourceLocation {
   protected static class Serializer implements JsonDeserializer<Pattern>, JsonSerializer<Pattern> {
     @Override
     public Pattern deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
-      return new Pattern(JSONUtils.getString(json, "location"));
+      return new Pattern(GsonHelper.getString(json, "location"));
     }
 
     @Override

@@ -1,9 +1,9 @@
 package slimeknights.tconstruct.library.recipe.modifiers.adding;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.ListTag;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.modifiers.Modifier;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
@@ -99,7 +99,7 @@ public interface IDisplayModifierRecipe extends IModifierRecipe {
 
   /** Gets a stream of all modifiable items for display */
   static Stream<Item> getAllModifiable() {
-    return TinkerTags.Items.MODIFIABLE.getAllElements().stream();
+    return TinkerTags.Items.MODIFIABLE.getValues().stream();
   }
 
   /** Maps the stream from tool items to applicable tool stacks */
@@ -124,7 +124,7 @@ public interface IDisplayModifierRecipe extends IModifierRecipe {
       builder.add(newModifier);
     }
     ModifierNBT modifiers = builder.build();
-    ListNBT list = modifiers.serializeToNBT();
+    ListTag list = modifiers.serializeToNBT();
     nbt.put(ToolStack.TAG_UPGRADES, list);
     nbt.put(ToolStack.TAG_MODIFIERS, list);
 

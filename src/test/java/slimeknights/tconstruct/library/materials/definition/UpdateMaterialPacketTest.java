@@ -3,7 +3,7 @@ package slimeknights.tconstruct.library.materials.definition;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.netty.buffer.Unpooled;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.text.Color;
 import org.junit.jupiter.api.Test;
 import slimeknights.tconstruct.fixture.MaterialFixture;
@@ -29,7 +29,7 @@ class UpdateMaterialPacketTest extends BaseMcTest {
     Map<MaterialId,MaterialId> redirects = ImmutableMap.of(REDIRECT_ID, MATERIAL_ID_1);
 
     // send a packet over the buffer
-    PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+    FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
     UpdateMaterialsPacket packetToEncode = new UpdateMaterialsPacket(materials, redirects);
     packetToEncode.encode(buffer);
     UpdateMaterialsPacket decoded = new UpdateMaterialsPacket(buffer);

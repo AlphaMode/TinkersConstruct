@@ -8,8 +8,8 @@ import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.tags.Tag;
+import net.minecraft.util.ItemLike;
 import net.minecraft.util.ResourceLocation;
 import slimeknights.mantle.recipe.data.AbstractRecipeBuilder;
 import slimeknights.tconstruct.library.recipe.casting.material.MaterialCastingRecipe.Serializer;
@@ -55,7 +55,7 @@ public class MaterialCastingRecipeBuilder extends AbstractRecipeBuilder<Material
    * @param consumed  If true, cast is consumed
    * @return  Builder instance
    */
-  public MaterialCastingRecipeBuilder setCast(ITag<Item> tag, boolean consumed) {
+  public MaterialCastingRecipeBuilder setCast(Tag<Item> tag, boolean consumed) {
     return this.setCast(Ingredient.fromTag(tag), consumed);
   }
 
@@ -65,7 +65,7 @@ public class MaterialCastingRecipeBuilder extends AbstractRecipeBuilder<Material
    * @param consumed  If true, cast is consumed
    * @return  Builder instance
    */
-  public MaterialCastingRecipeBuilder setCast(IItemProvider item, boolean consumed) {
+  public MaterialCastingRecipeBuilder setCast(ItemLike item, boolean consumed) {
     return this.setCast(Ingredient.fromItems(item), consumed);
   }
 

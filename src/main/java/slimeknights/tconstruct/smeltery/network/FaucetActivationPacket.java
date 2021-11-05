@@ -23,9 +23,9 @@ public class FaucetActivationPacket extends FluidUpdatePacket {
   }
 
   @Override
-  public void encode(FriendlyByteBuf packetBuffer) {
-    super.encode(packetBuffer);
-    packetBuffer.writeBoolean(isPouring);
+  public void encode(FriendlyByteBuf FriendlyByteBuf) {
+    super.encode(FriendlyByteBuf);
+    FriendlyByteBuf.writeBoolean(isPouring);
   }
 
   @Override

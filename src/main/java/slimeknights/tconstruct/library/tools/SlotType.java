@@ -60,7 +60,7 @@ public final class SlotType {
 
   /**
    * Registers the given slot type.
-   * Note that you will also want to define a texture for the creative modifier and JEI using {@link slimeknights.tconstruct.library.client.model.NBTKeyModel#registerExtraTexture(ResourceLocation, String, ResourceLocation)}
+   * Note that you will also want to define a texture for the creative modifier and JEI using {@link slimeknights.mantle.client.model.NBTKeyModel#registerExtraTexture(ResourceLocation, String, ResourceLocation)}
    * @param name     Name of the slot type
    * @param color    Color of the slot
    * @return  Slot type instance for the name, only once instance for each name

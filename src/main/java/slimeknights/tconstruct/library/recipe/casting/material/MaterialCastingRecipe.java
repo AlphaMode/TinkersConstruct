@@ -6,8 +6,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
@@ -112,7 +112,7 @@ public abstract class MaterialCastingRecipe extends AbstractCastingRecipe implem
   public List<IDisplayableCastingRecipe> getRecipes() {
     if (multiRecipes == null) {
       IRecipeType<?> type = getType();
-      List<ItemStack> castItems = Arrays.asList(cast.getMatchingStacks());
+      List<ItemStack> castItems = Arrays.asList(cast.getItems());
       multiRecipes = MaterialCastingLookup
         .getAllCastingFluids().stream()
         .filter(recipe -> {
@@ -169,20 +169,20 @@ public abstract class MaterialCastingRecipe extends AbstractCastingRecipe implem
 
     @Override
     protected T create(ResourceLocation idIn, String groupIn, @Nullable Ingredient cast, boolean consumed, boolean switchSlots, JsonObject json) {
-      int itemCost = JSONUtils.getInt(json, "item_cost");
-      IMaterialItem result = RecipeHelper.deserializeItem(JSONUtils.getString(json, "result"), "result", IMaterialItem.class);
+      int itemCost = GsonHelper.getInt(json, "item_cost");
+      IMaterialItem result = RecipeHelper.deserializeItem(GsonHelper.getString(json, "result"), "result", IMaterialItem.class);
       return this.factory.create(idIn, groupIn, cast, itemCost, result, consumed, switchSlots);
     }
 
     @Override
-    protected T create(ResourceLocation idIn, String groupIn, @Nullable Ingredient cast, boolean consumed, boolean switchSlots, PacketBuffer buffer) {
+    protected T create(ResourceLocation idIn, String groupIn, @Nullable Ingredient cast, boolean consumed, boolean switchSlots, FriendlyByteBuf buffer) {
       int fluidAmount = buffer.readInt();
       IMaterialItem result = RecipeHelper.readItem(buffer, IMaterialItem.class);
       return this.factory.create(idIn, groupIn, cast, fluidAmount, result, consumed, switchSlots);
     }
 
     @Override
-    protected void writeExtra(PacketBuffer buffer, MaterialCastingRecipe recipe) {
+    protected void writeExtra(FriendlyByteBuf buffer, MaterialCastingRecipe recipe) {
       buffer.writeInt(recipe.itemCost);
       RecipeHelper.writeItem(buffer, recipe.result);
     }

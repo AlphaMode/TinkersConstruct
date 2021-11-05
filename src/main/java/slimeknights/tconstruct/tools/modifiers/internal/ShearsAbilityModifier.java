@@ -1,7 +1,7 @@
 package slimeknights.tconstruct.tools.modifiers.internal;
 
 import lombok.Getter;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.block.TripWireBlock;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;

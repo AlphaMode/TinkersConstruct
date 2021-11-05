@@ -30,10 +30,10 @@ public class InventorySlotSyncPacket implements IThreadsafePacket {
   }
 
   @Override
-  public void encode(FriendlyByteBuf packetBuffer) {
-    packetBuffer.writeItem(this.itemStack);
-    packetBuffer.writeShort(this.slot);
-    packetBuffer.writeBlockPos(this.pos);
+  public void encode(FriendlyByteBuf FriendlyByteBuf) {
+    FriendlyByteBuf.writeItem(this.itemStack);
+    FriendlyByteBuf.writeShort(this.slot);
+    FriendlyByteBuf.writeBlockPos(this.pos);
   }
 
   @Override

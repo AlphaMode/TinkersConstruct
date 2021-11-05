@@ -16,7 +16,7 @@ import net.minecraft.client.resources.JsonReloadListener;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -85,7 +85,7 @@ public class StationSlotLayoutLoader extends JsonReloadListener {
       JsonElement value = entry.getValue();
       try {
         // skip empty objects, allows disabling a slot at a lower datapack
-        JsonObject object = JSONUtils.getJsonObject(value, "station_layout");
+        JsonObject object = GsonHelper.getJsonObject(value, "station_layout");
         if (!object.entrySet().isEmpty()) {
           // just need a valid slot information
           StationSlotLayout layout = GSON.fromJson(object, StationSlotLayout.class);

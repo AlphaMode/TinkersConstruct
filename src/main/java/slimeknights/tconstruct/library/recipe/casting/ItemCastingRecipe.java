@@ -3,12 +3,12 @@ package slimeknights.tconstruct.library.recipe.casting;
 import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
@@ -50,7 +50,7 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
   }
 
   @Override
-  public ItemStack getRecipeOutput() {
+  public ItemStack getResultItem() {
     return this.result.get();
   }
 
@@ -69,7 +69,7 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
 
   @Override
   public List<ItemStack> getCastItems() {
-    return Arrays.asList(cast.getMatchingStacks());
+    return Arrays.asList(cast.getItems());
   }
 
   @Override
@@ -93,7 +93,7 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
       return TinkerSmeltery.basinRecipeSerializer.get();
     }
   }
@@ -105,7 +105,7 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
       return TinkerSmeltery.tableRecipeSerializer.get();
     }
   }
@@ -118,12 +118,12 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
     protected T create(ResourceLocation idIn, String groupIn, @Nullable Ingredient cast, boolean consumed, boolean switchSlots, JsonObject json) {
       FluidIngredient fluid = FluidIngredient.deserialize(json, "fluid");
       ItemOutput output = ItemOutput.fromJson(JsonHelper.getElement(json, "result"));
-      int coolingTime = JSONUtils.getInt(json, "cooling_time");
+      int coolingTime = GsonHelper.getAsInt(json, "cooling_time");
       return factory.create(idIn, groupIn, cast, fluid, output, coolingTime, consumed, switchSlots);
     }
 
     @Override
-    protected T create(ResourceLocation idIn, String groupIn, @Nullable Ingredient cast, boolean consumed, boolean switchSlots, PacketBuffer buffer) {
+    protected T create(ResourceLocation idIn, String groupIn, @Nullable Ingredient cast, boolean consumed, boolean switchSlots, FriendlyByteBuf buffer) {
       FluidIngredient fluid = FluidIngredient.read(buffer);
       ItemOutput result = ItemOutput.read(buffer);
       int coolingTime = buffer.readInt();
@@ -131,7 +131,7 @@ public abstract class ItemCastingRecipe extends AbstractCastingRecipe implements
     }
 
     @Override
-    public void writeExtra(PacketBuffer buffer, T recipe) {
+    public void writeExtra(FriendlyByteBuf buffer, T recipe) {
       recipe.fluid.write(buffer);
       recipe.result.write(buffer);
       buffer.writeInt(recipe.coolingTime);

@@ -328,7 +328,7 @@ public class TinkerStationScreen extends BaseStationScreen<TinkerStationTileEnti
           IFormattableTextComponent textComponent = new StringTextComponent(" * ");
           ItemStack slotStack = this.container.getSlot(i).getStack();
           if (!layout.isValid(slotStack)) {
-            textComponent.mergeStyle(TextFormatting.RED);
+            textComponent.mergeStyle(ChatFormatting.RED);
           }
           textComponent.appendSibling(new TranslationTextComponent(key)).appendString("\n");
           text.appendSibling(textComponent);

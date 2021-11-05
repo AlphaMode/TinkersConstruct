@@ -11,12 +11,13 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import lombok.extern.log4j.Log4j2;
+
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.text.Color;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import slimeknights.mantle.util.LogicHelper;
@@ -204,9 +205,9 @@ public class MaterialManager extends SimpleJsonResourceReloadListener {
       boolean hidden = Boolean.TRUE.equals(materialJson.getHidden());
 
       // parse color from string
-      Color color = Optional.ofNullable(materialJson.getTextColor())
+      TextColor color = Optional.ofNullable(materialJson.getTextColor())
                             .filter(str -> !str.isEmpty())
-                            .map(Color::fromHex)
+                            .map(TextColor::parseColor)
                             .orElse(Material.WHITE);
 
 
@@ -221,7 +222,7 @@ public class MaterialManager extends SimpleJsonResourceReloadListener {
   private static class ConditionSerializer implements JsonDeserializer<ICondition>, JsonSerializer<ICondition> {
     @Override
     public ICondition deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
-      return CraftingHelper.getCondition(JSONUtils.getJsonObject(json, "condition"));
+      return CraftingHelper.getCondition(GsonHelper.convertToJsonObject(json, "condition"));
     }
 
     @Override

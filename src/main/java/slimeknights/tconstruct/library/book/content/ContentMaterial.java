@@ -3,17 +3,18 @@ package slimeknights.tconstruct.library.book.content;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
+
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.ForgeI18n;
+import net.minecraftforge.fmllegacy.ForgeI18n;
 import slimeknights.mantle.client.book.data.BookData;
 import slimeknights.mantle.client.book.data.element.TextComponentData;
 import slimeknights.mantle.client.book.data.element.TextData;
@@ -184,22 +185,22 @@ public class ContentMaterial extends TinkerPage {
       Modifier mod = trait.getModifier();
       TextComponentData textComponentData = new TextComponentData(mod.getDisplayName());
 
-      List<ITextComponent> textComponents = mod.getDescriptionList();
-      List<ITextComponent> formatted = new ArrayList<>();
+      List<Component> textComponents = mod.getDescriptionList();
+      List<Component> formatted = new ArrayList<>();
 
 
       for (int index = 0; index < textComponents.size(); index++) {
-        ITextComponent textComponent = textComponents.get(index);
+        Component textComponent = textComponents.get(index);
 
         if (index == 0) {
-          formatted.add(textComponent.deepCopy().modifyStyle(style -> style.setColor(material.getColor())));
+          formatted.add(textComponent.copy().withStyle(style -> style.withColor(material.getColor())));
         } else {
           formatted.add(textComponent);
         }
       }
 
-      textComponentData.tooltips = formatted.toArray(new ITextComponent[0]);
-      textComponentData.text = textComponentData.text.deepCopy().mergeStyle(TextFormatting.DARK_GRAY).mergeStyle(TextFormatting.UNDERLINE);
+      textComponentData.tooltips = formatted.toArray(new Component[0]);
+      textComponentData.text = textComponentData.text.copy().withStyle(ChatFormatting.DARK_GRAY).withStyle(ChatFormatting.UNDERLINE);
 
       lineData.add(textComponentData);
       lineData.add(new TextComponentData("\n"));
@@ -243,12 +244,12 @@ public class ContentMaterial extends TinkerPage {
     List<MaterialFluidRecipe> fluids = MaterialCastingLookup.getCastingFluids(materialId);
     if (!fluids.isEmpty()) {
       ItemElement elementItem = new TinkerItemElement(0, 0, 1, fluids.stream().flatMap(recipe -> recipe.getFluids().stream())
-                                                                     .map(fluid -> new ItemStack(fluid.getFluid().getFilledBucket()))
+                                                                     .map(fluid -> new ItemStack(fluid.getFluid().getBucket()))
                                                                      .collect(Collectors.toList()));
       FluidStack firstFluid = fluids.stream()
                                     .flatMap(recipe -> recipe.getFluids().stream())
                                     .findFirst().orElse(FluidStack.EMPTY);
-      elementItem.tooltip = ImmutableList.of(new TranslationTextComponent(CAST_FROM, firstFluid.getFluid().getAttributes().getDisplayName(firstFluid)));
+      elementItem.tooltip = ImmutableList.of(new TranslatableComponent(CAST_FROM, firstFluid.getFluid().getAttributes().getDisplayName(firstFluid)));
       displayTools.add(elementItem);
     }
     // composite casting
@@ -262,15 +263,15 @@ public class ContentMaterial extends TinkerPage {
                                                                                       .map(part -> part.withMaterial(input))
                                                                                       .collect(Collectors.toList()));
         FluidStack firstFluid = composite.getFluids().stream().findFirst().orElse(FluidStack.EMPTY);
-        elementItem.tooltip = ImmutableList.of(new TranslationTextComponent(COMPOSITE_FROM,
+        elementItem.tooltip = ImmutableList.of(new TranslatableComponent(COMPOSITE_FROM,
                                                                             firstFluid.getFluid().getAttributes().getDisplayName(firstFluid),
-                                                                            new TranslationTextComponent(input.getTranslationKey())));
+                                                                            new TranslatableComponent(input.getTranslationKey())));
         displayTools.add(elementItem);
       }
     }
 
     int y = 10;
-    for (Item item : TinkerTags.Items.MULTIPART_TOOL.getAllElements()) {
+    for (Item item : TinkerTags.Items.MULTIPART_TOOL.getValues()) {
       if (item instanceof IModifiable) {
         IModifiable tool = ((IModifiable) item);
         List<PartRequirement> requirements = tool.getToolDefinition().getData().getParts();
@@ -312,7 +313,7 @@ public class ContentMaterial extends TinkerPage {
   }
 
   public List<IToolPart> getToolParts() {
-    return TinkerTags.Items.TOOL_PARTS.getAllElements().stream().filter(item -> item instanceof IToolPart).map(item -> (IToolPart) item).collect(Collectors.toList());
+    return TinkerTags.Items.TOOL_PARTS.getValues().stream().filter(item -> item instanceof IToolPart).map(item -> (IToolPart) item).collect(Collectors.toList());
   }
 
 }

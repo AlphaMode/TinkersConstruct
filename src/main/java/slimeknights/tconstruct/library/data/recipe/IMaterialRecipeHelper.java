@@ -4,7 +4,7 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.recipe.ItemOutput;
 import slimeknights.mantle.registration.object.FluidObject;
@@ -64,7 +64,7 @@ public interface IMaterialRecipeHelper extends IRecipeHelper {
     Consumer<IFinishedRecipe> wrapped = optional ? withCondition(consumer, tagCondition("ingots/" + name)) : consumer;
     String matName = material.getPath();
     // ingot
-    ITag<Item> ingotTag = getTag("forge", "ingots/" + name);
+    Tag<Item> ingotTag = getTag("forge", "ingots/" + name);
     materialRecipe(wrapped, material, Ingredient.fromTag(ingotTag), 1, 1, folder + matName + "/ingot");
     // nugget
     wrapped = optional ? withCondition(consumer, tagCondition("nuggets/" + name)) : consumer;

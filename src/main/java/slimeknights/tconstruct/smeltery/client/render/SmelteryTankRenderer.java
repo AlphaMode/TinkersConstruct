@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.RenderType.CompositeState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;

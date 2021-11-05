@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.util.ITooltipFlag.TooltipFlags;
+import net.minecraft.core.NonNullList;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
@@ -14,13 +15,18 @@ import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.Player;
 import net.minecraft.inventory.EquipmentSlot;
 import net.minecraft.inventory.EquipmentSlot.Group;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.world.item.ItemStack;
@@ -33,7 +39,6 @@ import net.minecraft.util.InteractionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -63,7 +68,8 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -115,16 +121,15 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   }
 
   @Override
-  public boolean verifyTagAfterLoad(CompoundTag nbt) {
+  public void verifyTagAfterLoad(CompoundTag nbt) {
     // when the itemstack is loaded from NBT we recalculate all the data
     // stops things from being wrong if modifiers or materials change
     ToolStack.from(this, getToolDefinition(), nbt.getCompound("tag")).rebuildStats();
     // return value shouldn't matter since it's never checked
-    return true;
   }
 
   @Override
-  public void onCreated(ItemStack stack, Level worldIn, Player playerIn) {
+  public void onCraftedBy(ItemStack stack, Level worldIn, Player playerIn) {
     ToolStack.ensureInitialized(stack, getToolDefinition());
   }
 
@@ -141,7 +146,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   @Override
   public Rarity getRarity(ItemStack stack) {
     int rarity = ToolStack.from(stack).getVolatileData().getInt(RARITY);
-    return Rarity.values()[MathHelper.clamp(rarity, 0, 3)];
+    return Rarity.values()[Mth.clamp(rarity, 0, 3)];
   }
 
 
@@ -337,8 +342,8 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   /* Right click hooks */
 
   /** If true, this interaction hook should defer to the offhand */
-  protected static boolean shouldInteract(@Nullable LivingEntity player, ToolStack toolStack, Hand hand) {
-    return hand == Hand.OFF_HAND || player == null || !toolStack.getVolatileData().getBoolean(DEFER_OFFHAND) || player.getHeldItemOffhand().isEmpty();
+  protected static boolean shouldInteract(@Nullable LivingEntity player, ToolStack toolStack, InteractionHand hand) {
+    return hand == InteractionHand.OFF_HAND || player == null || !toolStack.getVolatileData().getBoolean(DEFER_OFFHAND) || player.getOffhandItem().isEmpty();
   }
   
   @Override
@@ -370,7 +375,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   }
 
   @Override
-  public InteractionResult itemInteractionForEntity(ItemStack stack, Player playerIn, LivingEntity target, Hand hand) {
+  public InteractionResult itemInteractionForEntity(ItemStack stack, Player playerIn, LivingEntity target, InteractionHand hand) {
     ToolStack tool = ToolStack.from(stack);
     if (shouldInteract(playerIn, tool, hand)) {
       for (ModifierEntry entry : tool.getModifierList()) {
@@ -384,9 +389,9 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(Level worldIn, Player playerIn, Hand hand) {
-    ItemStack stack = playerIn.getHeldItem(hand);
-    ToolStack tool = ToolStack.from(playerIn.getHeldItem(hand));
+  public ActionResult<ItemStack> onItemRightClick(Level worldIn, Player playerIn, InteractionHand hand) {
+    ItemStack stack = playerIn.getItemInHand(hand);
+    ToolStack tool = ToolStack.from(playerIn.getItemInHand(hand));
     if (shouldInteract(playerIn, tool, hand)) {
       for (ModifierEntry entry : tool.getModifierList()) {
         InteractionResult result = entry.getModifier().onToolUse(tool, entry.getLevel(), worldIn, playerIn, hand);
@@ -448,7 +453,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   /* Display names */
 
   @Override
-  public ITextComponent getDisplayName(ItemStack stack) {
+  public Component getDisplayName(ItemStack stack) {
     List<PartRequirement> components = getToolDefinition().getData().getParts();
     if (components.isEmpty()) {
       return super.getDisplayName(stack);
@@ -475,7 +480,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
 
   @Override
   @OnlyIn(Dist.CLIENT)
-  public void addInformation(ItemStack stack, @Nullable Level worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+  public void addInformation(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
     TooltipUtil.addInformation(this, stack, tooltip, TooltipKey.fromScreen(), flagIn == TooltipFlags.ADVANCED);
   }
 
@@ -483,7 +488,7 @@ public class ModifiableItem extends Item implements IModifiableDisplay, IModifia
   /* Display items */
 
   @Override
-  public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+  public void fillItemGroup(CreativeModeTab group, NonNullList<ItemStack> items) {
     if (this.isInGroup(group)) {
       ToolBuildHandler.addDefaultSubItems(this, items);
     }

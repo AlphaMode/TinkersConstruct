@@ -7,7 +7,7 @@ import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import slimeknights.mantle.recipe.RecipeSerializer;
@@ -188,14 +188,14 @@ public class ModifierRemovalRecipe implements ITinkerStationRecipe {
 
     @Nullable
     @Override
-    public ModifierRemovalRecipe read(ResourceLocation id, PacketBuffer buffer) {
+    public ModifierRemovalRecipe read(ResourceLocation id, FriendlyByteBuf buffer) {
       Ingredient ingredient = Ingredient.read(buffer);
       ItemStack container = buffer.readItemStack();
       return new ModifierRemovalRecipe(id, ingredient, container);
     }
 
     @Override
-    public void write(PacketBuffer buffer, ModifierRemovalRecipe recipe) {
+    public void write(FriendlyByteBuf buffer, ModifierRemovalRecipe recipe) {
       recipe.ingredient.write(buffer);
       buffer.writeItemStack(recipe.container);
     }

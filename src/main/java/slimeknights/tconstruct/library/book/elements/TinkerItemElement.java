@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.client.gui.GuiUtils;
+import net.minecraftforge.fmlclient.gui.GuiUtils;
 import slimeknights.mantle.client.render.RenderingHelper;
 import slimeknights.mantle.client.screen.book.BookScreen;
 import slimeknights.mantle.client.screen.book.element.ItemElement;
@@ -76,6 +76,6 @@ public class TinkerItemElement extends ItemElement {
   @Override
   public void drawHoveringText(PoseStack matrixStack, List<Component> textLines, int x, int y, Font font) {
     GuiUtils.drawHoveringText(matrixStack, textLines, x, y, BookScreen.PAGE_WIDTH, BookScreen.PAGE_HEIGHT, BookScreen.PAGE_WIDTH, font);
-    Lighting.turnOff();
+    //Lighting.turnOff();
   }
 }

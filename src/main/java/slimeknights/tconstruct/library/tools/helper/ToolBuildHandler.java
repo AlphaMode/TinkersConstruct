@@ -47,7 +47,7 @@ public final class ToolBuildHandler {
    * @param index  Index
    * @return  Render material
    */
-  public static MaterialId getRenderMaterial(int index) {
+  public static MaterialId getMaterial(int index) {
     return RENDER_MATERIALS.get(index % RENDER_MATERIALS.size());
   }
 

@@ -1,7 +1,8 @@
 package slimeknights.tconstruct.library.materials;
 
 import com.google.common.annotations.VisibleForTesting;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggedOutEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -9,8 +10,8 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.PacketDistributor.PacketTarget;
 import slimeknights.mantle.network.packet.ISimplePacket;
 import slimeknights.tconstruct.common.network.TinkerNetwork;
 import slimeknights.tconstruct.library.events.MaterialsLoadedEvent;
@@ -183,14 +184,14 @@ public final class MaterialRegistry {
   }
 
   /** Sends all relevant packets to the given player */
-  private void sendPackets(ServerPlayerEntity player, ISimplePacket[] packets) {
+  private void sendPackets(ServerPlayer player, ISimplePacket[] packets) {
     // on an integrated server, the material registries have a single instance on both the client and the server thread
     // this means syncing is unneeded, and has the side-effect of recreating all the material instances (which can lead to unexpected behavior)
     // as a result, integrated servers just mark fullyLoaded as true without syncing anything, side-effect is listeners may run twice on single player
 
     // on a dedicated server, the client is running a separate game instance, this is where we send packets, plus fully loaded should already be true
     // this event is not fired when connecting to a server
-    if (player.connection.getNetworkManager().isLocalChannel()) {
+    if (player.connection.getConnection().isMemoryConnection()) {
       // if the packet is being sent to ourself, skip sending, prevents recreating all material instances in the registry a second time on dedicated servers
       // note it will still send the packet if another client connects in LAN
       fullyLoaded = true;
@@ -213,12 +214,12 @@ public final class MaterialRegistry {
     };
 
     // send to single player
-    ServerPlayerEntity targetedPlayer = event.getPlayer();
+    ServerPlayer targetedPlayer = event.getPlayer();
     if (targetedPlayer != null) {
       sendPackets(targetedPlayer, packets);
     } else {
       // send to all players
-      for (ServerPlayerEntity player : event.getPlayerList().getPlayers()) {
+      for (ServerPlayer player : event.getPlayerList().getPlayers()) {
         sendPackets(player, packets);
       }
     }

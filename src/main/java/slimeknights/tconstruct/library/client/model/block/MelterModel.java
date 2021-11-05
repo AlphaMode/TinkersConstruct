@@ -2,7 +2,7 @@ package slimeknights.tconstruct.library.client.model.block;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import net.minecraft.client.resources.model.BakedModel;
+
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -46,7 +46,7 @@ public class MelterModel extends TankModel {
   }
 
   /** Baked variant to allow access to items */
-  public static final class BakedModel extends TankModel.BakedModel<MelterModel> {
+  public static final class BakedModel extends TankBakedModel<MelterModel> {
     @SuppressWarnings("WeakerAccess")
     protected BakedModel(IModelConfiguration owner, ModelState transforms, BakedModel baked, BakedModel gui, MelterModel original) {
       super(owner, transforms, baked, gui, original);

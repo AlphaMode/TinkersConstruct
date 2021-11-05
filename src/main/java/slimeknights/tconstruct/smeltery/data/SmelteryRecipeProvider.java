@@ -17,7 +17,7 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.util.ItemLike;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.Tags;
@@ -1889,7 +1889,7 @@ public class SmelteryRecipeProvider extends BaseRecipeProvider implements ISmelt
    * @param output    Recipe output
    * @param folder    Recipe folder path
    */
-  private void searedStonecutter(Consumer<IFinishedRecipe> consumer, IItemProvider output, String folder) {
+  private void searedStonecutter(Consumer<IFinishedRecipe> consumer, ItemLike output, String folder) {
     SingleItemRecipeBuilder.stonecuttingRecipe(CompoundIngredient.from(
       Ingredient.fromItems(TinkerSmeltery.searedStone),
       new IngredientWithout(Ingredient.fromTag(TinkerTags.Items.SEARED_BRICKS), Ingredient.fromItems(output))), output, 1)
@@ -1905,7 +1905,7 @@ public class SmelteryRecipeProvider extends BaseRecipeProvider implements ISmelt
    * @param cast      Cast item
    * @param location  Recipe location
    */
-  private void searedCasting(Consumer<IFinishedRecipe> consumer, IItemProvider block, Ingredient cast, String location) {
+  private void searedCasting(Consumer<IFinishedRecipe> consumer, ItemLike block, Ingredient cast, String location) {
     searedCasting(consumer, block, cast, FluidValues.SLIMEBALL * 2, location);
   }
 
@@ -1916,7 +1916,7 @@ public class SmelteryRecipeProvider extends BaseRecipeProvider implements ISmelt
    * @param cast      Cast item
    * @param location  Recipe location
    */
-  private void searedSlabCasting(Consumer<IFinishedRecipe> consumer, IItemProvider block, Ingredient cast, String location) {
+  private void searedSlabCasting(Consumer<IFinishedRecipe> consumer, ItemLike block, Ingredient cast, String location) {
     searedCasting(consumer, block, cast, FluidValues.SLIMEBALL, location);
   }
 
@@ -1928,7 +1928,7 @@ public class SmelteryRecipeProvider extends BaseRecipeProvider implements ISmelt
    * @param amount    Amount of fluid needed
    * @param location  Recipe location
    */
-  private void searedCasting(Consumer<IFinishedRecipe> consumer, IItemProvider block, Ingredient cast, int amount, String location) {
+  private void searedCasting(Consumer<IFinishedRecipe> consumer, ItemLike block, Ingredient cast, int amount, String location) {
     ItemCastingRecipeBuilder.basinRecipe(block)
                             .setFluidAndTime(TinkerFluids.moltenClay, false, amount)
                             .setCast(cast, true)
@@ -1944,7 +1944,7 @@ public class SmelteryRecipeProvider extends BaseRecipeProvider implements ISmelt
    * @param output    Recipe output
    * @param folder    Recipe folder path
    */
-  private void scorchedStonecutter(Consumer<IFinishedRecipe> consumer, IItemProvider output, String folder) {
+  private void scorchedStonecutter(Consumer<IFinishedRecipe> consumer, ItemLike output, String folder) {
     SingleItemRecipeBuilder.stonecuttingRecipe(new IngredientWithout(Ingredient.fromTag(TinkerTags.Items.SCORCHED_BLOCKS), Ingredient.fromItems(output)), output, 1)
                            .addCriterion("has_block", hasItem(TinkerTags.Items.SCORCHED_BLOCKS))
                            .build(consumer, wrap(output.asItem(), folder, "_stonecutting"));
@@ -1957,7 +1957,7 @@ public class SmelteryRecipeProvider extends BaseRecipeProvider implements ISmelt
    * @param cast      Cast item
    * @param location  Recipe location
    */
-  private void scorchedCasting(Consumer<IFinishedRecipe> consumer, IItemProvider block, Ingredient cast, String location) {
+  private void scorchedCasting(Consumer<IFinishedRecipe> consumer, ItemLike block, Ingredient cast, String location) {
     scorchedCasting(consumer, block, cast, FluidValues.SLIMEBALL * 2, location);
   }
 
@@ -1969,7 +1969,7 @@ public class SmelteryRecipeProvider extends BaseRecipeProvider implements ISmelt
    * @param amount    Amount of fluid needed
    * @param location  Recipe location
    */
-  private void scorchedCasting(Consumer<IFinishedRecipe> consumer, IItemProvider block, Ingredient cast, int amount, String location) {
+  private void scorchedCasting(Consumer<IFinishedRecipe> consumer, ItemLike block, Ingredient cast, int amount, String location) {
     ItemCastingRecipeBuilder.basinRecipe(block)
                             .setFluidAndTime(TinkerFluids.magma, true, amount)
                             .setCast(cast, true)
@@ -1990,7 +1990,7 @@ public class SmelteryRecipeProvider extends BaseRecipeProvider implements ISmelt
     String slimeFolder = folder + type.getString() + "/";
     MeltingRecipeBuilder.melting(Ingredient.fromTag(type.getSlimeballTag()), fluidSupplier.get(), FluidValues.SLIMEBALL, 1.0f)
                         .build(consumer, modResource(slimeFolder + "ball"));
-    IItemProvider item = TinkerWorld.congealedSlime.get(type);
+    ItemLike item = TinkerWorld.congealedSlime.get(type);
     MeltingRecipeBuilder.melting(Ingredient.fromItems(item), fluidSupplier.get(), FluidValues.SLIME_CONGEALED, 2.0f)
                         .build(consumer, modResource(slimeFolder + "congealed"));
     item = TinkerWorld.slime.get(type);

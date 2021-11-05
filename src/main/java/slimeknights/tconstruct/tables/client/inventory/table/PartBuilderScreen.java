@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.inventory.container.InventoryMenu;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.text.StringTextComponent;
@@ -205,7 +205,7 @@ public class PartBuilderScreen extends BaseStationScreen<PartBuilderTileEntity, 
     // if we have a part recipe, mark material red when not enough
     IPartBuilderRecipe partRecipe = this.tile.getPartRecipe();
     if (partRecipe != null && value < partRecipe.getCost()) {
-      formatted = formatted.mergeStyle(TextFormatting.DARK_RED);
+      formatted = formatted.mergeStyle(ChatFormatting.DARK_RED);
     }
     this.infoPanelScreen.setMaterialValue(formatted);
 
@@ -225,7 +225,7 @@ public class PartBuilderScreen extends BaseStationScreen<PartBuilderTileEntity, 
       List<ITextComponent> info = stat.getLocalizedInfo();
 
       if (!info.isEmpty()) {
-        stats.add(stat.getLocalizedName().mergeStyle(TextFormatting.UNDERLINE));
+        stats.add(stat.getLocalizedName().mergeStyle(ChatFormatting.UNDERLINE));
         tips.add(StringTextComponent.EMPTY);
 
         stats.addAll(info);
@@ -298,7 +298,7 @@ public class PartBuilderScreen extends BaseStationScreen<PartBuilderTileEntity, 
       int i = this.cornerY + 14;
       int j = i + 54;
       this.sliderProgress = ((float) mouseY - i - 7.5F) / ((float) (j - i) - 15.0F);
-      this.sliderProgress = MathHelper.clamp(this.sliderProgress, 0.0F, 1.0F);
+      this.sliderProgress = Mth.clamp(this.sliderProgress, 0.0F, 1.0F);
       this.recipeIndexOffset = (int) ((this.sliderProgress * this.getHiddenRows()) + 0.5D) * 4;
       return true;
     } else {
@@ -317,7 +317,7 @@ public class PartBuilderScreen extends BaseStationScreen<PartBuilderTileEntity, 
 
     if (this.canScroll()) {
       int i = this.getHiddenRows();
-      this.sliderProgress = MathHelper.clamp((float) (this.sliderProgress - delta / i), 0.0F, 1.0F);
+      this.sliderProgress = Mth.clamp((float) (this.sliderProgress - delta / i), 0.0F, 1.0F);
       this.recipeIndexOffset = (int) ((this.sliderProgress * (float) i) + 0.5f) * 4;
       return true;
     }

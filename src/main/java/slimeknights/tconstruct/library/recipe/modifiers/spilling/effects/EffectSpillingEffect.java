@@ -4,10 +4,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -51,13 +51,13 @@ public class EffectSpillingEffect implements ISpillingEffect {
         throw new JsonSyntaxException("Unknown effect " + id);
       }
       Effect effect = Objects.requireNonNull(ForgeRegistries.POTIONS.getValue(id));
-      int time = JSONUtils.getInt(json, "time");
-      int level = JSONUtils.getInt(json, "level", 1);
+      int time = GsonHelper.getInt(json, "time");
+      int level = GsonHelper.getInt(json, "level", 1);
       return new EffectSpillingEffect(effect, time, level);
     }
 
     @Override
-    public EffectSpillingEffect read(PacketBuffer buffer) {
+    public EffectSpillingEffect read(FriendlyByteBuf buffer) {
       Effect effect = buffer.readRegistryIdUnsafe(ForgeRegistries.POTIONS);
       int level = buffer.readVarInt();
       int time = buffer.readVarInt();
@@ -72,7 +72,7 @@ public class EffectSpillingEffect implements ISpillingEffect {
     }
 
     @Override
-    public void write(EffectSpillingEffect effect, PacketBuffer buffer) {
+    public void write(EffectSpillingEffect effect, FriendlyByteBuf buffer) {
       buffer.writeRegistryIdUnsafe(ForgeRegistries.POTIONS, effect.effect);
       buffer.writeVarInt(effect.time);
       buffer.writeVarInt(effect.level);

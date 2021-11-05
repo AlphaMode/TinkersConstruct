@@ -3,9 +3,10 @@ package slimeknights.tconstruct.library.book.content;
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import slimeknights.mantle.client.book.data.BookData;
@@ -97,7 +98,7 @@ public class ContentModifier extends TinkerPage {
     list.add(new TextElement(5, 16, BookScreen.PAGE_WIDTH - 10, h, text));
 
     if (this.effects.length > 0) {
-      TextData head = new TextData(I18n.format(KEY_EFFECTS));
+      TextData head = new TextData(I18n.get(KEY_EFFECTS));
       head.underlined = true;
 
       list.add(new TextElement(5, 16 + h, BookScreen.PAGE_WIDTH / 2 - 5, BookScreen.PAGE_HEIGHT - h - 20, head));

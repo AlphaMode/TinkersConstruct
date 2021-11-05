@@ -1,13 +1,13 @@
 package slimeknights.tconstruct.library.tools.helper;
 
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Hand;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.tools.nbt.IModifierToolStack;
 import slimeknights.tconstruct.library.tools.nbt.ToolStack;
@@ -141,9 +141,9 @@ public class ToolDamageUtil {
    * @param entity  Entity for animation
    * @param slot    Slot containing the stack
    */
-  public static boolean damageAnimated(IModifierToolStack tool, int amount, LivingEntity entity, EquipmentSlotType slot) {
-    if (damage(tool, amount, entity, entity.getItemStackFromSlot(slot))) {
-      entity.sendBreakAnimation(slot);
+  public static boolean damageAnimated(IModifierToolStack tool, int amount, LivingEntity entity, EquipmentSlot slot) {
+    if (damage(tool, amount, entity, entity.getItemBySlot(slot))) {
+      entity.broadcastBreakEvent(slot);
       return true;
     }
     return false;
@@ -157,9 +157,9 @@ public class ToolDamageUtil {
    * @param hand    Hand containing the stack
    * @return true if the tool broke when damaging
    */
-  public static boolean damageAnimated(IModifierToolStack tool, int amount, LivingEntity entity, Hand hand) {
-    if (damage(tool, amount, entity, entity.getHeldItem(hand))) {
-      entity.sendBreakAnimation(hand);
+  public static boolean damageAnimated(IModifierToolStack tool, int amount, LivingEntity entity, InteractionHand hand) {
+    if (damage(tool, amount, entity, entity.getItemInHand(hand))) {
+      entity.broadcastBreakEvent(hand);
       return true;
     }
     return false;
@@ -172,7 +172,7 @@ public class ToolDamageUtil {
    * @param entity  Entity for animation
    */
   public static boolean damageAnimated(IModifierToolStack tool, int amount, LivingEntity entity) {
-    return damageAnimated(tool, amount, entity, Hand.MAIN_HAND);
+    return damageAnimated(tool, amount, entity, InteractionHand.MAIN_HAND);
   }
 
   /**

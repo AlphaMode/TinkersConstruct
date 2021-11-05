@@ -78,7 +78,7 @@ public class ModifierRecipeLookup {
     LISTENER.checkClear();
     // this should work on both client and server
     // server just pulls from the tag, client does not use tags directly at this stage
-    for (ItemStack stack : ingredient.getMatchingStacks()) {
+    for (ItemStack stack : ingredient.getItems()) {
       MODIFIERS.add(stack.getItem());
     }
   }

@@ -14,7 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.potion.Effects;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.util.ItemLike;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.fluids.FluidAttributes;
 import slimeknights.mantle.recipe.EntityIngredient;
@@ -102,7 +102,7 @@ public class ModifierRecipeProvider extends BaseRecipeProvider {
 
     // slime crystals
     TinkerModifiers.slimeCrystal.forEach((type, crystal) -> {
-      IItemProvider slimeball = TinkerCommons.slimeball.get(type);
+      ItemLike slimeball = TinkerCommons.slimeball.get(type);
       CookingRecipeBuilder.blastingRecipe(Ingredient.fromItems(slimeball), crystal, 1.0f, 400)
                           .addCriterion("has_item", hasItem(slimeball))
                           .build(consumer, folder + "slime_crystal/" + type.getString());
